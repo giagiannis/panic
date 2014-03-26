@@ -1,6 +1,7 @@
 package gr.ntua.ece.cslab.panic.server;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import gr.ntua.ece.cslab.panic.server.shared.SystemLogger;
 import java.io.InputStream;
 import java.util.Properties;
 import org.eclipse.jetty.server.Server;
@@ -29,6 +30,13 @@ class RunServer {
             ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
             context.addServlet(holder, "/*");
             server.start();
+            
+            SystemLogger.configureLogger();
+            
+            SystemLogger.get().info("Server started");
             server.join();
+            SystemLogger.get().info("Server joined");
+
+            
         }
 }
