@@ -21,7 +21,9 @@ import gr.ntua.ece.cslab.panic.server.containers.beans.ApplicationInfoBean;
 import gr.ntua.ece.cslab.panic.server.containers.beans.ProfilingBean;
 import gr.ntua.ece.cslab.panic.server.shared.ApplicationList;
 import gr.ntua.ece.cslab.panic.server.shared.SystemLogger;
+import java.util.HashMap;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -37,10 +39,19 @@ import javax.ws.rs.core.Response;
 @Path("/application/")
 public class ApplicationREST {
 
+    // returns a list of the application alongside with their ids and names
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public HashMap<String,String> listApplications() {
+        SystemLogger.get().info("listing available applications");
+        return ApplicationList.getShortList();
+    }
     
     // submit new application description - NOT deployment
+    // the method returns the same JSON as the input, but the id attribute
+    // is filled with the id
     @POST
-    @Path("/new/")
+    @Path("new-application/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public ApplicationInfoBean putApplication(ApplicationInfoBean appInfo) {
@@ -53,8 +64,9 @@ public class ApplicationREST {
         return appInfo;
     }
     
+    // submit profiling details for a specific application
     @POST
-    @Path("/{id}/profiling-details/")
+    @Path("{id}/add-profiling-details/")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response setProfilingInfo(@PathParam("id") String appId, ProfilingBean profilingDetails) {
         Application app = ApplicationList.get(appId);

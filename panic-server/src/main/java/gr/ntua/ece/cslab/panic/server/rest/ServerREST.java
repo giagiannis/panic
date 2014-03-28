@@ -16,13 +16,16 @@
 
 package gr.ntua.ece.cslab.panic.server.rest;
 
-import gr.ntua.ece.cslab.panic.server.shared.SystemLogger;
-import javax.ws.rs.Consumes;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 //import org.json.JSONObject;
 
 /**
@@ -32,12 +35,20 @@ import javax.ws.rs.core.MediaType;
 @Path("/server/")
 public class ServerREST {
     
-//    @GET
-//    @Produces(MediaType.APPLICATION_XML)
-//    public JSONObject getServerInfo() {
-//        SystemLogger.get().info("request");
-//        return new JSONObject();
-//    }
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    public Response getServerInfo() {
+        Enumeration<URL> enumeration;
+        try {
+            enumeration = ServerREST.class.getClassLoader().getResources("");
+            while(enumeration.hasMoreElements())
+                System.out.println(enumeration.nextElement());
+            System.out.println(System.getProperty("java.class.path"));
+        } catch (IOException ex) {
+            Logger.getLogger(ServerREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return Response.status(Response.Status.OK).build();
+    }
     
 //    @POST
 //    @Path("/post/")

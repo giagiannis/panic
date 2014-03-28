@@ -19,6 +19,8 @@ package gr.ntua.ece.cslab.panic.server.shared;
 import gr.ntua.ece.cslab.panic.server.containers.Application;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,6 +57,18 @@ public class ApplicationList {
      */
     public static Application get(String id) {
         return map.get(id);
+    }
+    
+    /**
+     * Returns a hash map consisting of the application keys and names.
+     * @return 
+     */
+    public static HashMap<String, String> getShortList() {
+        HashMap<String,String> hashMap = new HashMap<>();
+        for(Map.Entry<String,Application> e : map.entrySet()) {
+            hashMap.put(e.getKey(), e.getValue().getAppInfo().getName());
+        }
+        return hashMap;
     }
     
     synchronized private static String getUniqueId() {

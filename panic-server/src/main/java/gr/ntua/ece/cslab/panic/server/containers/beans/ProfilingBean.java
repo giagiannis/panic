@@ -17,6 +17,7 @@
 package gr.ntua.ece.cslab.panic.server.containers.beans;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -29,6 +30,7 @@ public class ProfilingBean implements Serializable{
     private double desiredAccuracy;
     private List<String> models;
     private String sampler;
+    private HashMap<String, List<Integer>> inputSpaceValues;
 
     public ProfilingBean() {
     
@@ -64,6 +66,14 @@ public class ProfilingBean implements Serializable{
 
     public void setSampler(String sampler) {
         this.sampler = sampler;
+    }
+
+    public HashMap<String, List<Integer>> getInputSpaceValues() {
+        return inputSpaceValues;
+    }
+
+    public void setInputSpaceValues(HashMap<String, List<Integer>> inputSpaceValues) {
+        this.inputSpaceValues = inputSpaceValues;
     }
     
 }
