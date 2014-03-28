@@ -17,42 +17,34 @@
 package gr.ntua.ece.cslab.panic.server.rest;
 
 import gr.ntua.ece.cslab.panic.server.shared.SystemLogger;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+//import org.json.JSONObject;
 
 /**
- * Implements the application related API calls.
+ * ServerREST class exports services related to the ServerREST status.
  * @author Giannis Giannakopoulos
  */
-
-@Path("/application/")
-public class Application {
+@Path("/server/")
+public class ServerREST {
     
-    /**
-     * Returns a JSON containing all the 
-     * @return 
-     */
-    @GET
-//    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getApplications() {
-        SystemLogger.get().info("request");
-        return "Hello dummy!";
-    }
+//    @GET
+//    @Produces(MediaType.APPLICATION_XML)
+//    public JSONObject getServerInfo() {
+//        SystemLogger.get().info("request");
+//        return new JSONObject();
+//    }
     
-    /**
-     * Returns a JSON containing all the 
-     * @param id
-     * @return 
-     */
-    @GET
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getApplication(@PathParam("id") String id) {
-        SystemLogger.get().info("request "+id);
-        return "Hello dummy!";
-    }
+//    @POST
+//    @Path("/post/")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public JSONObject postServerInfo(String jsonString){
+//        System.out.println(jsonString);
+//        return new JSONObject();
+//    }
 }
