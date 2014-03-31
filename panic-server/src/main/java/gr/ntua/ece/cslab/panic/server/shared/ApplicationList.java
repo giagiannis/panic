@@ -59,6 +59,9 @@ public class ApplicationList {
         return map.get(id);
     }
     
+    public static Application remove(String id) {
+        return map.remove(id);
+    }
     /**
      * Returns a hash map consisting of the application keys and names.
      * @return 
