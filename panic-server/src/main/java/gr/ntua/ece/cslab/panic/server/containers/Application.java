@@ -16,8 +16,8 @@
 
 package gr.ntua.ece.cslab.panic.server.containers;
 
-import gr.ntua.ece.cslab.panic.server.containers.beans.ApplicationInfoBean;
-import gr.ntua.ece.cslab.panic.server.containers.beans.ProfilingBean;
+import gr.ntua.ece.cslab.panic.server.containers.beans.ApplicationInfo;
+import gr.ntua.ece.cslab.panic.server.containers.beans.ProfilingInfo;
 
 /**
  *
@@ -26,26 +26,26 @@ import gr.ntua.ece.cslab.panic.server.containers.beans.ProfilingBean;
  */
 public class Application {
     
-    private ApplicationInfoBean appInfo;
-    private ProfilingBean profilingDetails;
+    private ApplicationInfo appInfo;
+    private ProfilingInfo profilingDetails;
 
     public Application() {
     
     }
 
-    public ApplicationInfoBean getAppInfo() {
+    public ApplicationInfo getAppInfo() {
         return appInfo;
     }
 
-    public void setAppInfo(ApplicationInfoBean appInfo) {
+    public void setAppInfo(ApplicationInfo appInfo) {
         this.appInfo = appInfo;
     }
 
-    public ProfilingBean getProfilingDetails() {
+    public ProfilingInfo getProfilingDetails() {
         return profilingDetails;
     }
 
-    public void setProfilingDetails(ProfilingBean profilingDetails) {
+    public void setProfilingDetails(ProfilingInfo profilingDetails) {
         this.profilingDetails = profilingDetails;
     }
     
