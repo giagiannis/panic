@@ -17,8 +17,8 @@
 package gr.ntua.ece.cslab.panic.server.rest;
 
 import gr.ntua.ece.cslab.panic.server.containers.Application;
-import gr.ntua.ece.cslab.panic.server.containers.beans.ApplicationInfoBean;
-import gr.ntua.ece.cslab.panic.server.containers.beans.ProfilingBean;
+import gr.ntua.ece.cslab.panic.server.containers.beans.ApplicationInfo;
+import gr.ntua.ece.cslab.panic.server.containers.beans.ProfilingInfo;
 import gr.ntua.ece.cslab.panic.server.shared.ApplicationList;
 import gr.ntua.ece.cslab.panic.server.shared.SystemLogger;
 import java.util.HashMap;
@@ -53,7 +53,7 @@ public class ApplicationREST {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public HashMap<String,String> newApplication(ApplicationInfoBean application) {
+    public HashMap<String,String> newApplication(ApplicationInfo application) {
         Application app = new Application();
         app.setAppInfo(application);
         String id = ApplicationList.add(app);
@@ -93,7 +93,7 @@ public class ApplicationREST {
     @PUT
     @Path("{id}/profiling/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response profilingInfo(ProfilingBean profilingInfo, @PathParam("id") String id) {
+    public Response profilingInfo(ProfilingInfo profilingInfo, @PathParam("id") String id) {
         Application app = ApplicationList.get(id);
         if(app==null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -105,7 +105,7 @@ public class ApplicationREST {
     
     // returns profiling details for the specified application
     @GET
-    @Path("{id}/profiling")
+    @Path("{id}/profiling/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProfilingInfo(@PathParam("id") String id) {
         Application app = ApplicationList.get(id);
