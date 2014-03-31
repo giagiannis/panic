@@ -23,8 +23,10 @@ import gr.ntua.ece.cslab.panic.server.shared.ApplicationList;
 import gr.ntua.ece.cslab.panic.server.shared.SystemLogger;
 import java.util.HashMap;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -39,7 +41,7 @@ import javax.ws.rs.core.Response;
 @Path("/application/")
 public class ApplicationREST {
 
-    // returns a list of the application alongside with their ids and names
+    // returns a list of the submitted applications
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public HashMap<String,String> listApplications() {
@@ -47,33 +49,72 @@ public class ApplicationREST {
         return ApplicationList.getShortList();
     }
     
-    // submit new application description - NOT deployment
-    // the method returns the same JSON as the input, but the id attribute
-    // is filled with the id
+    // creates a new application
     @POST
-    @Path("new-application/")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationInfoBean putApplication(ApplicationInfoBean appInfo) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public HashMap<String,String> newApplication(ApplicationInfoBean application) {
         Application app = new Application();
-        app.setAppInfo(appInfo);
+        app.setAppInfo(application);
         String id = ApplicationList.add(app);
         ApplicationList.get(id).getAppInfo().setId(id);
-        appInfo.setId(id);
-        SystemLogger.get().info("new application with Id "+ appInfo.getId());
-        return appInfo;
+        SystemLogger.get().info("new application created with id "+id);
+        HashMap<String,String>  map = new HashMap<>();
+        map.put("id", id);
+        return map;
     }
     
-    // submit profiling details for a specific application
-    @POST
-    @Path("{id}/add-profiling-details/")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response setProfilingInfo(@PathParam("id") String appId, ProfilingBean profilingDetails) {
-        Application app = ApplicationList.get(appId);
+    // return "static" application info
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("{id}/")
+    public Response getApplication(@PathParam("id") String id) {
+        Application app = ApplicationList.get(id);
         if(app == null)
-            return Response.status(Response.Status.NOT_ACCEPTABLE).build();
-        app.setProfilingDetails(profilingDetails);
-        SystemLogger.get().info("profiling details added for app with Id "+appId);
-        return Response.status(Response.Status.OK).build();
+            return Response.status(Response.Status.NOT_FOUND).build();
+        else
+            return Response.ok(app.getAppInfo()).build();
     }
+    
+    // used to delete an application
+    @DELETE
+    @Path("{id}/")
+    public Response deleteApplication(@PathParam("id") String id) {
+        SystemLogger.get().info("delete application with id "+id);
+        if(ApplicationList.get(id)==null)
+            return Response.status(Response.Status.NOT_FOUND).build();
+        else {
+            ApplicationList.remove(id);
+            return Response.status(Response.Status.OK).build();
+        }
+    }
+
+    // provide profiling details 
+    @PUT
+    @Path("{id}/profiling/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response profilingInfo(ProfilingBean profilingInfo, @PathParam("id") String id) {
+        Application app = ApplicationList.get(id);
+        if(app==null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            app.setProfilingDetails(profilingInfo);
+            return Response.status(Response.Status.OK).build();
+        }
+    }
+    
+    // returns profiling details for the specified application
+    @GET
+    @Path("{id}/profiling")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProfilingInfo(@PathParam("id") String id) {
+        Application app = ApplicationList.get(id);
+        if(app == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(app.getProfilingDetails()).build();
+        }
+    }
+
+    
 }
