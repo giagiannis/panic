@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  *
  * @author Giannis Giannakopoulos
  */
-public class ApplicationInfoBean implements Serializable {
+public class ApplicationInfo implements Serializable {
     
     private String id;
     private String name;
@@ -36,7 +36,7 @@ public class ApplicationInfoBean implements Serializable {
     private long endTimestamp;
     
 
-    public ApplicationInfoBean() {
+    public ApplicationInfo() {
         this.beginTimestamp = -1;
         this.endTimestamp = -1;
         this.status = "NOT_STARTED";
@@ -89,7 +89,7 @@ public class ApplicationInfoBean implements Serializable {
         try {
             return genson.serialize(this);
         } catch (TransformationException | IOException ex) {
-            Logger.getLogger(ApplicationInfoBean.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ApplicationInfo.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

@@ -24,7 +24,7 @@ import java.util.List;
  * This class contains profiling specific details and is used 
  * @author Giannis Giannakopoulos
  */
-public class ProfilingBean implements Serializable{
+public class ProfilingInfo implements Serializable{
     
     private int maxDeployments;
     private double desiredAccuracy;
@@ -32,7 +32,7 @@ public class ProfilingBean implements Serializable{
     private String sampler;
     private HashMap<String, List<Integer>> inputSpaceValues;
 
-    public ProfilingBean() {
+    public ProfilingInfo() {
     
     }
     
