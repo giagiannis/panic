@@ -29,11 +29,11 @@ import org.junit.Test;
  *
  * @author Giannis Giannakopoulos
  */
-public class InputPointTest {
+public class MultiPointTest {
     
     private final Random rand;
     
-    public InputPointTest() {
+    public MultiPointTest() {
         this.rand = new Random();
     }
 
@@ -46,9 +46,9 @@ public class InputPointTest {
             map.put(key+i, rand.nextDouble());
         }
         
-        InputPoint pointA = new InputPoint();
+        MultiPoint pointA = new MultiPoint();
         pointA.setValues(map);
-        InputPoint pointB = new InputPoint();
+        MultiPoint pointB = new MultiPoint();
         pointB.setValues(map);
         Assert.assertEquals(pointA, pointB);               
     }
@@ -62,12 +62,12 @@ public class InputPointTest {
             map.put(key+i, rand.nextDouble());
         }
         
-        InputPoint pointA = new InputPoint();
+        MultiPoint pointA = new MultiPoint();
         pointA.setValues(map);
         
         Genson genson = new Genson();
         String json = genson.serialize(pointA);
-        InputPoint pointB = genson.deserialize(json, InputPoint.class);
+        MultiPoint pointB = genson.deserialize(json, MultiPoint.class);
         Assert.assertEquals(pointA, pointB);
     }
     

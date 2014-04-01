@@ -27,20 +27,18 @@ import java.util.Collection;
 import java.util.HashMap;
 
 /**
- * Represents an input space point. 
+ * Represents a multidimensional point. The dimensions are indexed using a key
+ * (String) and each dimension is mapped to an applicable value (double).
  * @author Giannis Giannakopoulos
  */
-public class InputPoint implements Serializable{
+public class MultiPoint implements Serializable{
     
     @JsonIgnore
-    private String doubleFormat;
+    private static final String doubleFormat = "0.0000000000";
     private HashMap<String, Double> values;
 
-    public InputPoint() {
+    public MultiPoint() {
         this.values = new HashMap<>();
-        doubleFormat = "0.";
-        for(int i=0;i<10;i++)
-            doubleFormat+="0";
     }
    
     public HashMap<String, Double> getValues() {
@@ -77,9 +75,9 @@ public class InputPoint implements Serializable{
     @Override
     public boolean equals(Object o) {
         boolean result = super.equals(o);
-        InputPoint other;
-        if(o instanceof InputPoint) 
-            other = (InputPoint) o;
+        MultiPoint other;
+        if(o instanceof MultiPoint) 
+            other = (MultiPoint) o;
         else
             return result;
         
@@ -110,7 +108,7 @@ public class InputPoint implements Serializable{
     }
     
     private Double chopDouble(Double initial) {
-        return new Double(new DecimalFormat(this.doubleFormat).format(initial));
+        return new Double(new DecimalFormat(doubleFormat).format(initial));
         
     }
 }
