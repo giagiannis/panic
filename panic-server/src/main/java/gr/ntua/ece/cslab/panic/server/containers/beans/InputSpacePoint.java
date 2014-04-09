@@ -22,5 +22,19 @@ package gr.ntua.ece.cslab.panic.server.containers.beans;
  * @see MultiPoint
  */
 public class InputSpacePoint extends MultiPoint {
-    
+
+    @Override
+    public String toString() {
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append("[");
+        for(String key: this.getKeysAsCollection()){
+            strBuild.append(this.getValue(key));
+            strBuild.append(" {");
+            strBuild.append(key);
+            strBuild.append("}, ");
+        }
+        strBuild.delete(strBuild.length()-2,strBuild.length());
+        strBuild.append("]");
+        return strBuild.toString();
+    }
 }
