@@ -17,14 +17,14 @@
 package gr.ntua.ece.cslab.panic.server.samplers;
 
 import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Describes the API with which the objects will contact with the Samplers.
  * @author Giannis Giannakopoulos
  */
-public interface DomainSampler {
+public interface Sampler {
     
     /**
      * This method is used to return the next point of the sampling space
@@ -36,5 +36,5 @@ public interface DomainSampler {
      * Informs the sampler about the applicable values per dimension.
      * @param ranges 
      */
-    public void setDimensionsWithRanges(Map<String, List<Double>> ranges);
+    public void setDimensionsWithRanges(Map<String, Set<Double>> ranges);
 }

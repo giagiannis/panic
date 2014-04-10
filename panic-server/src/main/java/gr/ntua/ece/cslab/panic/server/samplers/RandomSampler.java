@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 giannis.
+ * Copyright 2014 Giannis Giannakopoulos.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package gr.ntua.ece.cslab.panic.server.samplers;
 import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -28,11 +27,11 @@ import java.util.Set;
  *
  * @author giannis
  */
-public class RandomSampler implements DomainSampler {
+public class RandomSampler implements Sampler {
 
     private Set<InputSpacePoint> selected;
     private Random rand;
-    private Map<String, List<Double>> ranges;
+    private Map<String, Set<Double>> ranges;
     public RandomSampler() {
         this.selected = new HashSet<>();
         this.rand = new Random();
@@ -45,7 +44,7 @@ public class RandomSampler implements DomainSampler {
     }
 
     @Override
-    public void setDimensionsWithRanges(Map<String, List<Double>> ranges) {
+    public void setDimensionsWithRanges(Map<String, Set<Double>> ranges) {
         this.ranges = ranges;
     }
     
