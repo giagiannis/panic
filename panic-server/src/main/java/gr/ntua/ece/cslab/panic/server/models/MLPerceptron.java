@@ -16,85 +16,46 @@
 
 package gr.ntua.ece.cslab.panic.server.models;
 
-import java.io.IOException;
+import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.server.containers.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.server.models.utils.CsvLoader;
+import java.util.Collections;
+import java.util.List;
 import weka.classifiers.functions.MultilayerPerceptron;
-import weka.core.Instance;
 
 /**
  *
+ * Multi layer perceptron, as implement by WEKA.
  * @author Giannis Giannakopoulos
  */
-public class MLPerceptron extends AbsractModel {
-
-    private MultilayerPerceptron classifier;
+public class MLPerceptron extends AbsractWekaModel {
     
     public MLPerceptron() {
+        super();
+        classifier = new MultilayerPerceptron();
+    }
+    
+    @Override
+    public void configureClassifier() {
+        //no configuration for now
+    }
+    
+    public static void main(String[] args) throws Exception {
+        MLPerceptron classifier = new MLPerceptron();
+        CsvLoader loader = new CsvLoader();
+        loader.setFilename(args[0]);
+        loader.setNumberOfInputDimensions(1);
+        loader.setOutputDimensionIndex(1);
         
-    }
-    
-    public void train() throws Exception {
-        this.classifier = new MultilayerPerceptron();
-        this.classifier.buildClassifier(this.instancesForTraining);
-    }
-    
-    
-    // single dimensional stuff
-        // the following methods only work for a single dimension input space
-    public double getAppxValue(int x) throws Exception {
-        Instance instance = new Instance(2);
-        instance.setValue(0, x);
-        instance.setMissing(1);
-        return classifier.classifyInstance(instance);
-    }
-    
-    public double getActualValue(int x) throws Exception {
-        return this.instances.instance(x).value(1);
-    }
-    
-    public double[] getKeys() {
-        double[] keys = new double[this.instances.numInstances()];
-        for(int i=0;i<keys.length;i++){
-            keys[i] = this.instances.instance(i).value(0);
+        List<OutputSpacePoint> data = loader.getOutputSpacePoints();
+        Collections.shuffle(data);
+        List<OutputSpacePoint> train = data.subList(0, 10);
+        for(OutputSpacePoint po : train) {
+            classifier.feed(po, true);
+            for(InputSpacePoint p: loader.getInputSpacePoints())
+                System.out.println(classifier.getPoint(p));
         }
-        return keys;
-    }
-    
-    public double[] getRealValues() {
-        double[] realValues = new double[this.instances.numInstances()];
-        for(int i=0;i<realValues.length;i++){
-            realValues[i] = this.instances.instance(i).value(1);
-        }
-        return realValues;
-    }
-    
-    public double[] getAppxValues() throws Exception {
-        double[] keys = this.getKeys();
-        double[] values = new double[keys.length];
-        for(int i=0;i<keys.length;i++){
-            Instance inst = new Instance(this.instances.instance(0).numAttributes());
-            inst.setValue(0, keys[i]);
-            values[i] = this.classifier.classifyInstance(inst);
-        }
-        return values;
-    }
-    
-    public static void main(String[] args) throws IOException, Exception {
-        if(args.length<2){
-            System.err.println("2 arguments needed: <input file> <sampling ratio>");
-            System.exit(1);
-        }
-        String filename = args[0];
-        
-        Double sampling = new Double(args[1]);
-        MLPerceptron my = new MLPerceptron();
-        my.setInputFile(filename);
-        my.sampleDataSet(sampling);
-        my.train();
-        double[] keys = my.getKeys(), actual = my.getRealValues(), appx = my.getAppxValues();
-        for(int i=0;i<=100;i++) {
-            System.out.format("%.0f\t%.2f\t%.2f\n", keys[i], actual[i], appx[i]);
-        }
+//        classifier.train();
 
-        
     }
 }
