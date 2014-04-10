@@ -26,15 +26,15 @@ public class InputSpacePoint extends MultiPoint {
     @Override
     public String toString() {
         StringBuilder strBuild = new StringBuilder();
-        strBuild.append("[");
+        strBuild.append("(");
         for(String key: this.getKeysAsCollection()){
             strBuild.append(this.getValue(key));
-            strBuild.append(" {");
-            strBuild.append(key);
-            strBuild.append("}, ");
+//            strBuild.append(" {");
+//            strBuild.append(key);
+//            strBuild.append("}, ");
         }
         strBuild.delete(strBuild.length()-2,strBuild.length());
-        strBuild.append("]");
+        strBuild.append(")");
         return strBuild.toString();
     }
 }

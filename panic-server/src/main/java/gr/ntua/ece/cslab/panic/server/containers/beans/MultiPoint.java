@@ -71,6 +71,11 @@ public class MultiPoint implements Serializable{
     public Collection<String> getKeysAsCollection() {
         return this.values.keySet();
     }
+    
+    @JsonIgnore
+    public int numberDimensions(){
+        return this.values.size();
+    }
 
     @Override
     public boolean equals(Object o) {

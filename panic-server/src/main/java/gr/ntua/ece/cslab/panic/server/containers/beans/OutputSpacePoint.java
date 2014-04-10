@@ -16,15 +16,41 @@
 
 package gr.ntua.ece.cslab.panic.server.containers.beans;
 
+import com.owlike.genson.annotation.JsonIgnore;
 import com.owlike.genson.annotation.JsonProperty;
 
 /**
  *
  * @author Giannis Giannakopoulos
  */
-public class OutputSpacePoint extends MultiPoint {
+public class OutputSpacePoint  {
     
     private InputSpacePoint inputSpacePoint;
+    private double value;
+    private String key;
+
+    
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+    
+    @JsonIgnore
+    public void setValue(String key, Double value) {
+        this.setKey(key);
+        this.setValue(value);
+    }
 
     @JsonProperty(value="input")
     public InputSpacePoint getInputSpacePoint() {
@@ -35,5 +61,12 @@ public class OutputSpacePoint extends MultiPoint {
     public void setInputSpacePoint(InputSpacePoint inputSpacePoint) {
         this.inputSpacePoint = inputSpacePoint;
     }
+
+    @Override
+    public String toString() {
+        return this.inputSpacePoint.toString()+" -> ("+ this.value+")";
+    }
+    
+    
     
 }
