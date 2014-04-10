@@ -18,7 +18,7 @@ package gr.ntua.ece.cslab.panic.server.models;
 
 import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.server.containers.beans.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.server.models.utils.CsvLoader;
+import gr.ntua.ece.cslab.panic.server.utils.CSVFileManager;
 import java.util.Collections;
 import java.util.List;
 import weka.classifiers.functions.MultilayerPerceptron;
@@ -42,7 +42,7 @@ public class MLPerceptron extends AbsractWekaModel {
     
     public static void main(String[] args) throws Exception {
         MLPerceptron classifier = new MLPerceptron();
-        CsvLoader loader = new CsvLoader();
+        CSVFileManager loader = new CSVFileManager();
         loader.setFilename(args[0]);
         loader.setNumberOfInputDimensions(1);
         loader.setOutputDimensionIndex(1);
