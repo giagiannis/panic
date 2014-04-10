@@ -37,4 +37,14 @@ public class InputSpacePoint extends MultiPoint {
         strBuild.append(")");
         return strBuild.toString();
     }
+    
+    public String toStringCSVFormat(){
+        StringBuilder strBuild = new StringBuilder();
+        for(String key: this.getKeysAsCollection()){
+            strBuild.append(this.getValue(key));
+            strBuild.append("\t");
+        }
+        strBuild.delete(strBuild.length()-1,strBuild.length());
+        return strBuild.toString();
+    }
 }
