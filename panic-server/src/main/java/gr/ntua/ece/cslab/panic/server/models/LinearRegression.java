@@ -16,21 +16,25 @@
 
 package gr.ntua.ece.cslab.panic.server.models;
 
-import weka.classifiers.functions.MultilayerPerceptron;
+import weka.classifiers.functions.SimpleLinearRegression;
 
 /**
- * Multi layer perceptron, as implement by WEKA.
+ *
  * @author Giannis Giannakopoulos
  */
-public class MLPerceptron extends AbsractWekaModel {
-    
-    public MLPerceptron() {
-        super();
-        classifier = new MultilayerPerceptron();
+public class LinearRegression extends AbsractWekaModel {
+
+    public LinearRegression() {
+        this.classifier = new SimpleLinearRegression();
     }
-    
+
     @Override
     public void configureClassifier() {
-        //no configuration for now
+        // nothing for now
     }
+    
+    
+    
+    
+    
 }

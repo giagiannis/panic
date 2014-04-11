@@ -16,21 +16,33 @@
 
 package gr.ntua.ece.cslab.panic.server.models;
 
-import weka.classifiers.functions.MultilayerPerceptron;
+
+import weka.classifiers.functions.LeastMedSq;
 
 /**
- * Multi layer perceptron, as implement by WEKA.
+ *
  * @author Giannis Giannakopoulos
  */
-public class MLPerceptron extends AbsractWekaModel {
-    
-    public MLPerceptron() {
+public class LeastSquares extends AbsractWekaModel {
+
+    public LeastSquares() {
         super();
-        classifier = new MultilayerPerceptron();
+        this.classifier = new LeastMedSq();
     }
-    
+
     @Override
     public void configureClassifier() {
-        //no configuration for now
+     
     }
+    
+
+    @Override
+    public void train() throws Exception {
+        LeastMedSq castedClassifier = (LeastMedSq) this.classifier;
+        castedClassifier.setSampleSize(this.pointsSampled.size());
+        super.train();
+    }
+    
+    
+    
 }

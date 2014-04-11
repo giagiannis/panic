@@ -33,6 +33,4 @@ public class IsoRegression extends AbsractWekaModel{
     public void configureClassifier() {
         // no configuration for now
     }
-    
-    
 }
