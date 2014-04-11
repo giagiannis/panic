@@ -17,6 +17,8 @@ package gr.ntua.ece.cslab.panic.server.utils;
 
 import gr.ntua.ece.cslab.panic.server.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.server.models.IsoRegression;
+import gr.ntua.ece.cslab.panic.server.models.LeastSquares;
+import gr.ntua.ece.cslab.panic.server.models.LinearRegression;
 import gr.ntua.ece.cslab.panic.server.models.MLPerceptron;
 import gr.ntua.ece.cslab.panic.server.models.Model;
 import java.io.PrintStream;
@@ -36,7 +38,7 @@ import org.apache.commons.cli.Options;
 public class CompareModelsBenchmark {
 
     private static Options options;
-    private static Class[] defaultModels = {MLPerceptron.class, IsoRegression.class};
+    private static Class[] defaultModels = {MLPerceptron.class, IsoRegression.class, LeastSquares.class, LinearRegression.class};
 
     public static void cliOptionsSetup(String[] args) {
         options = new Options();
@@ -121,6 +123,9 @@ public class CompareModelsBenchmark {
             models[i++] = (Model) c.getConstructor().newInstance();
         }
         
+        for(Model m : models) {
+            m.configureClassifier();
+        }
         
         // sampler initialization
         //  TODO
@@ -141,9 +146,12 @@ public class CompareModelsBenchmark {
             OutputSpacePoint point = actualPoints.remove(0);
             System.out.format("%d round (%s)\n", i+1, point.toString());
             for(Model m : models) {
-                m.feed(point);
+                m.feed(point, false);
             }
         }
+        
+        for(Model m : models)
+            m.train();
         
         // print a nice header for the csv file...
         for(String k : actualPoints.get(0).getInputSpacePoint().getKeysAsCollection()) {
