@@ -1,0 +1,27 @@
+#!/usr/bin/gnuplot
+# this file takes one file and a number of columns as input
+# and outputs a single graph containing the lines columns
+# the X dimension is the 1st column of the file
+# the following COLS_PRINT columns are then printed
+
+
+# environment variables section
+INPUT_FILE = system("echo $INPUT_FILE")
+COLS_PRINT = system("echo $COLS_PRINT")
+
+if(INPUT_FILE eq "") print "No INPUT_FILE set" ; exit 
+if(COLS_PRINT eq "") print "No COLS_PRINT set" ; exit 
+
+
+set macro
+print "INPUT_FILE:\t".INPUT_FILE
+print "COLS_PRINT:\t".COLS_PRINT
+set grid
+
+
+plot for [c=2:(COLS_PRINT+1)] INPUT_FILE using 1:c with lines title columnheader(c)
+#do for [c in COLS_PRINT] {
+#	print c
+#}
+pause 4
+
