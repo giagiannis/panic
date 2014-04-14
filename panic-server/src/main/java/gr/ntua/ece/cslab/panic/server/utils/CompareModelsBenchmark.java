@@ -40,6 +40,7 @@ public class CompareModelsBenchmark {
 
     private static Options options;
     private static Class[] defaultModels = null;
+    private static Class[] defaultSamplers = null;
 
     public static void cliOptionsSetup(String[] args) {
         options = new Options();
@@ -80,8 +81,23 @@ public class CompareModelsBenchmark {
             defaultModels[i++] = c;
     }
     
+    public static void discoverSamplers() {
+        List<Class> list = new ArrayList<>();
+        Reflections reflections = new Reflections("gr.ntua.ece.cslab");
+        for(Class c: reflections.getSubTypesOf(Sampler.class)){
+            if(!c.getName().toLowerCase().contains("abstract")){
+                list.add(c);
+            }
+        }
+        defaultSamplers = new Class[list.size()];
+        int i = 0;
+        for(Class c : list)
+            defaultSamplers[i++] = c;
+    }
+    
     public static void main(String[] args) throws Exception{
         discoverModels();
+        discoverSamplers();
 //        System.exit(1);
         String infile = null;
         PrintStream outputPrintStream = null;
@@ -101,6 +117,13 @@ public class CompareModelsBenchmark {
         
         if(cmd.hasOption("list-models")) {
             for(Class c : defaultModels) {
+                System.out.println(c.toString());
+            }
+            System.exit(1);
+        }
+        
+        if(cmd.hasOption("list-samplers")) {
+            for(Class c : defaultSamplers) {
                 System.out.println(c.toString());
             }
             System.exit(1);
