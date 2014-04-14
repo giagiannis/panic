@@ -135,17 +135,28 @@ public class CSVFileManager {
      * Method returning the district values of each dimension. Useful for samplers.
      * @return
      */
-    public HashMap<String, Set<Double>> getDimensionRanges() {
-        HashMap<String, Set<Double>> results = new HashMap<>();
+  
+    public HashMap<String, List<Double>> getDimensionRanges() {
+        HashMap<String, Set<Double>> temp = new HashMap<>();
         List<InputSpacePoint> points = this.getInputSpacePoints();
         for(InputSpacePoint p : points) {
             for(String key : p.getKeysAsCollection()) {
-                if(results.get(key) == null)
-                    results.put(key, new HashSet<Double>());
-                results.get(key).add(p.getValue(key));
+                if(temp.get(key) == null)
+                    temp.put(key, new HashSet<Double>());
+                temp.get(key).add(p.getValue(key));
             }
         }
+        HashMap<String, List<Double>> results = new HashMap<>();
+        for(String s: temp.keySet())
+            results.put(s, new LinkedList<>(temp.get(s)));
         return results;
+    }
+    
+    public OutputSpacePoint getActualValue(InputSpacePoint point) {
+        for(OutputSpacePoint p : this.getOutputSpacePoints())
+            if(p.getInputSpacePoint().equals(point))
+                return p;
+        return null;
     }
 //    public static void main(String[] args) {
 //        CSVFileManager loader = new CSVFileManager();

@@ -18,9 +18,10 @@ package gr.ntua.ece.cslab.panic.server.utils;
 import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.server.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.server.models.Model;
+import gr.ntua.ece.cslab.panic.server.samplers.RandomSampler;
+import gr.ntua.ece.cslab.panic.server.samplers.Sampler;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
@@ -85,6 +86,7 @@ public class CompareModelsBenchmark {
         String infile = null;
         PrintStream outputPrintStream = null;
         Double samplingRate = null;
+        Sampler sampler = null;
         
         // cli arguments parsing
         cliOptionsSetup(args);
@@ -122,7 +124,12 @@ public class CompareModelsBenchmark {
         } else
             samplingRate = 0.2;
         
-        // model initialization
+        if(cmd.hasOption("st")) {
+            Class samplerClass = Class.forName(cmd.getOptionValue("st"));
+            sampler = (Sampler) samplerClass.getConstructor().newInstance();
+        } else {
+            sampler = new RandomSampler();
+        }
         
         Class[] modelClasses = defaultModels;
         if(cmd.hasOption("m")) {
@@ -132,7 +139,11 @@ public class CompareModelsBenchmark {
                 modelClasses[i] = Class.forName(classNames[i]);
             }
         }
-        
+
+
+
+
+        // model initialization
         Model[] models = new Model[modelClasses.length];
         int i=0;
         for(Class c : modelClasses){
@@ -143,26 +154,26 @@ public class CompareModelsBenchmark {
             m.configureClassifier();
         }
         
-        // sampler initialization
-        //  TODO
-        // ===========================================================
         
         CSVFileManager file = new CSVFileManager();
         file.setFilename(infile);
         
+        // sampler initialization
+        sampler.setSamplingRate(samplingRate);
+        sampler.setDimensionsWithRanges(file.getDimensionRanges());
         
-        // temporary code used to create benchmark without actual sampling
+        sampler.configureSampler();
         
-        List<OutputSpacePoint> actualPoints = file.getOutputSpacePoints();
-        Collections.shuffle(actualPoints);
-        
-        int pointsToFeed = (int) Math.round(actualPoints.size() * samplingRate);
-        
-        for(i=0;i<pointsToFeed;i++) {
-            OutputSpacePoint point = actualPoints.remove(0);
-            System.out.format("%d round (%s)\n", i+1, point.toString());
+
+        // model training
+        i=1;
+        while(sampler.hasMore()) {
+            InputSpacePoint nextSample = sampler.next();
+            
+            OutputSpacePoint out = file.getActualValue(nextSample);
+            System.out.format("%d round (%s)\n", i++, nextSample.toString());
             for(Model m : models) {
-                m.feed(point, false);
+                m.feed(out, false);
             }
         }
         
@@ -171,7 +182,7 @@ public class CompareModelsBenchmark {
         
 
         // models are created and the results are printed...
-        createCSVFormat(outputPrintStream, actualPoints.get(0), models, file,samplingRate);
+        createCSVFormat(outputPrintStream, models, file,samplingRate);
      
         
         // destroying and closing objects
@@ -180,9 +191,8 @@ public class CompareModelsBenchmark {
         
     }
     
-    public static void createCSVFormat(PrintStream outputPrintStream, OutputSpacePoint headerPoint, Model[] models, CSVFileManager file, double sr) throws Exception {
-                // print a nice header for the csv file...
-        
+    public static void createCSVFormat(PrintStream outputPrintStream, Model[] models, CSVFileManager file, double sr) throws Exception {
+        OutputSpacePoint headerPoint = file.getOutputSpacePoints().get(0);
         outputPrintStream.println("# Created: "+new Date());
         outputPrintStream.println("# Sampling rate: "+sr);
         outputPrintStream.println("# Sampling method: random");
