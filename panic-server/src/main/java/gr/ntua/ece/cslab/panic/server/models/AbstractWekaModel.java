@@ -92,6 +92,17 @@ public abstract class AbstractWekaModel implements Model {
             inst.setValue(att, point.getValue(k));
         }
         inst.setMissing(index);
+        
+        
+        //assign instance to dataset
+        FastVector att  = new FastVector(point.numberDimensions()+1);
+        for(String s:point.getKeysAsCollection())
+            att.addElement(new Attribute(s, index++));
+        att.addElement(new Attribute("objective", index++));
+        
+        Instances dataset = new Instances("instances", att, point.numberDimensions()+1);
+        dataset.setClassIndex(dataset.numAttributes()-1);
+        inst.setDataset(dataset);
         return inst;
     }
 
