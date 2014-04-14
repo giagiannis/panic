@@ -15,20 +15,20 @@
  */
 package gr.ntua.ece.cslab.panic.server.utils;
 
+import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.server.containers.beans.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.server.models.IsoRegression;
-import gr.ntua.ece.cslab.panic.server.models.LeastSquares;
-import gr.ntua.ece.cslab.panic.server.models.LinearRegression;
-import gr.ntua.ece.cslab.panic.server.models.MLPerceptron;
 import gr.ntua.ece.cslab.panic.server.models.Model;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.reflections.Reflections;
 /**
  * This class is used as a benchmarking class, in order to compare different
  * modeling methods. The output is stored in a single csv file.
@@ -38,7 +38,7 @@ import org.apache.commons.cli.Options;
 public class CompareModelsBenchmark {
 
     private static Options options;
-    private static Class[] defaultModels = {MLPerceptron.class, IsoRegression.class, LeastSquares.class, LinearRegression.class};
+    private static Class[] defaultModels = null;
 
     public static void cliOptionsSetup(String[] args) {
         options = new Options();
@@ -64,8 +64,24 @@ public class CompareModelsBenchmark {
         options.addOption(null, "list-samplers", false, "lists the available samplers");
         
     }
+    
+    public static void discoverModels() {
+        List<Class> list = new ArrayList<>();
+        Reflections reflections = new Reflections("gr.ntua.ece.cslab");
+        for(Class c: reflections.getSubTypesOf(Model.class)){
+            if(!c.getName().toLowerCase().contains("abstract")){
+                list.add(c);
+            }
+        }
+        defaultModels = new Class[list.size()];
+        int i = 0;
+        for(Class c : list)
+            defaultModels[i++] = c;
+    }
+    
     public static void main(String[] args) throws Exception{
-        
+        discoverModels();
+//        System.exit(1);
         String infile = null;
         PrintStream outputPrintStream = null;
         Double samplingRate = null;
@@ -153,11 +169,27 @@ public class CompareModelsBenchmark {
         for(Model m : models)
             m.train();
         
-        // print a nice header for the csv file...
-        for(String k : actualPoints.get(0).getInputSpacePoint().getKeysAsCollection()) {
+
+        // models are created and the results are printed...
+        createCSVFormat(outputPrintStream, actualPoints.get(0), models, file,samplingRate);
+     
+        
+        // destroying and closing objects
+        if(outputPrintStream != System.out)
+            outputPrintStream.close();
+        
+    }
+    
+    public static void createCSVFormat(PrintStream outputPrintStream, OutputSpacePoint headerPoint, Model[] models, CSVFileManager file, double sr) throws Exception {
+                // print a nice header for the csv file...
+        
+        outputPrintStream.println("# Created: "+new Date());
+        outputPrintStream.println("# Sampling rate: "+sr);
+        outputPrintStream.println("# Sampling method: random");
+        for(String k : headerPoint.getInputSpacePoint().getKeysAsCollection()) {
             outputPrintStream.print(k+"\t");
         }
-        outputPrintStream.print(actualPoints.get(0).getKey()+"\t");
+        outputPrintStream.print(headerPoint.getKey()+"\t");
         
         for(Model m: models)
             outputPrintStream.print(m.getClass().toString().substring(m.toString().lastIndexOf("."))+"\t");
@@ -171,11 +203,6 @@ public class CompareModelsBenchmark {
                 outputPrintStream.format("%.4f\t", m.getPoint(p.getInputSpacePoint()).getValue());
             outputPrintStream.println();
         }
-     
-        
-        // destroying and closing objects
-        if(outputPrintStream != System.out)
-            outputPrintStream.close();
-        
+
     }
 }

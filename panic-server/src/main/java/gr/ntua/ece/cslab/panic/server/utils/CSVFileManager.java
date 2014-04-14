@@ -110,7 +110,7 @@ public class CSVFileManager {
                 point.setInputSpacePoint(new InputSpacePoint());
                 for(int i=0;i<numberOfInputDimensions;i++)
                     point.getInputSpacePoint().addDimension("x"+(i+1), new Double(line[i]));
-                point.setValue("y", new Double(line[outputDimensionIndex]));
+                point.setValue("objective", new Double(line[outputDimensionIndex]));
                 results.add(point);
             }
             reader.close();
