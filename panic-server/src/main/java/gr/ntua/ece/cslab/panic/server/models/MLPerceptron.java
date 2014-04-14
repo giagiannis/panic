@@ -22,7 +22,7 @@ import weka.classifiers.functions.MultilayerPerceptron;
  * Multi layer perceptron, as implement by WEKA.
  * @author Giannis Giannakopoulos
  */
-public class MLPerceptron extends AbsractWekaModel {
+public class MLPerceptron extends AbstractWekaModel {
     
     public MLPerceptron() {
         super();

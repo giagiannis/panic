@@ -23,7 +23,7 @@ import weka.classifiers.functions.LeastMedSq;
  *
  * @author Giannis Giannakopoulos
  */
-public class LeastSquares extends AbsractWekaModel {
+public class LeastSquares extends AbstractWekaModel {
 
     public LeastSquares() {
         super();

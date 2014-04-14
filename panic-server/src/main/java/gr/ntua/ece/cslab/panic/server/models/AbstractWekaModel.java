@@ -29,12 +29,12 @@ import weka.core.Instances;
  * Abstract class implementing multiple methods used for Weka classifiers.
  * @author Giannis Giannakopoulos
  */
-public abstract class AbsractWekaModel implements Model {
+public abstract class AbstractWekaModel implements Model {
 
     protected List<OutputSpacePoint> pointsSampled;
     protected Classifier classifier;
     
-    public AbsractWekaModel() {
+    public AbstractWekaModel() {
         this.pointsSampled = new LinkedList<>();
     }
     
@@ -59,7 +59,7 @@ public abstract class AbsractWekaModel implements Model {
     public OutputSpacePoint getPoint(InputSpacePoint point) throws Exception {
         OutputSpacePoint result = new OutputSpacePoint();
         result.setInputSpacePoint(point);
-        result.setValue("y", this.classifier.classifyInstance(convertPointToInstance(point)));
+        result.setValue("objective", this.classifier.classifyInstance(convertPointToInstance(point)));
         return result;
     }
     

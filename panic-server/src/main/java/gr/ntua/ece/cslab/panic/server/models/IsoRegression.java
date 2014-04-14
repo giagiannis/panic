@@ -22,7 +22,7 @@ import weka.classifiers.functions.IsotonicRegression;
  * Isotonic Regression, as implemented by WEKA.
  * @author Giannis Giannakopoulos
  */
-public class IsoRegression extends AbsractWekaModel{
+public class IsoRegression extends AbstractWekaModel{
 
     public IsoRegression() {
         super();

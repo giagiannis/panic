@@ -22,7 +22,7 @@ import weka.classifiers.functions.SimpleLinearRegression;
  *
  * @author Giannis Giannakopoulos
  */
-public class LinearRegression extends AbsractWekaModel {
+public class LinearRegression extends AbstractWekaModel {
 
     public LinearRegression() {
         this.classifier = new SimpleLinearRegression();
