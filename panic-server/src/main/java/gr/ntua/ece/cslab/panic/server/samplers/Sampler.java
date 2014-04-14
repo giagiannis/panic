@@ -17,8 +17,8 @@
 package gr.ntua.ece.cslab.panic.server.samplers;
 
 import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
-import java.util.Map;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Describes the API with which the objects will contact with the Samplers.
@@ -36,5 +36,25 @@ public interface Sampler {
      * Informs the sampler about the applicable values per dimension.
      * @param ranges 
      */
-    public void setDimensionsWithRanges(Map<String, Set<Double>> ranges);
+    public void setDimensionsWithRanges(HashMap<String, List<Double>> ranges);
+    
+    /**
+     * Method used to set the sampling rate which will be used for sampling.
+     * @param samplingRate a number from (0.0 - 1.0]
+     */
+    public void setSamplingRate(double samplingRate);
+    
+    /**
+     * Method used to configure the sampler. This method must be executed last,
+     * after all the initialization steps and before start picking the first
+     * samples.
+     */
+    public void configureSampler();
+    
+    
+    /**
+     * Method used to inform whether more points can be chosen or not.
+     * @return 
+     */
+    public boolean hasMore();
 }

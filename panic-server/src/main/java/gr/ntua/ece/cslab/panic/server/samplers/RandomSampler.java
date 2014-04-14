@@ -19,33 +19,51 @@ package gr.ntua.ece.cslab.panic.server.samplers;
 import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 /**
- *
- * @author giannis
+ * This class implements random sampling. The multidimensional points are mapped
+ * to one dimension, and then picked in a random way.
+ * @author Giannis Giannakopoulos
  */
-public class RandomSampler implements Sampler {
+public class RandomSampler extends AbstractStaticSampler {
 
-    private Set<InputSpacePoint> selected;
-    private Random rand;
-    private Map<String, Set<Double>> ranges;
-    public RandomSampler() {
-        this.selected = new HashSet<>();
-        this.rand = new Random();
-        this.ranges = new HashMap<>();
-    }
+    private final Random random;
+    private final Set<Integer> chosenIds;
     
+    public RandomSampler() {
+        super();
+        this.random = new Random();
+        this.chosenIds = new HashSet<>();
+    }
+
+    @Override
+    public void configureSampler() {
+        super.configureSampler();
+    }
+
     @Override
     public InputSpacePoint next() {
-        return null;
-    }
-
-    @Override
-    public void setDimensionsWithRanges(Map<String, Set<Double>> ranges) {
-        this.ranges = ranges;
+        super.next();
+        Integer randomId = this.random.nextInt(this.maxChoices);
+        while(this.chosenIds.contains(randomId))
+            randomId = this.random.nextInt(this.maxChoices);
+        InputSpacePoint point  = this.getPointById(randomId);
+        this.chosenIds.add(randomId);
+        return point;
     }
     
+    private InputSpacePoint getPointById(int  id) {
+        int identifier = id;
+        InputSpacePoint point = new InputSpacePoint();
+        for(String s : this.ranges.keySet()) {
+            int index = identifier%this.ranges.get(s).size();
+            identifier /= this.ranges.get(s).size();
+            point.addDimension(s, this.ranges.get(s).get(index));
+        }
+        return point;
+    }    
 }
