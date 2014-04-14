@@ -17,10 +17,7 @@
 package gr.ntua.ece.cslab.panic.server.samplers;
 
 import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -55,15 +52,4 @@ public class RandomSampler extends AbstractStaticSampler {
         this.chosenIds.add(randomId);
         return point;
     }
-    
-    private InputSpacePoint getPointById(int  id) {
-        int identifier = id;
-        InputSpacePoint point = new InputSpacePoint();
-        for(String s : this.ranges.keySet()) {
-            int index = identifier%this.ranges.get(s).size();
-            identifier /= this.ranges.get(s).size();
-            point.addDimension(s, this.ranges.get(s).get(index));
-        }
-        return point;
-    }    
 }

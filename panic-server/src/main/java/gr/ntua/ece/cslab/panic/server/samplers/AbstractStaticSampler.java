@@ -64,4 +64,23 @@ public abstract class AbstractStaticSampler implements Sampler {
         for(String s:this.ranges.keySet())
             this.maxChoices *= this.ranges.get(s).size();
     }
+    
+    /**
+     * Method which maps every multidimensional point to a single dimension. This
+     * dimension is references by an Integer id. The objective of the function is
+     * to convert ids to InputSpacePoints.
+     * @param id
+     * @return 
+     */
+    protected InputSpacePoint getPointById(int  id) {
+        int identifier = id;
+        InputSpacePoint point = new InputSpacePoint();
+        for(String s : this.ranges.keySet()) {
+            int index = identifier%this.ranges.get(s).size();
+            identifier /= this.ranges.get(s).size();
+            point.addDimension(s, this.ranges.get(s).get(index));
+        }
+        return point;
+    }    
+
 }
