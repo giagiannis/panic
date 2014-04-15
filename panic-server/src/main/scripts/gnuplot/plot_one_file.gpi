@@ -12,6 +12,7 @@ COLS_PRINT = system("echo $COLS_PRINT")
 TITLE = system("echo $TITLE")
 X_LABEL = system("echo $X_LABEL")
 Y_LABEL = system("echo $Y_LABEL")
+INDEX = system("echo $INDEX")
 
 if(TITLE eq "") TITLE = "Sample Graph"
 if(X_LABEL eq "")X_LABEL = "X axis" 
