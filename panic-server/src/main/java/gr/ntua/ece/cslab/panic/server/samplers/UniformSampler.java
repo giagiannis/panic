@@ -54,8 +54,12 @@ public class UniformSampler extends AbstractStaticSampler {
     public static void main(String[] args) {
         HashMap<String, List<Double>> res = new HashMap<>();
         res.put("x", new LinkedList<Double>());
-        for(double j=0.5;j<=10.0;j+=0.5)
+        for(double j=0.0;j<=100.0;j+=1.0)
             res.get("x").add(j);
+//        res.put("x2", new LinkedList<Double>());
+//        for(double j=100.0;j<=110.0;j+=0.5)
+//            res.get("x2").add(j);
+        
         
         UniformSampler sampler = new UniformSampler();
         sampler.setDimensionsWithRanges(res);

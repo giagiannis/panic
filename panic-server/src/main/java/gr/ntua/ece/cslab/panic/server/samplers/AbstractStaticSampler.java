@@ -17,6 +17,7 @@
 package gr.ntua.ece.cslab.panic.server.samplers;
 
 import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,6 +41,9 @@ public abstract class AbstractStaticSampler implements Sampler {
     @Override
     public void setDimensionsWithRanges(HashMap<String, List<Double>> ranges) {
         this.ranges =  ranges;
+        for(String s: this.ranges.keySet()){      // sort each dimension ranges
+            Collections.sort(this.ranges.get(s));
+        }
     }
 
     @Override
@@ -49,7 +53,7 @@ public abstract class AbstractStaticSampler implements Sampler {
 
     @Override
     public boolean hasMore() {
-        return this.pointsPicked<this.maxChoices*this.samplingRate;
+        return this.pointsPicked<(int)Math.floor(this.maxChoices*this.samplingRate);
     }
 
     @Override
@@ -67,7 +71,7 @@ public abstract class AbstractStaticSampler implements Sampler {
     
     /**
      * Method which maps every multidimensional point to a single dimension. This
-     * dimension is references by an Integer id. The objective of the function is
+     * dimension is referenced by an Integer id. The objective of the function is
      * to convert ids to InputSpacePoints.
      * @param id
      * @return 
