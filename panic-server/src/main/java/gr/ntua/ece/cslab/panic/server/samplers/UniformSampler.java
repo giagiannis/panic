@@ -17,9 +17,6 @@
 package gr.ntua.ece.cslab.panic.server.samplers;
 
 import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Creates a grid out of the input space and returns the grid points.
@@ -49,26 +46,5 @@ public class UniformSampler extends AbstractStaticSampler {
         this.index = (int)Math.floor((this.pointsPicked-1) * this.pivot+this.pivot/2.0);
         InputSpacePoint result = this.getPointById(this.index);
         return result;
-    }
-    
-    public static void main(String[] args) {
-        HashMap<String, List<Double>> res = new HashMap<>();
-        res.put("x", new LinkedList<Double>());
-        for(double j=0.0;j<=100.0;j+=1.0)
-            res.get("x").add(j);
-//        res.put("x2", new LinkedList<Double>());
-//        for(double j=100.0;j<=110.0;j+=0.5)
-//            res.get("x2").add(j);
-        
-        
-        UniformSampler sampler = new UniformSampler();
-        sampler.setDimensionsWithRanges(res);
-        sampler.setSamplingRate(new Double(args[0]));
-        
-        sampler.configureSampler();
-        
-        while(sampler.hasMore())
-            System.out.println(sampler.next());
-        
     }
 }
