@@ -17,7 +17,6 @@ package gr.ntua.ece.cslab.panic.server.utils;
 
 import gr.ntua.ece.cslab.panic.server.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.server.models.Model;
-import gr.ntua.ece.cslab.panic.server.samplers.RandomSampler;
 import gr.ntua.ece.cslab.panic.server.samplers.Sampler;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -93,12 +92,12 @@ public class Benchmark {
                 list.add(c);
             }
         }
-        Class[] models = new Class[list.size()];
+        Class[] modelsDiscovered = new Class[list.size()];
         int i = 0;
         for (Class c : list) {
-            models[i++] = c;
+            modelsDiscovered[i++] = c;
         }
-        return models;
+        return modelsDiscovered;
     }
 
     /**
@@ -114,12 +113,12 @@ public class Benchmark {
                 list.add(c);
             }
         }
-        Class[] samplers = new Class[list.size()];
+        Class[] samplersDiscovered = new Class[list.size()];
         int i = 0;
         for (Class c : list) {
-            samplers[i++] = c;
+            samplersDiscovered[i++] = c;
         }
-        return samplers;
+        return samplersDiscovered;
     }
 
     /**
@@ -158,7 +157,7 @@ public class Benchmark {
         if (cmd.hasOption("i")) {
             inputFile = cmd.getOptionValue("i");
         } else {
-            System.err.println("input file not specified");
+            System.err.println("Please use -h flag to see the necessary options...");
             System.exit(1);
         }
 
