@@ -1,59 +1,10 @@
 from kamaki.clients import ClientError
 from kamaki.clients.astakos import AstakosClient
 from kamaki.clients.cyclades import CycladesClient, CycladesNetworkClient
-
 from sys import stderr
+from deployer.connectors.generic import AbstractConnector
 
 __author__ = 'Giannis Giannakopoulos'
-
-
-class AbstractConnector:
-    """
-    Abstract Connector is the IaaS connectors API. Each connector will override
-    this class.
-    """
-
-    def __init__(self):
-        pass
-
-    def authenticate(self, authentication=None):
-        raise NotImplemented
-
-    def create_vm(self, name, flavor_id, image_id):
-        """
-
-        :param name:
-        :param flavor_id:
-        :param image_id:
-        """
-        raise NotImplemented
-
-    def delete_vm(self, vm_id):
-        """
-
-        :param vm_id:
-        :raise NotImplemented:
-        """
-        raise NotImplemented
-
-    def list_vms(self):
-        """
-
-
-        :raise NotImplemented:
-        """
-        raise NotImplemented
-
-    def get_status(self, vm_id):
-        """
-
-        :param vm_id:
-        :raise NotImplemented:
-        """
-        raise NotImplemented
-
-    def get_server_addresses(self, vm_id):
-        raise NotImplemented
 
 
 class OkeanosConnector(AbstractConnector):
@@ -101,8 +52,6 @@ class OkeanosConnector(AbstractConnector):
             networks.append({'uuid': self.__create_floating_ip()})
         if self.private_network != -1:
             networks.append({'uuid': self.private_network})
-        networks = None if networks == [] else networks
-        print networks
 
         response = self.__cyclades.create_server(name=name, flavor_id=flavor_id, image_id=image_id, networks=networks)
         ret_value = dict()
@@ -157,3 +106,11 @@ class OkeanosConnector(AbstractConnector):
             cidr='192.168.0.0/24'
         )
         return response['id']
+
+    def clone(self):
+        new_connector = OkeanosConnector()
+        new_connector.attach_public_ipv4 = self.attach_public_ipv4
+        new_connector.private_network = self.private_network
+        new_connector.__network_client = self.__network_client
+        new_connector.__cyclades = self.__cyclades
+        return new_connector

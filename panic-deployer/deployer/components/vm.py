@@ -6,10 +6,9 @@ with warnings.catch_warnings():
 
 import socket
 import time
-from conf import SLEEP_TIMEOUT
-from errors import ArgumentsError
-from connectors import AbstractConnector
-from conf import MAX_WAIT_FOR_LOOPS
+from deployer.conf import SLEEP_TIMEOUT, MAX_WAIT_FOR_LOOPS
+from deployer.errors import ArgumentsError
+from deployer.connectors import AbstractConnector
 
 __author__ = 'Giannis Giannakopoulos'
 
@@ -100,8 +99,3 @@ class VM:
                 return sshclient
             except socket.error:    # no route to host is expected here at first
                 time.sleep(SLEEP_TIMEOUT)
-
-
-class VMGroup:
-    def __init__(self):
-        pass
