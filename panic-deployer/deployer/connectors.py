@@ -1,6 +1,6 @@
 from kamaki.clients import ClientError
 from kamaki.clients.astakos import AstakosClient
-from kamaki.clients.cyclades import CycladesClient
+from kamaki.clients.cyclades import CycladesClient, CycladesNetworkClient
 
 from sys import stderr
 
@@ -63,8 +63,10 @@ class OkeanosConnector(AbstractConnector):
 
     def __init__(self):
         AbstractConnector.__init__(self)
-        self.cyclades = None
+        self.__cyclades = None
+        self.__network_client = None
         self.attach_public_ipv4 = False
+        self.private_network = -1
 
     def authenticate(self, authentication=None):
         """
@@ -72,13 +74,15 @@ class OkeanosConnector(AbstractConnector):
         :param authentication:
         :return:
         """
-        if self.cyclades is not None:
+        if self.__cyclades is not None:
             return True
         try:
             authcl = AstakosClient(authentication['URL'], authentication['TOKEN'])
             authcl.authenticate()
-            self.cyclades = CycladesClient(authcl.get_service_endpoints('compute')['publicURL'],
-                                           authentication['TOKEN'])
+            self.__cyclades = CycladesClient(authcl.get_service_endpoints('compute')['publicURL'],
+                                             authentication['TOKEN'])
+            self.__network_client = CycladesNetworkClient(authcl.get_service_endpoints('network')['publicURL'],
+                                                          authentication['TOKEN'])
         except ClientError:
             stderr.write('Connector initialization failed')
             return False
@@ -92,8 +96,15 @@ class OkeanosConnector(AbstractConnector):
         :param image_id:
         :return:
         """
-        networks = None if self.attach_public_ipv4 else []
-        response = self.cyclades.create_server(name=name, flavor_id=flavor_id, image_id=image_id, networks=networks)
+        networks = []
+        if self.attach_public_ipv4:
+            networks.append({'uuid': self.__create_floating_ip()})
+        if self.private_network != -1:
+            networks.append({'uuid': self.private_network})
+        networks = None if networks == [] else networks
+        print networks
+
+        response = self.__cyclades.create_server(name=name, flavor_id=flavor_id, image_id=image_id, networks=networks)
         ret_value = dict()
         ret_value['password'] = response['adminPass']
         ret_value['id'] = response['id']
@@ -107,7 +118,7 @@ class OkeanosConnector(AbstractConnector):
         :param server_id:
         :return:
         """
-        return self.cyclades.delete_server(server_id)
+        return self.__cyclades.delete_server(server_id)
 
     def list_vms(self):
         """
@@ -115,7 +126,7 @@ class OkeanosConnector(AbstractConnector):
 
         :return:
         """
-        return self.cyclades.list_servers()
+        return self.__cyclades.list_servers()
 
     def get_status(self, vm_id):
         """
@@ -123,10 +134,10 @@ class OkeanosConnector(AbstractConnector):
         :param vm_id:
         :return:
         """
-        return self.cyclades.get_server_details(vm_id)
+        return self.__cyclades.get_server_details(vm_id)
 
     def get_server_addresses(self, vm_id, ip_version=None):
-        addresses = self.cyclades.get_server_details(vm_id)['addresses']
+        addresses = self.__cyclades.get_server_details(vm_id)['addresses']
         results = []
         while len(addresses) > 0:
             key, value = addresses.popitem()
@@ -134,4 +145,10 @@ class OkeanosConnector(AbstractConnector):
                 results.append(value[0]['addr'])
         return results
 
+    def __create_floating_ip(self):
+        response = self.__network_client.create_floatingip()
+        return response['floating_network_id']
 
+    def create_private_network(self):
+        response = self.__network_client.create_network(type='MAC_FILTERED', name='Deployment network')
+        return response['id']
