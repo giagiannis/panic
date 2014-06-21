@@ -1,4 +1,7 @@
+import os
 import warnings
+from deployer.utils import get_random_file_name
+
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     import paramiko
@@ -99,3 +102,39 @@ class VM:
                 return sshclient
             except socket.error:    # no route to host is expected here at first
                 time.sleep(SLEEP_TIMEOUT)
+
+    def get_file_content(self, remote_path):
+        """
+        Secure copy file from remote_path and get its contents.
+        """
+        local_path = "/tmp/"+get_random_file_name()
+        sshclient = self.__create_ssh_client()
+        sftp = sshclient.open_sftp()
+        sftp.get(remote_path, local_path)
+        sftp.close()
+        f = open(local_path)
+        content = f.read()
+        f.close()
+        os.remove(local_path)
+        return content
+
+    def put_file_content(self, file_content, remote_path):
+        """
+        Secure copy file contents to remote_path
+        """
+        local_path = "/tmp/"+get_random_file_name()
+        sshclient = self.__create_ssh_client()
+        sftp = sshclient.open_sftp()
+        f = open(local_path, mode='w')
+        f.write(file_content)
+        f.flush()
+        f.close()
+        sftp.put(localpath=local_path, remotepath=remote_path)
+        sftp.close()
+        os.remove(local_path)
+
+    def put_file(self, localpath, remotepath):
+        sshclient = self.__create_ssh_client()
+        sftp = sshclient.open_sftp()
+        sftp.put(localpath=localpath, remotepath=remotepath)
+        sftp.close()

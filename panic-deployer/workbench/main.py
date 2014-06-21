@@ -1,4 +1,6 @@
 import os
+import paramiko
+from paramiko.client import SSHClient
 import sys
 
 from deployer.components.vmgroup import VMGroup
@@ -8,8 +10,14 @@ from deployer.conf import CLOUD_TOKEN, CLOUD_URL
 __author__ = 'Giannis Giannakopoulos'
 
 
-sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-
+#sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+#sshclient = SSHClient()
+#sshclient.set_missing_host_key_policy(paramiko.WarningPolicy())
+#sshclient.connect(hostname="snf-544242.vm.okeanos.grnet.gr", port=22,
+#                  username="root", password="paparia", timeout=10)
+#sftp = sshclient.open_sftp()
+#sftp.put(localpath="/tmp/elviabrihsswputlc3xs", remotepath="/root/foo")
+#sftp.close()
 
 sys.stdout.write("Initializing ~okeanos connector...\t")
 con = OkeanosConnector()
@@ -31,11 +39,11 @@ group.multiplicity = 3
 f = open('/home/giannis/script.sh')
 data = f.read()
 f.close()
-
 group.scripts = [data]
 
 group.create()
 
+group.inject_ssh_key()
 group.execute_script()
 #con.attach_public_ipv4 = False
 #con.private_network = con.create_private_network()
