@@ -52,6 +52,9 @@ class AbstractConnector:
         """
         raise NotImplemented
 
+    def get_server_addresses(self, vm_id):
+        raise NotImplemented
+
 
 class OkeanosConnector(AbstractConnector):
     """
@@ -61,6 +64,7 @@ class OkeanosConnector(AbstractConnector):
     def __init__(self):
         AbstractConnector.__init__(self)
         self.cyclades = None
+        self.attach_public_ipv4 = False
 
     def authenticate(self, authentication=None):
         """
@@ -88,7 +92,8 @@ class OkeanosConnector(AbstractConnector):
         :param image_id:
         :return:
         """
-        response = self.cyclades.create_server(name=name, flavor_id=flavor_id, image_id=image_id, networks=None)
+        networks = None if self.attach_public_ipv4 else []
+        response = self.cyclades.create_server(name=name, flavor_id=flavor_id, image_id=image_id, networks=networks)
         ret_value = dict()
         ret_value['password'] = response['adminPass']
         ret_value['id'] = response['id']
@@ -119,3 +124,14 @@ class OkeanosConnector(AbstractConnector):
         :return:
         """
         return self.cyclades.get_server_details(vm_id)
+
+    def get_server_addresses(self, vm_id, ip_version=None):
+        addresses = self.cyclades.get_server_details(vm_id)['addresses']
+        results = []
+        while len(addresses) > 0:
+            key, value = addresses.popitem()
+            if ip_version is None or value['version'] == ip_version:
+                results << value['addr']
+        return results
+
+

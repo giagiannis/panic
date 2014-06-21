@@ -87,6 +87,9 @@ class VM:
         self.__create_ssh_client().close()
         return
 
+    def get_addresses(self, ip_version=None):
+        return self.cloud_connector.get_server_addresses(self.id, ip_version)
+
     def __create_ssh_client(self):
         sshclient = SSHClient()
         sshclient.set_missing_host_key_policy(paramiko.WarningPolicy())
