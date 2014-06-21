@@ -131,7 +131,7 @@ class OkeanosConnector(AbstractConnector):
         while len(addresses) > 0:
             key, value = addresses.popitem()
             if ip_version is None or value['version'] == ip_version:
-                results.append(value['addr'])
+                results.append(value[0]['addr'])
         return results
 
 
