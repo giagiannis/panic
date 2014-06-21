@@ -151,4 +151,9 @@ class OkeanosConnector(AbstractConnector):
 
     def create_private_network(self):
         response = self.__network_client.create_network(type='MAC_FILTERED', name='Deployment network')
+        self.__network_client.create_subnet(
+            network_id=response['id'],
+            enable_dhcp=True,
+            cidr='192.168.0.0/24'
+        )
         return response['id']
