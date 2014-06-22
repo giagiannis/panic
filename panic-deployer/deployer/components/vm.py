@@ -44,16 +44,6 @@ class VM:
         self.id = response['id']
         self.hostname = response['hostname']
 
-    def wait_until_active(self):
-        """
-        This method blocks until the VM gets an "ACTIVE" state.
-        """
-        status = self.cloud_connector.get_status(self.id)['status']
-        loops = 0
-        while status != 'ACTIVE' and loops < MAX_WAIT_FOR_LOOPS:
-            status = self.cloud_connector.get_status(self.id)['status']
-            time.sleep(SLEEP_TIMEOUT)
-
     def delete(self):
         """
         Forcefully destroy the VM .

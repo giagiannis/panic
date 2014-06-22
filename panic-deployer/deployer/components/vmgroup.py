@@ -37,8 +37,7 @@ class VMGroup:
             vm.name = self.name_prefix+str(i)
             self.__vms.append(vm)
         self.__spawn_threads('create')
-        for vm in self.__vms:
-            vm.wait_until_visible()
+        self.__spawn_threads('wait_until_visible')
 
     def execute_script(self):
         """
@@ -50,20 +49,27 @@ class VMGroup:
         self.__script_index += 1
         self.__spawn_threads('run_command', args=[current_script])
 
-    def inject_ssh_key(self):
-        private_key_name = get_random_file_name()
+    def inject_ssh_key(self, private_key_path, public_key_path):
+        """
+        This method injects a previously created SSH keypair to the VMs of the group. This keypair is used as default
+        from the VMs. The public key is placed into authorized_keys file
+        """
+        self.__spawn_threads('run_command', args=["mkdir -p /root/.ssh"])
+        self.__spawn_threads('put_file', args=[private_key_path, "/root/.ssh/id_rsa"])
+        self.__spawn_threads('put_file', args=[public_key_path, "/root/.ssh/id_rsa.pub"])
+        self.__spawn_threads('run_command', args=["cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys &&"
+                                                  "chmod 700 /root/.ssh/ && chmod 600 /root/.ssh/id_rsa && "
+                                                  "echo \"StrictHostKeyChecking no\" > /root/.ssh/config"])
+        #for vm in self.__vms:
+        #    vm.run_command("mkdir -p /root/.ssh")
+        #    vm.put_file(localpath=private_key_path, remotepath="/root/.ssh/id_rsa")
+        #    vm.put_file(localpath=public_key_path, remotepath="/root/.ssh/id_rsa.pub")
+        #    vm.run_command("cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys ")
+        #    vm.run_command("chmod 700 /root/.ssh/ && chmod 600 /root/.ssh/id_rsa")
+        #    vm.run_command("echo \"StrictHostKeyChecking no\" > /root/.ssh/config")
 
-        private_key_path = "/tmp/keys/"+private_key_name
-        public_key_path = private_key_path+".pub"
-        os.system("mkdir -p /tmp/keys/ && ssh-keygen -f "+private_key_path+" -N ''")
-
-        for vm in self.__vms:
-            vm.run_command("mkdir -p /root/.ssh")
-            vm.put_file(localpath=private_key_path, remotepath="/root/.ssh/id_rsa")
-            vm.put_file(localpath=public_key_path, remotepath="/root/.ssh/id_rsa.pub")
-            vm.run_command("cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys")
-            vm.run_command("chmod 700 /root/.ssh/ && chmod 600 /root/.ssh/id_rsa")
-            vm.run_command("echo \"StrictHostKeyChecking no\" > /root/.ssh/config")
+    def delete(self):
+        self.__spawn_threads('delete')
 
     def __spawn_threads(self, method_to_call, args=None):
         threads = []

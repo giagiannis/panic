@@ -2,6 +2,7 @@ import os
 import paramiko
 from paramiko.client import SSHClient
 import sys
+import time
 
 from deployer.components.vmgroup import VMGroup
 from deployer.connectors import OkeanosConnector
@@ -10,171 +11,53 @@ from deployer.conf import CLOUD_TOKEN, CLOUD_URL
 __author__ = 'Giannis Giannakopoulos'
 
 
-#sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-#sshclient = SSHClient()
-#sshclient.set_missing_host_key_policy(paramiko.WarningPolicy())
-#sshclient.connect(hostname="snf-544242.vm.okeanos.grnet.gr", port=22,
-#                  username="root", password="paparia", timeout=10)
-#sftp = sshclient.open_sftp()
-#sftp.put(localpath="/tmp/elviabrihsswputlc3xs", remotepath="/root/foo")
-#sftp.close()
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
 
 sys.stdout.write("Initializing ~okeanos connector...\t")
+timestamp = time.time()
 con = OkeanosConnector()
 auth = dict()
-auth['URL'] = CLOUD_URL
-auth['TOKEN'] = CLOUD_TOKEN
-con.authenticate(auth)
-sys.stdout.write("Done!\n")
+con.authenticate({'URL': CLOUD_URL, 'TOKEN': CLOUD_TOKEN})
+private_network_id = con.create_private_network()
+con.private_network = private_network_id
+sys.stdout.write("Done! ["+str(time.time()-timestamp)+" sec]\n")
 
-
+sys.stdout.write("Configuring VM group...\t")
+timestamp = time.time()
 group = VMGroup()
 group.flavor = 150
 group.image = "78e96a57-2436-45c8-96b5-5eda9eb69be9"
 group.name_prefix = "cluster"
 group.cloud_connector = con.clone()
 group.cloud_connector.attach_public_ipv4 = True
-group.multiplicity = 3
-
+group.multiplicity = 2
 f = open('/home/giannis/script.sh')
 data = f.read()
 f.close()
 group.scripts = [data]
+sys.stdout.write("Done! ["+str(time.time()-timestamp)+" sec]\n")
 
+sys.stdout.write("Creating VMs...\t")
+timestamp = time.time()
 group.create()
+sys.stdout.write("Done! ["+str(time.time()-timestamp)+" sec]\n")
 
-group.inject_ssh_key()
+sys.stdout.write("Injecting ssh keys...\t")
+timestamp = time.time()
+group.inject_ssh_key(
+    private_key_path="/tmp/keys/3ksv2sxbounsnfufofih",
+    public_key_path="/tmp/keys/3ksv2sxbounsnfufofih.pub")
+sys.stdout.write("Done! ["+str(time.time()-timestamp)+" sec]\n")
+
+sys.stdout.write("Executing script...\t")
+timestamp = time.time()
 group.execute_script()
-#con.attach_public_ipv4 = False
-#con.private_network = con.create_private_network()
-#
-#vm = VM()
-#vm.cloud_connector = con
-#vm.image_id = "78e96a57-2436-45c8-96b5-5eda9eb69be9"
-#vm.flavor_id = 150
-#vm.name = "tobedeleted"
-#sys.stdout.write("Creating VM...\t")
-#sys.stdout.flush()
-#vm.create()
-#sys.stdout.write("Done!\n")
-#
-#print "\tHostname:\t"+vm.hostname
-#print "\tPassword:\t"+vm.login_password
-#sys.stdout.write("Waiting until VM is created...\t")
-#vm.wait_until_active()
-#sys.stdout.write("Done\n")
-#sys.stdout.write("Waiting until VM bootstraps...\t")
-#vm.wait_until_visible()
-#sys.stdout.write("Done!\n")
-#sys.stdout.write("Running scripts...\t")
-#f = open('/home/giannis/script.sh')
-#data = f.read()
-#f.close()
-#vm.run_command(data)
-#sys.stdout.write("Done!\n")
-#print "\tVM with hostname "+vm.hostname+" is ready! Enjoy!" + str(vm.get_addresses())
-#
-#vm = VM()
-#vm.cloud_connector = con
-#vm.image_id = "78e96a57-2436-45c8-96b5-5eda9eb69be9"
-#vm.flavor_id = 150
-#vm.name = "tobedeleted"
-#sys.stdout.write("Creating VM...\t")
-#sys.stdout.flush()
-#vm.create()
-#sys.stdout.write("Done!\n")
-#
-#print "\tHostname:\t"+vm.hostname
-#print "\tPassword:\t"+vm.login_password
-#sys.stdout.write("Waiting until VM is created...\t")
-#vm.wait_until_active()
-#sys.stdout.write("Done\n")
-#sys.stdout.write("Waiting until VM bootstraps...\t")
-#vm.wait_until_visible()
-#sys.stdout.write("Done!\n")
-#sys.stdout.write("Running scripts...\t")
-#f = open('/home/giannis/script.sh')
-#data = f.read()
-#f.close()
-#vm.run_command(data)
-#sys.stdout.write("Done!\n")
-#print "\tVM with hostname "+vm.hostname+" is ready! Enjoy!" + str(vm.get_addresses())
-#
-#vm = VM()
-#vm.cloud_connector = con
-#vm.image_id = "78e96a57-2436-45c8-96b5-5eda9eb69be9"
-#vm.flavor_id = 150
-#vm.name = "tobedeleted"
-#sys.stdout.write("Creating VM...\t")
-#sys.stdout.flush()
-#vm.create()
-#sys.stdout.write("Done!\n")
-#
-#print "\tHostname:\t"+vm.hostname
-#print "\tPassword:\t"+vm.login_password
-#sys.stdout.write("Waiting until VM is created...\t")
-#vm.wait_until_active()
-#sys.stdout.write("Done\n")
-#sys.stdout.write("Waiting until VM bootstraps...\t")
-#vm.wait_until_visible()
-#sys.stdout.write("Done!\n")
-#sys.stdout.write("Running scripts...\t")
-#f = open('/home/giannis/script.sh')
-#data = f.read()
-#f.close()
-#vm.run_command(data)
-#sys.stdout.write("Done!\n")
-#print "\tVM with hostname "+vm.hostname+" is ready! Enjoy!" + str(vm.get_addresses())
-#
-#vm = VM()
-#vm.cloud_connector = con
-#vm.image_id = "78e96a57-2436-45c8-96b5-5eda9eb69be9"
-#vm.flavor_id = 150
-#vm.name = "tobedeleted"
-#sys.stdout.write("Creating VM...\t")
-#sys.stdout.flush()
-#vm.create()
-#sys.stdout.write("Done!\n")
-#
-#print "\tHostname:\t"+vm.hostname
-#print "\tPassword:\t"+vm.login_password
-#sys.stdout.write("Waiting until VM is created...\t")
-#vm.wait_until_active()
-#sys.stdout.write("Done\n")
-#sys.stdout.write("Waiting until VM bootstraps...\t")
-#vm.wait_until_visible()
-#sys.stdout.write("Done!\n")
-#sys.stdout.write("Running scripts...\t")
-#f = open('/home/giannis/script.sh')
-#data = f.read()
-#f.close()
-#vm.run_command(data)
-#sys.stdout.write("Done!\n")
-#print "\tVM with hostname "+vm.hostname+" is ready! Enjoy!" + str(vm.get_addresses())
-#
-#con.attach_public_ipv4 = True
-#vm = VM()
-#vm.cloud_connector = con
-#vm.image_id = "78e96a57-2436-45c8-96b5-5eda9eb69be9"
-#vm.flavor_id = 150
-#vm.name = "tobedeleted"
-#sys.stdout.write("Creating VM...\t")
-#sys.stdout.flush()
-#vm.create()
-#sys.stdout.write("Done!\n")
-#
-#print "\tHostname:\t"+vm.hostname
-#print "\tPassword:\t"+vm.login_password
-#sys.stdout.write("Waiting until VM is created...\t")
-#vm.wait_until_active()
-#sys.stdout.write("Done\n")
-#sys.stdout.write("Waiting until VM bootstraps...\t")
-#vm.wait_until_visible()
-#sys.stdout.write("Done!\n")
-#sys.stdout.write("Running scripts...\t")
-#f = open('/home/giannis/script.sh')
-#data = f.read()
-#f.close()
-#vm.run_command(data)
-#sys.stdout.write("Done!\n")
-#print "\tVM with hostname "+vm.hostname+" is ready! Enjoy!" + str(vm.get_addresses())
+sys.stdout.write("Done! ["+str(time.time()-timestamp)+" sec]\n")
+
+#response = raw_input("Do your debugging and then hit enter to destroy stuff...")
+
+sys.stdout.write("Deleting the VMs...\t")
+timestamp = time.time()
+group.delete()
+con.cleanup()
+sys.stdout.write("Done! ["+str(time.time()-timestamp)+" sec]\n")
