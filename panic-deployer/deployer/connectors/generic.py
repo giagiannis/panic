@@ -51,3 +51,12 @@ class AbstractConnector:
 
     def clone(self):
         raise NotImplemented
+
+    def serialize(self):
+        raise NotImplemented
+
+    def deserialize(self, state):
+        raise NotImplemented
+
+    def cleanup(self):
+        raise NotImplemented

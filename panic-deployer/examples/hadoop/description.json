@@ -16,7 +16,7 @@
 				    "content" : "echo 'House of the rising sun' > /root/temp"
 				}
 			],
-			"provider_abilities": {
+			"provider_actions": {
 			    "attach_public_ipv4" : true
 			}
 		},
@@ -35,18 +35,21 @@
 				    "content" : "echo 'House of the rising sun from slave ;)' > /root/temp"
 				}
 			],
-			"provider_abilities": {
+			"provider_actions": {
 			    "attach_public_ipv4" : true
 			}
 		}
 	],
-	"inject_ssh_keypair" : true,
+	"actions" : {
+	    "inject_ssh_keypair" : true,
+	    "update_etc_hosts" : true
+	},
 	"provider" : {
 	    "name": "~okeanos",
 	    "auth" :{
 	        "URL" : "https://accounts.okeanos.grnet.gr/identity/v2.0",
 	        "TOKEN" : "aaQpzc7Vd6przo7RodJloBqRpz-QXrpQ4p2QYLcQBis"
 	    },
-	    "private_network" : true
+	    "private_network" : false
 	}
 }

@@ -2,7 +2,7 @@ import logging
 from threading import Thread
 from deployer.components.vmgroup import VMGroup
 from deployer.errors import ArgumentsError
-from deployer.utils import generate_ssh_key_pair
+from deployer.utils import generate_ssh_key_pair, get_random_file_name
 
 __author__ = 'Giannis Giannakopoulos'
 
@@ -14,10 +14,12 @@ class Deployment:
     """
 
     def __init__(self):
-        self.inject_ssh_key_pair = False
+        self.inject_ssh_key_pair = True
+        self.update_hosts = True
         self.__vm_groups = list()
         self.cloud_connector = None
         self.name = ''
+        self.private_network = -1
 
     def configure(self, description):
         """
@@ -28,31 +30,35 @@ class Deployment:
         if self.cloud_connector is None:
             raise ArgumentsError("Connector must be set!")
         self.name = description['name']
-        self.inject_ssh_key_pair = description['inject_ssh_keypair']
+        self.inject_ssh_key_pair = description['actions']['inject_ssh_keypair']
+        self.update_hosts = description['actions']['update_etc_hosts']
+        if description['provider']['private_network']:
+            self.cloud_connector.private_network = self.cloud_connector.create_private_network()
         for group in description['groups']:
             g = VMGroup()
             g.configure(group)
             g.cloud_connector = self.cloud_connector.clone()
-            for ability, value in group['provider_abilities'].iteritems():
+            for ability, value in group['provider_actions'].iteritems():
                 setattr(g.cloud_connector, ability, value)
             self.__vm_groups.append(g)
 
     def launch(self):
-        logging.getLogger("launch").info("Starting deployment")
+        logging.getLogger("deployment").info("Starting deployment")
         self.__spawn_threads('create')
-        logging.getLogger("launch").info("VMs visible -- construcing and injecting key pairs")
+        logging.getLogger("deployment").info("VMs visible -- construcing and injecting key pairs")
         if self.inject_ssh_key_pair:
-            keys = generate_ssh_key_pair(keys_prefix='foobar')
+            keys = generate_ssh_key_pair(keys_prefix=get_random_file_name())
             self.__spawn_threads('inject_ssh_key', args=[keys['private'], keys['public']])
 
-        logging.getLogger("launch").info("Ok -- setting /etc/hosts files")
-        hosts = dict()
-        for vmg in self.__vm_groups:
-            for ip, host in vmg.get_addresses().iteritems():
-                hosts[ip] = host
-        for vmg in self.__vm_groups:
-            vmg.set_hosts(hosts)
-        logging.getLogger("launch").info("Launch is finished!")
+        if self.update_hosts:
+            logging.getLogger("deployment").info("Ok -- setting /etc/hosts files")
+            hosts = dict()
+            for vmg in self.__vm_groups:
+                for ip, host in vmg.get_addresses().iteritems():
+                    hosts[ip] = host
+            for vmg in self.__vm_groups:
+                vmg.set_hosts(hosts)
+            logging.getLogger("deployment").info("Launch is finished!")
 
     def execute_script(self):
         self.__spawn_threads('execute_script')
@@ -64,7 +70,7 @@ class Deployment:
         return False
 
     def terminate(self):
-        pass
+        self.__spawn_threads('delete')
 
     def __spawn_threads(self, method_to_call, args=None):
         """
@@ -81,3 +87,22 @@ class Deployment:
             threads.append(t)
         for t in threads:
             t.join()
+
+    def serialize(self):
+        d = dict()
+        d['name'] = self.name
+        d['groups'] = list()
+        d['connector'] = self.cloud_connector.serialize()
+        for g in self.__vm_groups:
+            d['groups'].append(g.serialize())
+        return d
+
+    def deserialize(self, state, cloud_connector):
+        self.cloud_connector = cloud_connector
+        self.name = state['name']
+        for group_state in state['groups']:
+            group = VMGroup()
+            group.deserialize(group_state, cloud_connector)
+            self.__vm_groups.append(group)
+        for key, value in state['connector'].iteritems():
+            setattr(self.cloud_connector, key, value)

@@ -1,4 +1,3 @@
-import os
 from threading import Thread
 from deployer.components.vm import VM
 from deployer.connectors.generic import AbstractConnector
@@ -118,3 +117,24 @@ class VMGroup:
             threads.append(t)
         for t in threads:
             t.join()
+
+    def serialize(self):
+        d = dict()
+        d['vms'] = list()
+        d['scripts'] = self.scripts
+        d['name_prefix'] = self.name_prefix
+        for vm in self.__vms:
+            d['vms'].append(vm.serialize())
+        d['connector'] = self.cloud_connector.serialize()
+        return d
+
+    def deserialize(self, state, cloud_connector):
+        self.scripts = state['scripts']
+        self.name_prefix = state['name_prefix']
+        for vm_state in state['vms']:
+            vm = VM()
+            vm.deserialize(vm_state, cloud_connector)
+            self.__vms.append(vm)
+        self.cloud_connector = cloud_connector
+        for key, value in state['connector'].iteritems():
+            setattr(self.cloud_connector, key, value)

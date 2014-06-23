@@ -150,3 +150,12 @@ class VM:
             old += key+"\t"+value+"\n"
         self.put_file_content(file_content=old, remote_path="/etc/hosts")
 
+    def serialize(self):
+        d = self.__dict__.copy()
+        d.pop("cloud_connector")
+        return d
+
+    def deserialize(self, state, cloud_connector):
+        for key, value in state.iteritems():
+            setattr(self, key, value)
+        self.cloud_connector = cloud_connector

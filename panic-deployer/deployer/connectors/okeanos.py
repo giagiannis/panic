@@ -148,4 +148,15 @@ class OkeanosConnector(AbstractConnector):
         return new_connector
 
     def cleanup(self):
-        self.__network_client.delete_network(self.private_network)
+        if self.private_network != -1:
+            self.__network_client.delete_network(self.private_network)
+
+    def serialize(self):
+        d = dict()
+        d['attach_public_ipv4'] = self.attach_public_ipv4
+        d['private_network'] = self.private_network
+        return d
+
+    def deserialize(self, state):
+        self.attach_public_ipv4 = state['attach_public_ipv4']
+        self.private_network = state['private_network']
