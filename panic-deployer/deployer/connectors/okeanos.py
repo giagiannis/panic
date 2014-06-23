@@ -41,6 +41,17 @@ class OkeanosConnector(AbstractConnector):
             return False
         return True
 
+    def configure(self, configuration):
+        self.authenticate(configuration['auth'])
+        if 'private_network' in configuration and configuration['private_network']:
+            self.private_network = 0
+        if 'attach_public_ipv4' in configuration and configuration['attach_public_ipv4']:
+            self.attach_public_ipv4 = True
+
+    def prepare(self):
+        if self.private_network == 0:
+            self.private_network = self.create_private_network()
+
     def create_vm(self, name, flavor_id, image_id):
         """
 

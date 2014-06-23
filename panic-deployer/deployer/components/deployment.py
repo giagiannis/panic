@@ -32,8 +32,6 @@ class Deployment:
         self.name = description['name']
         self.inject_ssh_key_pair = description['actions']['inject_ssh_keypair']
         self.update_hosts = description['actions']['update_etc_hosts']
-        if description['provider']['private_network']:
-            self.cloud_connector.private_network = self.cloud_connector.create_private_network()
         for group in description['groups']:
             g = VMGroup()
             g.configure(group)
@@ -71,6 +69,7 @@ class Deployment:
 
     def terminate(self):
         self.__spawn_threads('delete')
+        self.cloud_connector.cleanup()
 
     def __spawn_threads(self, method_to_call, args=None):
         """
@@ -99,10 +98,10 @@ class Deployment:
 
     def deserialize(self, state, cloud_connector):
         self.cloud_connector = cloud_connector
+        for key, value in state['connector'].iteritems():
+            setattr(self.cloud_connector, key, value)
         self.name = state['name']
         for group_state in state['groups']:
             group = VMGroup()
-            group.deserialize(group_state, cloud_connector)
+            group.deserialize(group_state, cloud_connector.clone())
             self.__vm_groups.append(group)
-        for key, value in state['connector'].iteritems():
-            setattr(self.cloud_connector, key, value)

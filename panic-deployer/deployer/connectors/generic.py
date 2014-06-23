@@ -13,6 +13,9 @@ class AbstractConnector:
     def authenticate(self, authentication=None):
         raise NotImplemented
 
+    def configure(self, configuration):
+        raise NotImplemented
+
     def create_vm(self, name, flavor_id, image_id):
         """
 
@@ -20,6 +23,9 @@ class AbstractConnector:
         :param flavor_id:
         :param image_id:
         """
+        raise NotImplemented
+
+    def prepare(self):
         raise NotImplemented
 
     def delete_vm(self, vm_id):

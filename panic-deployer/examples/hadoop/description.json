@@ -17,7 +17,7 @@
 				}
 			],
 			"provider_actions": {
-			    "attach_public_ipv4" : true
+			  "attach_public_ipv4" : true
 			}
 		},
 		{
@@ -36,7 +36,7 @@
 				}
 			],
 			"provider_actions": {
-			    "attach_public_ipv4" : true
+			  "attach_public_ipv4" : true
 			}
 		}
 	],
@@ -50,6 +50,7 @@
 	        "URL" : "https://accounts.okeanos.grnet.gr/identity/v2.0",
 	        "TOKEN" : "aaQpzc7Vd6przo7RodJloBqRpz-QXrpQ4p2QYLcQBis"
 	    },
-	    "private_network" : false
+	    "private_network" : true
+	    
 	}
 }

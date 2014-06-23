@@ -81,6 +81,7 @@ class VMGroup:
 
     def delete(self):
         self.__spawn_threads('delete')
+        self.cloud_connector.cleanup()
 
     def get_addresses(self):
         """
@@ -133,7 +134,7 @@ class VMGroup:
         self.name_prefix = state['name_prefix']
         for vm_state in state['vms']:
             vm = VM()
-            vm.deserialize(vm_state, cloud_connector)
+            vm.deserialize(vm_state, cloud_connector.clone())
             self.__vms.append(vm)
         self.cloud_connector = cloud_connector
         for key, value in state['connector'].iteritems():

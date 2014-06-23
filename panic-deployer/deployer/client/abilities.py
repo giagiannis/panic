@@ -65,7 +65,7 @@ def configure_connector(provider):
     logging.getLogger("root").info("Configuring the cloud connector")
     if provider['name'] == "~okeanos" or provider['name'] == "okeanos":
         connector = OkeanosConnector()
-        connector.authenticate(provider['auth'])
+        connector.configure(provider)
         return connector
     else:
         raise NotImplemented("The connector is not supported")
@@ -78,6 +78,8 @@ def start_deployment(cloud_connector, description):
     :param description:
     :return:
     """
+    logging.getLogger("root").info("Preparing the connector")
+    cloud_connector.prepare()
     logging.getLogger("root").info("Starting new deployment")
     deployment = Deployment()
     deployment.cloud_connector = cloud_connector
@@ -93,8 +95,6 @@ def start_deployment(cloud_connector, description):
 def terminate_deployment(deployment):
     logging.getLogger("root").info("Terminating deployment")
     deployment.terminate()
-    deployment.cloud_connector.cleanup()
-
 
 def load_state_file(statefile_path, cloud_connector):
     logging.getLogger("root").info("Loading state file")
