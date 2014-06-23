@@ -55,8 +55,11 @@ class VM:
         Execute an ssh command. It opens a new ssh connection.
         """
         sshclient = self.__create_ssh_client()
-        sshclient.exec_command(command)
+        stdin_c, stdout_c, stderr_c = sshclient.exec_command(command)
+        output = stdout_c.read()
+        error = stderr_c.read()
         sshclient.close()
+        return output, error
 
     def run_script(self, script):
         """
@@ -67,9 +70,12 @@ class VM:
         sftp.put(script, '/tmp/script-to-run')
         sftp.close()
         sshclient.exec_command("chmod +x /tmp/script-to-run")
-        sshclient.exec_command("/tmp/script-to-run")
+        stdin_c, stdout_c, stderr_c = sshclient.exec_command("/tmp/script-to-run")
         sshclient.exec_command("rm /tmp/script-to-run")
         sshclient.close()
+        output = stdout_c.read()
+        error = stderr_c.read()
+        return output, error
 
     def wait_until_visible(self):
         """
@@ -79,8 +85,10 @@ class VM:
         self.__create_ssh_client().close()
         return
 
-    def get_addresses(self, ip_version=None):
-        return self.cloud_connector.get_server_addresses(self.id, ip_version)
+    def get_addresses(self, ip_version=None, connection_type=None):
+        return self.cloud_connector.get_server_addresses(self.id,
+                                                         ip_version=ip_version,
+                                                         connection_type=connection_type)
 
     def __create_ssh_client(self):
         sshclient = SSHClient()
@@ -128,3 +136,17 @@ class VM:
         sftp = sshclient.open_sftp()
         sftp.put(localpath=localpath, remotepath=remotepath)
         sftp.close()
+
+    def update_hosts(self, hosts):
+        """
+        This method fetches the /etc/hosts file from the VM and
+        it updates according to the hosts dictionary. The key in
+        hosts is the IP and the value is the domain name.
+        """
+        old = self.get_file_content("/etc/hosts")
+        old += "\n\n"
+        old += "# Lines added automatically\n"
+        for key, value in hosts.iteritems():
+            old += key+"\t"+value+"\n"
+        self.put_file_content(file_content=old, remote_path="/etc/hosts")
+

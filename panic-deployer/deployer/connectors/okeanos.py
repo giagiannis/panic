@@ -109,12 +109,16 @@ class OkeanosConnector(AbstractConnector):
         """
         return self.__cyclades.get_server_details(vm_id)
 
-    def get_server_addresses(self, vm_id, ip_version=None):
+    def get_server_addresses(self, vm_id, ip_version=None, connection_type=None):
+        """
+        Returns the enabled addresses, as referenced from the IaaS.
+        """
         addresses = self.__cyclades.get_server_details(vm_id)['addresses']
         results = []
         while len(addresses) > 0:
             key, value = addresses.popitem()
-            if ip_version is None or value['version'] == ip_version:
+            if (ip_version is None or value[0]['version'] == ip_version) and \
+                    (connection_type is None or value[0]['OS-EXT-IPS:type'] == connection_type):
                 results.append(value[0]['addr'])
         return results
 

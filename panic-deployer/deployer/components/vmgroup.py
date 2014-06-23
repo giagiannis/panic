@@ -3,7 +3,6 @@ from threading import Thread
 from deployer.components.vm import VM
 from deployer.connectors.generic import AbstractConnector
 from deployer.errors import ArgumentsError
-from deployer.utils import get_random_file_name
 
 __author__ = 'Giannis Giannakopoulos'
 
@@ -22,6 +21,23 @@ class VMGroup:
         self.name_prefix = ''
         self.__script_index = 0
         self.__vms = []
+
+    def configure(self, description):
+        """
+        Method used to configure the VM group object using a single method.
+        The description object that is passed contains
+        :param description:
+        :return:
+        """
+        self.image = description['image']
+        self.flavor = description['flavor']
+        self.multiplicity = description['multiplicity']
+        self.name_prefix = description['name']
+        scripts_temp = dict()
+        for script in description['scripts']:
+            scripts_temp[script['order']] = script['content']
+        for order in sorted(scripts_temp):
+            self.scripts.append(scripts_temp[order])
 
     def create(self):
         """
@@ -49,6 +65,9 @@ class VMGroup:
         self.__script_index += 1
         self.__spawn_threads('run_command', args=[current_script])
 
+    def has_more_scripts(self):
+        return self.__script_index < len(self.scripts)
+
     def inject_ssh_key(self, private_key_path, public_key_path):
         """
         This method injects a previously created SSH keypair to the VMs of the group. This keypair is used as default
@@ -60,16 +79,33 @@ class VMGroup:
         self.__spawn_threads('run_command', args=["cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys &&"
                                                   "chmod 700 /root/.ssh/ && chmod 600 /root/.ssh/id_rsa && "
                                                   "echo \"StrictHostKeyChecking no\" > /root/.ssh/config"])
-        #for vm in self.__vms:
-        #    vm.run_command("mkdir -p /root/.ssh")
-        #    vm.put_file(localpath=private_key_path, remotepath="/root/.ssh/id_rsa")
-        #    vm.put_file(localpath=public_key_path, remotepath="/root/.ssh/id_rsa.pub")
-        #    vm.run_command("cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys ")
-        #    vm.run_command("chmod 700 /root/.ssh/ && chmod 600 /root/.ssh/id_rsa")
-        #    vm.run_command("echo \"StrictHostKeyChecking no\" > /root/.ssh/config")
 
     def delete(self):
         self.__spawn_threads('delete')
+
+    def get_addresses(self):
+        """
+        Returns a dictionary holding the IP as key and the VM name as value, for each VM.
+        """
+        hosts = dict()
+        for vm in self.__vms:
+            address = None
+            addr_t = vm.get_addresses(ip_version=4, connection_type='fixed')
+            if len(addr_t) > 0:
+                address = addr_t[0]       # prefer private IPv4
+            if address is None:
+                addr_t = vm.get_addresses(ip_version=4)                            # next is public IPv4
+                if len(addr_t) > 0:
+                    address = addr_t[0]
+            if address is None:
+                addr_t = vm.get_addresses(ip_version=6)                            # ipv6
+                if len(addr_t) > 0:
+                    address = addr_t[0]
+            hosts[address] = vm.name
+        return hosts
+
+    def set_hosts(self, hosts):
+        self.__spawn_threads('update_hosts', args=[hosts])
 
     def __spawn_threads(self, method_to_call, args=None):
         threads = []
@@ -82,15 +118,3 @@ class VMGroup:
             threads.append(t)
         for t in threads:
             t.join()
-
-
-def main():
-    print "foofootos"
-    group = VMGroup()
-    t = Thread(target=group.create)
-    t.start()
-    t.join()
-    del t
-
-if __name__ == "__main__":
-    main()
