@@ -159,7 +159,7 @@ class OkeanosConnector(AbstractConnector):
         return new_connector
 
     def cleanup(self):
-        if self.private_network != -1:
+        if self.private_network != -1 and self.private_network != 0:
             self.__network_client.delete_network(self.private_network)
 
     def serialize(self):
