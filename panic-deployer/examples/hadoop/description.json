@@ -18,6 +18,10 @@
 				{
 				    "order" : 3,
 				    "path" : "shared/configure.sh"
+				},
+				{
+				    "order" : 4,
+				    "path" : "shared/start.sh"
 				}
 			],
 			"provider_actions": {
