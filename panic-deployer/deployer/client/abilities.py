@@ -29,7 +29,7 @@ def transform_description(description, path_prefix):
     for g in groups:
         scripts = g['scripts']
         for s in scripts:
-            if s.has_key('path'):
+            if 'path' in s:
                 f = open(path_prefix+"/"+s['path'])
                 con = f.read()
                 f.close()
@@ -95,6 +95,7 @@ def start_deployment(cloud_connector, description):
 def terminate_deployment(deployment):
     logging.getLogger("root").info("Terminating deployment")
     deployment.terminate()
+
 
 def load_state_file(statefile_path, cloud_connector):
     logging.getLogger("root").info("Loading state file")

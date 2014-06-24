@@ -49,6 +49,10 @@ class OkeanosConnector(AbstractConnector):
             self.attach_public_ipv4 = True
 
     def prepare(self):
+        """
+        In this method, application-level IaaS related actions are executed.
+        :return:
+        """
         if self.private_network == 0:
             self.private_network = self.create_private_network()
 
@@ -160,7 +164,19 @@ class OkeanosConnector(AbstractConnector):
 
     def cleanup(self):
         if self.private_network != -1 and self.private_network != 0:
+            self.__wait_until_private_net_is_empty(self.private_network)
             self.__network_client.delete_network(self.private_network)
+
+    def __wait_until_private_net_is_empty(self, private_net_id):
+
+        for i in range(1, MAX_WAIT_FOR_LOOPS):
+            port_set = set()
+            for p in self.__network_client.list_ports():
+                port_set.add(p['network_id'])
+            if private_net_id in port_set:
+                return
+            else:
+                sleep(SLEEP_TIMEOUT)
 
     def serialize(self):
         d = dict()
