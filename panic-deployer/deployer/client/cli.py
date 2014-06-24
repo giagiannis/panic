@@ -9,7 +9,7 @@ __author__ = 'Giannis Giannakopoulos'
 
 
 def configure_options():
-    parser = OptionParser()
+    parser = OptionParser(prog="deployer", version="v0.1", usage=" %prog %v")
     parser.add_option("-d",
                       "--desc",
                       dest='description',
