@@ -173,7 +173,7 @@ class OkeanosConnector(AbstractConnector):
             port_set = set()
             for p in self.__network_client.list_ports():
                 port_set.add(p['network_id'])
-            if private_net_id in port_set:
+            if private_net_id not in port_set:
                 return
             else:
                 sleep(SLEEP_TIMEOUT)
