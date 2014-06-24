@@ -107,6 +107,9 @@ class VMGroup:
     def set_hosts(self, hosts):
         self.__spawn_threads('update_hosts', args=[hosts])
 
+    def set_hostname(self):
+        self.__spawn_threads('set_hostnames')
+
     def __spawn_threads(self, method_to_call, args=None):
         threads = []
         for vm in self.__vms:

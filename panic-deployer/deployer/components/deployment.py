@@ -16,6 +16,7 @@ class Deployment:
     def __init__(self):
         self.inject_ssh_key_pair = True
         self.update_hosts = True
+        self.set_hostnames = True
         self.__vm_groups = list()
         self.cloud_connector = None
         self.name = ''
@@ -30,8 +31,13 @@ class Deployment:
         if self.cloud_connector is None:
             raise ArgumentsError("Connector must be set!")
         self.name = description['name']
-        self.inject_ssh_key_pair = description['actions']['inject_ssh_keypair']
-        self.update_hosts = description['actions']['update_etc_hosts']
+        if 'inject_ssh_keypair' in description['actions']:
+            self.inject_ssh_key_pair = description['actions']['inject_ssh_keypair']
+        if 'update_etc_hosts' in description['actions']:
+            self.update_hosts = description['actions']['update_etc_hosts']
+        if 'set_hostnames' in description['actions']:
+            self.update_hosts = description['actions']['set_hostnames']
+
         for group in description['groups']:
             g = VMGroup()
             g.configure(group)
@@ -57,6 +63,10 @@ class Deployment:
             for vmg in self.__vm_groups:
                 vmg.set_hosts(hosts)
             logging.getLogger("deployment").info("Launch is finished!")
+
+        if self.set_hostnames:
+            logging.getLogger("deployment").info("Setting hostnames")
+            self.__spawn_threads('set_hostnames')
 
     def execute_script(self):
         self.__spawn_threads('execute_script')

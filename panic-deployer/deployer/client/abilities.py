@@ -15,6 +15,7 @@ def configure_logger():
     """
     logging.basicConfig()
     logging.getLogger("root").setLevel(conf.LOG_LEVEL)
+    logging.getLogger("vm").setLevel(conf.LOG_LEVEL)
 
 
 def transform_description(description, path_prefix):

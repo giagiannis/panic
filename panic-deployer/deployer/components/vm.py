@@ -1,3 +1,4 @@
+import logging
 import os
 import warnings
 from deployer.utils import get_random_file_name
@@ -36,6 +37,7 @@ class VM:
         Creates a VM, with a specific name for a given flavor and image.
         :raise ArgumentsError: if there exist missing arguments
         """
+        logging.getLogger("vm").debug(self.name+":creating VM")
         if self.name == '' or self.image_id == '' or self.flavor_id == '':
             raise ArgumentsError("name, image_id and flavor_id must be declared to start a VM!")
         response = self.cloud_connector.create_vm(name=self.name, image_id=self.image_id, flavor_id=self.flavor_id)
@@ -48,17 +50,21 @@ class VM:
         """
         Forcefully destroy the VM .
         """
+        logging.getLogger("vm").debug(self.name+":deleting VM")
         self.cloud_connector.delete_vm(self.id)
 
     def run_command(self, command):
         """
         Execute an ssh command. It opens a new ssh connection.
         """
+        logging.getLogger("vm").debug(self.name+": running command")
         sshclient = self.__create_ssh_client()
         stdin_c, stdout_c, stderr_c = sshclient.exec_command(command)
         output = stdout_c.read()
         error = stderr_c.read()
         sshclient.close()
+        logging.getLogger("vm").debug(self.name+": stdout:" + output)
+        logging.getLogger("vm").debug(self.name+": stdout:" + error)
         return output, error
 
     def run_script(self, script):
@@ -83,6 +89,7 @@ class VM:
         The timeouts and number of tries are defined from configuration files.
         """
         self.__create_ssh_client().close()
+        logging.getLogger("vm").debug(self.name+": VM is visible")
         return
 
     def get_addresses(self, ip_version=None, connection_type=None):
@@ -132,6 +139,7 @@ class VM:
         os.remove(local_path)
 
     def put_file(self, localpath, remotepath):
+        logging.getLogger("vm").debug(self.name+": putting file")
         sshclient = self.__create_ssh_client()
         sftp = sshclient.open_sftp()
         sftp.put(localpath=localpath, remotepath=remotepath)
@@ -143,6 +151,7 @@ class VM:
         it updates according to the hosts dictionary. The key in
         hosts is the IP and the value is the domain name.
         """
+        logging.getLogger("vm").debug(self.name+": updating hosts")
         old = self.get_file_content("/etc/hosts")
         old += "\n\n"
         old += "# Lines added automatically\n"
@@ -159,3 +168,8 @@ class VM:
         for key, value in state.iteritems():
             setattr(self, key, value)
         self.cloud_connector = cloud_connector
+
+    def set_hostname(self):
+        logging.getLogger("vm").debug(self.name+": setting hostname")
+        self.run_command("hostname "+self.name)
+
