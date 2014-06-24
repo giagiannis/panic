@@ -1,4 +1,6 @@
+import json
 from optparse import OptionParser
+from pprint import pprint
 import sys
 from deployer.client.abilities import configure_logger, parse_description_file, configure_connector, start_deployment, \
     load_state_file, save_state_file, terminate_deployment
@@ -29,7 +31,7 @@ def configure_options():
     parser.add_option("-a",
                       "--actions",
                       dest='action',
-                      choices=['launch', 'terminate'],
+                      choices=['launch', 'terminate', 'show'],
                       help="action to do")
 
     (options, args) = parser.parse_args()
@@ -38,8 +40,6 @@ def configure_options():
 
 def endpoint():
     (options, parser) = configure_options()
-    # if options.description is None:
-    #     parser.error("please provide a description file")
     if options.action is None:
         parser.error("please provide an action")
 
@@ -67,6 +67,15 @@ def endpoint():
         else:
             sys.stderr("I need a statefile to load the configuration from...")
             exit(1)
+
+    if options.action == 'show':
+        if options.statefile_load is not None:
+            f = open(options.statefile_load)
+            json_content = f.read()
+            d = json.loads(json_content)
+            for g in d['deployment']['groups']:
+                g.pop('scripts')
+            pprint(d)
 
 if __name__ == "__main__":
     endpoint()
