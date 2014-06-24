@@ -36,7 +36,7 @@ class Deployment:
         if 'update_etc_hosts' in description['actions']:
             self.update_hosts = description['actions']['update_etc_hosts']
         if 'set_hostnames' in description['actions']:
-            self.update_hosts = description['actions']['set_hostnames']
+            self.set_hostnames = description['actions']['set_hostnames']
 
         for group in description['groups']:
             g = VMGroup()
@@ -62,7 +62,6 @@ class Deployment:
                     hosts[ip] = host
             for vmg in self.__vm_groups:
                 vmg.set_hosts(hosts)
-            logging.getLogger("deployment").info("Launch is finished!")
 
         if self.set_hostnames:
             logging.getLogger("deployment").info("Setting hostnames")
