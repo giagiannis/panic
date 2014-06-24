@@ -9,11 +9,11 @@
 			"scripts" : [
 				{
 				    "order" : 1,
-				    "path" : "master/prepare.sh"
+				    "path" : "master/nat.sh"
 				},
 				{
 				    "order" : 2,
-				    "content" : "echo 'House of the rising sun' > /root/temp"
+				    "path" : "master/prepare.sh"
 				}
 			],
 			"provider_actions": {
@@ -28,11 +28,11 @@
 			"scripts" : [
 				{
 				    "order" : 1,
-				    "path" : "slave/prepare.sh"
+				    "path" : "slave/nat.sh"
 				},
 				{
 				    "order" : 2,
-				    "content" : "echo 'House of the rising sun from slave ;)' > /root/temp"
+				    "path" : "slave/prepare.sh"
 				}
 			],
 			"provider_actions": {
@@ -42,7 +42,8 @@
 	],
 	"actions" : {
 	    "inject_ssh_keypair" : true,
-	    "update_etc_hosts" : true
+	    "update_etc_hosts" : true,
+	    "set_hostnames" : true
 	},
 	"provider" : {
 	    "name": "~okeanos",
