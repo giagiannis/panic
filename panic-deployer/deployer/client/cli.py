@@ -1,4 +1,5 @@
 from optparse import OptionParser
+import sys
 from deployer.client.abilities import configure_logger, parse_description_file, configure_connector, start_deployment, \
     load_state_file, save_state_file, terminate_deployment
 
@@ -37,24 +38,35 @@ def configure_options():
 
 def endpoint():
     (options, parser) = configure_options()
-    if options.description is None:
-        parser.error("please provide a description file")
+    # if options.description is None:
+    #     parser.error("please provide a description file")
     if options.action is None:
         parser.error("please provide an action")
 
     configure_logger()
-    description = parse_description_file(description_file_path=options.description)
-    cloud_connector = configure_connector(description['provider'])
+
+    description = None
+    cloud_connector = None
+
+    if options.description is not None:
+        description = parse_description_file(description_file_path=options.description)
+        cloud_connector = configure_connector(description['provider'])
 
     if options.action == "launch":
+        if description is None or cloud_connector is None:
+            sys.stderr("Please provide description file...")
+            exit(1)
         deployment = start_deployment(cloud_connector, description)
         if options.statefile_save is not None:
-            save_state_file(deployment, options.statefile_save)
+            save_state_file(deployment, description, options.statefile_save)
 
     if options.action == 'terminate':
         if options.statefile_load is not None:
-            deployment = load_state_file(options.statefile_load, cloud_connector)
+            deployment, cloud_connector = load_state_file(options.statefile_load)
             terminate_deployment(deployment)
+        else:
+            sys.stderr("I need a statefile to load the configuration from...")
+            exit(1)
 
 if __name__ == "__main__":
     endpoint()

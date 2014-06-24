@@ -93,21 +93,33 @@ def start_deployment(cloud_connector, description):
 
 
 def terminate_deployment(deployment):
+    """
+    Terminate deployment ability
+    :param deployment:
+    :return:
+    """
     logging.getLogger("root").info("Terminating deployment")
     deployment.terminate()
 
 
-def load_state_file(statefile_path, cloud_connector):
+def load_state_file(statefile_path):
+    """
+    This method loads the state file and create a deployment object and a cloud connector.
+    :param statefile_path: the path where the statefile exists
+    :return: deployment object, cloud connector object
+    """
     logging.getLogger("root").info("Loading state file")
     f = open(statefile_path, 'r')
     json_content = f.read()
     f.close()
+    state = json.loads(json_content)
+    cloud_connector = configure_connector(state['provider'])
     deployment = Deployment()
-    deployment.deserialize(json.loads(json_content), cloud_connector)
-    return deployment
+    deployment.deserialize(state['deployment'], cloud_connector)
+    return deployment, cloud_connector
 
 
-def save_state_file(deployment, statefile_path, indent=2):
+def save_state_file(deployment, description, statefile_path, indent=2):
     """
     Save the statefile of the deployment to the specified path
     :param deployment:
@@ -115,7 +127,10 @@ def save_state_file(deployment, statefile_path, indent=2):
     :return:
     """
     logging.getLogger("root").info("Saving state file")
-    json_content = json.dumps(deployment.serialize(), indent=indent)
+    dictionary = dict()
+    dictionary['deployment'] = deployment.serialize()
+    dictionary['provider'] = description['provider']
+    json_content = json.dumps(dictionary, indent=indent)
     f = open(statefile_path, 'w')
     f.write(json_content)
     f.flush()
