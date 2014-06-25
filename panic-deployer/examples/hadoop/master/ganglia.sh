@@ -46,6 +46,7 @@ service ganglia-monitor restart
 NUMBER_OF_SLAVES=$(cat /etc/hosts | grep slave | wc -l)
 for i in $(seq 1 $NUMBER_OF_SLAVES); do
   ssh slave$i "service ganglia-monitor restart"
+done
 }
 
 install_packages
