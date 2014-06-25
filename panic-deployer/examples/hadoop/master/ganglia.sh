@@ -2,7 +2,9 @@
 
 install_packages(){
 export DEBIAN_FRONTEND=noninteractive
-apt-get -y install ganglia-monitor ganglia-webfrontend 1>/dev/null 2>/dev/null
+apt-get -y install ganglia-monitor 1>/dev/null 2>/dev/null
+apt-get -y install gmetad 1>/dev/null 2>/dev/null
+apt-get -y install ganglia-webfrontend 1>/dev/null 2>/dev/null
 }
 
 setup_web(){
@@ -16,7 +18,7 @@ configure_gmetad(){
 # data_source
 sed -i -e 's/^data_source.*/data_source "Hadoop cluster" 10 master1:8649/g' /etc/ganglia/gmetad.conf
 # gridname
-sed -i -e 's/^# gridname "MyGrid"/gridname "Hadoop Cluster"/g' /etc/ganglia/gmetad.conf
+sed -i -e 's/^# gridname "MyGrid"/gridname "Hadoop cluster"/g' /etc/ganglia/gmetad.conf
 
 service gmetad restart
 }
