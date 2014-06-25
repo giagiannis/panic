@@ -14,6 +14,10 @@ mv /tmp/hadoop-1.2.1/ $HADOOP_INSTALLATION_PATH
 echo "export PATH=\$PATH:/opt/hadoop/bin/" >> /etc/profile
 rm /tmp/hadoop.tar.gz
 
+# add libsnappy to hadoo native lib
+
+ln -s /usr/lib/libsnappy.so.1 /opt/hadoop/lib/native/Linux-amd64-64/
+
 echo "Hadoop downloaded and extracted"
 }
 
