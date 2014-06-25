@@ -57,14 +57,19 @@ class VM:
         """
         Execute an ssh command. It opens a new ssh connection.
         """
-        logging.getLogger("vm").debug(self.name+": running command")
+        if len(command) < 100:
+            logging.getLogger("vm").debug(self.name+": running command "+command)
+        else:
+            logging.getLogger("vm").debug(self.name+": running command (too large to show)")
         sshclient = self.__create_ssh_client()
         stdin_c, stdout_c, stderr_c = sshclient.exec_command(command)
         output = stdout_c.read()
         error = stderr_c.read()
         sshclient.close()
-        logging.getLogger("vm").debug(self.name+": stdout:" + output)
-        logging.getLogger("vm").debug(self.name+": stdout:" + error)
+        if output is not None and output != '':
+            logging.getLogger("vm").debug(self.name+": stdout:" + output)
+        if error is not None and error != '':
+            logging.getLogger("vm").debug(self.name+": stderr:" + error)
         return output, error
 
     def run_script(self, script):
@@ -139,7 +144,7 @@ class VM:
         os.remove(local_path)
 
     def put_file(self, localpath, remotepath):
-        logging.getLogger("vm").debug(self.name+": putting file")
+        logging.getLogger("vm").debug(self.name+": putting file "+localpath+" to "+self.name+":"+remotepath)
         sshclient = self.__create_ssh_client()
         sftp = sshclient.open_sftp()
         sftp.put(localpath=localpath, remotepath=remotepath)
