@@ -21,7 +21,11 @@
 				},
 				{
 				    "order" : 4,
-				    "path" : "shared/start.sh"
+				    "path" : "master/start.sh"
+				},
+				{
+				    "order" : 4,
+				    "path" : "master/ganglia.sh"
 				}
 			],
 			"provider_actions": {
@@ -45,6 +49,10 @@
 				{
 				    "order" : 3,
 				    "path" : "shared/configure.sh"
+				},
+				{
+				    "order" : 4,
+				    "path" : "slave/ganglia.sh"
 				}
 			],
 			"provider_actions": {
