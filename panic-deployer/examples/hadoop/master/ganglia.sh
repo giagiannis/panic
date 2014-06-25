@@ -20,6 +20,9 @@ sed -i -e 's/^data_source.*/data_source "Hadoop cluster" 10 master1:8649/g' /etc
 # gridname
 sed -i -e 's/^# gridname "MyGrid"/gridname "Hadoop cluster"/g' /etc/ganglia/gmetad.conf
 
+# all hosts trusted
+sed -i -e 's/^# all_trusted on/all_trusted on/g' /etc/ganglia/gmetad.conf
+
 service gmetad restart
 }
 
@@ -37,9 +40,18 @@ sed -i -e "/^cluster {/ a \  name=\"Hadoop cluster\"" /etc/ganglia/gmond.conf
 service ganglia-monitor restart
 }
 
+restart_all() {
+service gmetad restart
+service ganglia-monitor restart
+NUMBER_OF_SLAVES=$(cat /etc/hosts | grep slave | wc -l)
+for i in $(seq 1 $NUMBER_OF_SLAVES); do
+  ssh slave$i "service ganglia-monitor restart"
+}
+
 install_packages
 configure_gmond
 configure_gmetad
 setup_web
+restart_all
 
 echo "Ganglia installed"
