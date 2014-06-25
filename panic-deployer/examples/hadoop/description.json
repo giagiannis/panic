@@ -56,7 +56,6 @@
 				}
 			],
 			"provider_actions": {
-			  "attach_public_ipv4" : true
 			}
 		}
 	],
