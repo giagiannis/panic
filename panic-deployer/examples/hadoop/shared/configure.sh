@@ -7,11 +7,14 @@ HADOOP_URL="http://apache.cc.uoc.gr/hadoop/common/stable1/hadoop-1.2.1-bin.tar.g
 HADOOP_INSTALLATION_PATH="/opt/hadoop"
 
 download_hadoop(){
-wget $HADOOP_URL -O /tmp/hadoop.tar.gz
+echo "Downloading hadoop"
+wget $HADOOP_URL -O /tmp/hadoop.tar.gz -o /tmp/wget_logs.txt
 tar xfz /tmp/hadoop.tar.gz -C /tmp/
 mv /tmp/hadoop-1.2.1/ $HADOOP_INSTALLATION_PATH
 echo "export PATH=\$PATH:/opt/hadoop/bin/" >> /etc/profile
 rm /tmp/hadoop.tar.gz
+
+echo "Hadoop downloaded and extracted"
 }
 
 conf_xml(){
@@ -46,6 +49,8 @@ conf_xml mapred.job.tracker master1:9001 $HADOOP_INSTALLATION_PATH/conf/mapred-s
 conf_xml mapred.tasktracker.map.tasks.maximum $NUMBER_OF_CORES $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
 conf_xml mapred.tasktracker.reduce.tasks.maximum $NUMBER_OF_CORES $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
 conf_xml mapred.child.java.opts -Xmx${MEMORY_MB}m $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
+
+echo "Hadoop configured"
 }
 
 download_hadoop

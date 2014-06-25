@@ -14,6 +14,8 @@ iptables -t nat -A POSTROUTING -j MASQUERADE
 # enable IPv4 packet forwarding in the kernel
 echo 1 > /proc/sys/net/ipv4/ip_forward
 
+echo "Master is not operating as router"
+
 
 #echo "Applying port-forwarding rules"
 # Port forwarding

@@ -9,3 +9,5 @@ $HADOOP_INSTALLATION_PATH/bin/hadoop namenode -format
 $HADOOP_INSTALLATION_PATH/bin/start-dfs.sh
 
 $HADOOP_INSTALLATION_PATH/bin/start-mapred.sh
+
+echo "hadoop started"
