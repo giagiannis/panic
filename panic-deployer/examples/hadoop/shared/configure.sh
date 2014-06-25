@@ -19,6 +19,9 @@ sed -i -e "/<configuration>/a \ \t<property>\n\t\t<name>$1</name>\n\t\t<value>$2
 }
 
 configure_hadoop(){
+NUMBER_OF_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
+MEMORY_MB=$(free -m | grep -i mem | awk '{print$2}')
+
 # set JAVA_HOME
 sed  -i 's|# export JAVA_HOME.*|export JAVA_HOME='"$JAVA_HOME"'|' $HADOOP_INSTALLATION_PATH/conf/hadoop-env.sh
 
@@ -29,16 +32,21 @@ SLAVES=$(cat /etc/hosts | grep slave | wc -l)
 for i in $(seq 1 $SLAVES); do 
   echo slave$i >> $HADOOP_INSTALLATION_PATH/conf/slaves
 done
-# configure hdfs
+
+# configure core-site.xml
+conf_xml fs.default.name hdfs://master1:9000 $HADOOP_INSTALLATION_PATH/conf/core-site.xml
+
+# configure hdfs-site.xml
 conf_xml dfs.replication 1 $HADOOP_INSTALLATION_PATH/conf/hdfs-site.xml
 conf_xml dfs.name.dir /opt/hdfsname/ $HADOOP_INSTALLATION_PATH/conf/hdfs-site.xml
 conf_xml dfs.data.dir /opt/hdfsdata/ $HADOOP_INSTALLATION_PATH/conf/hdfs-site.xml
-conf_xml fs.default.name hdfs://master1:9000 $HADOOP_INSTALLATION_PATH/conf/hdfs-site.xml
 
-# configure mapred
+# configure mapred-site.xml
 conf_xml mapred.job.tracker master1:9001 $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
+conf_xml mapred.tasktracker.map.tasks.maximum $NUMBER_OF_CORES $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
+conf_xml mapred.tasktracker.reduce.tasks.maximum $NUMBER_OF_CORES $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
+conf_xml mapred.child.java.opts -Xmx${MEMORY_MB}m $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
 }
-
 
 download_hadoop
 configure_hadoop
