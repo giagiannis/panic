@@ -16,7 +16,7 @@ rm /tmp/hadoop.tar.gz
 
 # add libsnappy to hadoo native lib
 
-ln -s /usr/lib/libsnappy.so.1 /opt/hadoop/lib/native/Linux-amd64-64/
+ln -s /usr/lib/libsnappy.so.1 /opt/hadoop/lib/native/Linux-amd64-64/libsnappy.so
 
 echo "Hadoop downloaded and extracted"
 }
