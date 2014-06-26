@@ -1,3 +1,5 @@
 nb-configuration.xml
 target/
 nbactions.xml
+/panic-data-generator/nbproject/private/nbproject
+nbproject/
