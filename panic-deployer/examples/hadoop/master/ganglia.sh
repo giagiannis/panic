@@ -37,7 +37,7 @@ sed -i -e "s/  bind/# bind/" /etc/ganglia/gmond.conf
 sed -i -e "s/  bind/# bind/" /etc/ganglia/gmond.conf
 
 sed -i -e '/^cluster {/{n;d}' /etc/ganglia/gmond.conf
-sed -i -e "/^cluster {/ a \  name=\"Hadoop cluster\"" /etc/ganglia/gmond.conf
+sed -i -e "/^cluster {/ a \  name=\"master\"" /etc/ganglia/gmond.conf
 
 service ganglia-monitor restart
 }
