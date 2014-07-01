@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 public class MultiPoint implements Serializable{
     
     private static final String doubleFormat = "0.0000000000";
+    private static final long serialVersionUID = 1L;
     private HashMap<String, Double> values;
 
     public MultiPoint() {

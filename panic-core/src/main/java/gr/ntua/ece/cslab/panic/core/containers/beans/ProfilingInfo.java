@@ -25,6 +25,7 @@ import java.util.List;
  * @author Giannis Giannakopoulos
  */
 public class ProfilingInfo implements Serializable{
+    private static final long serialVersionUID = 1L;
     
     private int maxDeployments;
     private double desiredAccuracy;

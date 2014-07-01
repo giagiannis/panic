@@ -22,6 +22,7 @@ package gr.ntua.ece.cslab.panic.core.containers.beans;
  * @see MultiPoint
  */
 public class InputSpacePoint extends MultiPoint {
+    private static final long serialVersionUID = 1L;
 
     @Override
     public String toString() {
