@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.ntua.ece.cslab.panic.core.utils;
+package gr.ntua.ece.cslab.panic.core.client;
 
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
+import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,17 +85,20 @@ public class Benchmark {
      *
      * @return
      */
-    public static Class[] discoverModels() {
-        List<Class> list = new ArrayList<>();
+    
+    public static Class<? extends Model>[] discoverModels() {
+        List<Class<? extends Model>> list = new ArrayList<>();
         Reflections reflections = new Reflections("gr.ntua.ece.cslab");
-        for (Class c : reflections.getSubTypesOf(Model.class)) {
+        for (Class<? extends Model> c : reflections.getSubTypesOf(Model.class)) {
             if (!c.getName().toLowerCase().contains("abstract")) {
                 list.add(c);
             }
         }
-        Class[] modelsDiscovered = new Class[list.size()];
+        @SuppressWarnings("unchecked")
+        Class<? extends Model>[] modelsDiscovered = new Class[list.size()];
+        
         int i = 0;
-        for (Class c : list) {
+        for (Class<? extends Model> c : list) {
             modelsDiscovered[i++] = c;
         }
         return modelsDiscovered;
@@ -105,17 +109,18 @@ public class Benchmark {
      *
      * @return
      */
-    public static Class[] discoverSamplers() {
-        List<Class> list = new ArrayList<>();
+    public static Class<? extends Sampler>[] discoverSamplers() {
+        List<Class<? extends Sampler>> list = new ArrayList<>();
         Reflections reflections = new Reflections("gr.ntua.ece.cslab");
-        for (Class c : reflections.getSubTypesOf(Sampler.class)) {
+        for (Class<? extends Sampler> c : reflections.getSubTypesOf(Sampler.class)) {
             if (!c.getName().toLowerCase().contains("abstract")) {
                 list.add(c);
             }
         }
-        Class[] samplersDiscovered = new Class[list.size()];
+        @SuppressWarnings("unchecked")
+        Class<? extends Sampler>[] samplersDiscovered = new Class[list.size()];
         int i = 0;
-        for (Class c : list) {
+        for (Class<? extends Sampler> c : list) {
             samplersDiscovered[i++] = c;
         }
         return samplersDiscovered;
@@ -141,14 +146,14 @@ public class Benchmark {
         }
 
         if (cmd.hasOption("list-models")) {
-            for (Class c : discoverModels()) {
+            for (Class<? extends Model> c : discoverModels()) {
                 System.out.println(c.toString());
             }
             System.exit(1);
         }
 
         if (cmd.hasOption("list-samplers")) {
-            for (Class c : discoverSamplers()) {
+            for (Class<? extends Sampler> c : discoverSamplers()) {
                 System.out.println(c.toString());
             }
             System.exit(1);
@@ -188,7 +193,7 @@ public class Benchmark {
         } else {
             int i = 0;
             models = new Model[discoverModels().length];
-            for (Class c : discoverModels()) {
+            for (Class<? extends Model> c : discoverModels()) {
                 models[i++] = (Model) c.getConstructor().newInstance();
             }
         }
@@ -205,7 +210,7 @@ public class Benchmark {
         } else {
             int i=0;
             samplers = new Sampler[discoverSamplers().length];
-            for(Class c : discoverSamplers())
+            for(Class<? extends Sampler> c : discoverSamplers())
                 samplers[i++] = (Sampler) c.getConstructor().newInstance();
         }
     }
