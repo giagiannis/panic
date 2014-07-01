@@ -16,6 +16,7 @@
         based on a set of sample points.
     </description>
     <modules>
+        <module>panic-core</module>
         <module>panic-server</module>
         <module>panic-client</module>
         <module>panic-ui</module>
