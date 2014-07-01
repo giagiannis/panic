@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.server.models;
+package gr.ntua.ece.cslab.panic.core.models;
 
-import weka.classifiers.functions.MultilayerPerceptron;
+import weka.classifiers.meta.Bagging;
 
 /**
- * Multi layer perceptron, as implement by WEKA.
+ *
  * @author Giannis Giannakopoulos
  */
-public class MLPerceptron extends AbstractWekaModel {
-    
-    public MLPerceptron() {
+public class BagClassify extends AbstractWekaModel {
+
+    public BagClassify() {
         super();
-        classifier = new MultilayerPerceptron();
+        this.classifier = new Bagging();
     }
-    
+
     @Override
     public void configureClassifier() {
-        //no configuration for now
+        // do nothing for now
     }
+    
+    
+    
+    
 }

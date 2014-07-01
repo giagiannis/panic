@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.ntua.ece.cslab.panic.server.utils;
+package gr.ntua.ece.cslab.panic.core.utils;
 
-import gr.ntua.ece.cslab.panic.server.containers.beans.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.server.models.Model;
-import gr.ntua.ece.cslab.panic.server.samplers.Sampler;
+import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.models.Model;
+import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Date;

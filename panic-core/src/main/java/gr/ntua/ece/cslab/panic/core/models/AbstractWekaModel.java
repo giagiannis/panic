@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gr.ntua.ece.cslab.panic.server.models;
+package gr.ntua.ece.cslab.panic.core.models;
 
-import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.server.containers.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import java.util.LinkedList;
 import java.util.List;
 import weka.classifiers.Classifier;

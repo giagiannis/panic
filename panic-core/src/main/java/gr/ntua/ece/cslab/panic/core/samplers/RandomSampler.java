@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.server.samplers;
+package gr.ntua.ece.cslab.panic.core.samplers;
 
-import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;

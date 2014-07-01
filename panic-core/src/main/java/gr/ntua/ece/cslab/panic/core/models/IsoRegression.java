@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.server.models;
+package gr.ntua.ece.cslab.panic.core.models;
 
-import weka.classifiers.functions.GaussianProcesses;
+import weka.classifiers.functions.IsotonicRegression;
 
 /**
- *
+ * Isotonic Regression, as implemented by WEKA.
  * @author Giannis Giannakopoulos
  */
-public class GaussianCurves extends AbstractWekaModel {
+public class IsoRegression extends AbstractWekaModel{
 
-    public GaussianCurves() {
+    public IsoRegression() {
         super();
-        this.classifier = new GaussianProcesses();
+        classifier = new IsotonicRegression();
     }
 
-    
-    
     @Override
     public void configureClassifier() {
-        // nothing for now
+        // no configuration for now
     }
-    
 }

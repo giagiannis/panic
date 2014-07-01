@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.server.models;
+package gr.ntua.ece.cslab.panic.core.models;
 
-import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.server.containers.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 
 /**
  * This interface is inherited to each defined approximation model.

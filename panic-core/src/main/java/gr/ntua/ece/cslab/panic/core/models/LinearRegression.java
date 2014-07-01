@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.server.models;
+package gr.ntua.ece.cslab.panic.core.models;
 
 import weka.classifiers.functions.SimpleLinearRegression;
 

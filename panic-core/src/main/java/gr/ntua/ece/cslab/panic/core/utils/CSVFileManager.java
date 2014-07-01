@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.server.utils;
+package gr.ntua.ece.cslab.panic.core.utils;
 
 import au.com.bytecode.opencsv.CSVReader;
-import gr.ntua.ece.cslab.panic.server.containers.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.server.containers.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;

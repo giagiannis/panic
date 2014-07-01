@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.server.models;
+package gr.ntua.ece.cslab.panic.core.models;
 
-import weka.classifiers.meta.RandomSubSpace;
+import weka.classifiers.functions.MultilayerPerceptron;
 
 /**
- *
+ * Multi layer perceptron, as implement by WEKA.
  * @author Giannis Giannakopoulos
  */
-public class RandomSubSpaces extends AbstractWekaModel{
-
-    public RandomSubSpaces() {
+public class MLPerceptron extends AbstractWekaModel {
+    
+    public MLPerceptron() {
         super();
-        this.classifier = new RandomSubSpace();
+        classifier = new MultilayerPerceptron();
     }
-
+    
     @Override
     public void configureClassifier() {
-        // nothing for now
+        //no configuration for now
     }
 }

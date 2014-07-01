@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.server.models;
+package gr.ntua.ece.cslab.panic.core.models;
 
-import weka.classifiers.functions.IsotonicRegression;
+import weka.classifiers.meta.RandomSubSpace;
 
 /**
- * Isotonic Regression, as implemented by WEKA.
+ *
  * @author Giannis Giannakopoulos
  */
-public class IsoRegression extends AbstractWekaModel{
+public class RandomSubSpaces extends AbstractWekaModel{
 
-    public IsoRegression() {
+    public RandomSubSpaces() {
         super();
-        classifier = new IsotonicRegression();
+        this.classifier = new RandomSubSpace();
     }
 
     @Override
     public void configureClassifier() {
-        // no configuration for now
+        // nothing for now
     }
 }

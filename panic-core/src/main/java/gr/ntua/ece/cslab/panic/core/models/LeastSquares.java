@@ -14,26 +14,34 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.server.models;
+package gr.ntua.ece.cslab.panic.core.models;
 
-import weka.classifiers.meta.Bagging;
+
+import weka.classifiers.functions.LeastMedSq;
 
 /**
  *
  * @author Giannis Giannakopoulos
  */
-public class BagClassify extends AbstractWekaModel {
+public class LeastSquares extends AbstractWekaModel {
 
-    public BagClassify() {
+    public LeastSquares() {
         super();
-        this.classifier = new Bagging();
+        this.classifier = new LeastMedSq();
     }
 
     @Override
     public void configureClassifier() {
-        // do nothing for now
+     
     }
     
+
+    @Override
+    public void train() throws Exception {
+        LeastMedSq castedClassifier = (LeastMedSq) this.classifier;
+        castedClassifier.setSampleSize(this.pointsSampled.size());
+        super.train();
+    }
     
     
     

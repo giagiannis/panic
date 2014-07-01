@@ -14,35 +14,26 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.server.models;
+package gr.ntua.ece.cslab.panic.core.models;
 
-
-import weka.classifiers.functions.LeastMedSq;
+import weka.classifiers.functions.GaussianProcesses;
 
 /**
  *
  * @author Giannis Giannakopoulos
  */
-public class LeastSquares extends AbstractWekaModel {
+public class GaussianCurves extends AbstractWekaModel {
 
-    public LeastSquares() {
+    public GaussianCurves() {
         super();
-        this.classifier = new LeastMedSq();
+        this.classifier = new GaussianProcesses();
     }
 
+    
+    
     @Override
     public void configureClassifier() {
-     
+        // nothing for now
     }
-    
-
-    @Override
-    public void train() throws Exception {
-        LeastMedSq castedClassifier = (LeastMedSq) this.classifier;
-        castedClassifier.setSampleSize(this.pointsSampled.size());
-        super.train();
-    }
-    
-    
     
 }
