@@ -162,8 +162,10 @@ public class Benchmark {
         if (cmd.hasOption("i")) {
             inputFile = cmd.getOptionValue("i");
         } else {
-            System.err.println("Please use -h flag to see the necessary options...");
-            System.exit(1);
+            System.err.println("Input file is necessary");
+            HelpFormatter format = new HelpFormatter();
+            format.printHelp(CompareModelsBenchmark.class.toString(), options);
+            System.exit(0);
         }
 
         if (cmd.hasOption("o")) {
