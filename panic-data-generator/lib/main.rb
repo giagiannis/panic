@@ -1,5 +1,11 @@
-# To change this license header, choose License Headers in Project Properties.
-# To change this template file, choose Tools | Templates
-# and open the template in the editor.
+#!/usr/bin/ruby
 
-puts "Hello World"
+  
+require_relative 'functions'
+
+
+[1, 2, 4, 8].each { |x1|
+  (1..20).each { |x2|
+    puts "#{x1}\t#{x2}\t#{((x1-1)/(8.0-1)+((x2-1)/(20.0-1.0)))*9000 + 1000}"
+  }
+}

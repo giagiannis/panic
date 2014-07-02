@@ -13,13 +13,13 @@ require 'rake/testtask'
 
 spec = Gem::Specification.new do |s|
   s.name = 'panic-data-generator'
-  s.version = '0.0.1'
+  s.version = '0.1'
   s.has_rdoc = true
   s.extra_rdoc_files = ['README', 'LICENSE']
-  s.summary = 'Your summary here'
+  s.summary = 'Synthetic data for PANIC'
   s.description = s.summary
-  s.author = ''
-  s.email = ''
+  s.author = 'Giannis Giannakopoulos'
+  s.email = 'ggian@cslab.ece.ntua.gr'
   # s.executables = ['your_executable_here']
   s.files = %w(LICENSE README Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
   s.require_path = "lib"
