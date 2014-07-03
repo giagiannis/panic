@@ -62,6 +62,15 @@ public abstract class AbstractWekaModel implements Model {
         result.setValue("objective", this.classifier.classifyInstance(convertPointToInstance(point)));
         return result;
     }
+
+    /**
+     * Returns the list of sampled points along with their values.
+     * @return 
+     */
+    @Override
+    public List<OutputSpacePoint> getOriginalPointValues() {
+        return pointsSampled;
+    }
     
     /**
      * Converts an output space point to a Weka instance

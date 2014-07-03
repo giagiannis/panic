@@ -18,6 +18,7 @@ package gr.ntua.ece.cslab.panic.core.models;
 
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
+import java.util.List;
 
 /**
  * This interface is inherited to each defined approximation model.
@@ -63,4 +64,10 @@ public interface Model {
      * Method used to provide specific instructions for each classifier.
      */
     public void configureClassifier();
+
+    /**
+     * Method used to get the sampled points along with their experimental values.
+     * @return 
+     */
+    public List<OutputSpacePoint> getOriginalPointValues();
 }
