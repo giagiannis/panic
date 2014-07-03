@@ -38,11 +38,6 @@ public class RandomSampler extends AbstractStaticSampler {
     }
 
     @Override
-    public void configureSampler() {
-        super.configureSampler();
-    }
-
-    @Override
     public InputSpacePoint next() {
         super.next();
         Integer randomId = this.random.nextInt(this.maxChoices);
