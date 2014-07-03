@@ -13,4 +13,4 @@ ARGUMENT=${ARGUMENT%?}
 
 
 echo "Plotting, press enter to terminate.."
-gnuplot -perist -e "set grid; splot $ARGUMENT; pause -1;"
+gnuplot -p -e "set grid; splot $ARGUMENT; pause -1;"
