@@ -18,6 +18,7 @@ package gr.ntua.ece.cslab.panic.core.client;
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.models.Model;
+import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 
@@ -28,7 +29,7 @@ import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
  *
  * @author Giannis Giannakopoulos
  */
-public class CompareModelsBenchmark extends Benchmark {
+public class Main extends Benchmark {
 
     public static void main(String[] args) throws Exception {
 
@@ -40,6 +41,11 @@ public class CompareModelsBenchmark extends Benchmark {
             instantiateSamplers();
             for (Model m : models) {
                 m.configureClassifier();
+            }
+            
+            if(s instanceof AbstractAdaptiveSampler) {
+                AbstractAdaptiveSampler temp = (AbstractAdaptiveSampler) s;
+                temp.setModel(models[0]);
             }
 
             CSVFileManager file = new CSVFileManager();

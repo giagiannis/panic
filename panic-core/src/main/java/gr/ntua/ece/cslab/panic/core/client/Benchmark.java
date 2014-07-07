@@ -141,7 +141,7 @@ public class Benchmark {
 
         if (cmd.hasOption("h")) {
             HelpFormatter format = new HelpFormatter();
-            format.printHelp(CompareModelsBenchmark.class.toString(), options);
+            format.printHelp(Main.class.toString(), options);
             System.exit(0);
         }
 
@@ -164,7 +164,7 @@ public class Benchmark {
         } else {
             System.err.println("Input file is necessary");
             HelpFormatter format = new HelpFormatter();
-            format.printHelp(CompareModelsBenchmark.class.toString(), options);
+            format.printHelp(Main.class.toString(), options);
             System.exit(0);
         }
 

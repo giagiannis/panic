@@ -37,7 +37,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>gr.ntua.ece.cslab.panic.core.client.CompareModelsBenchmark</mainClass>
+                            <mainClass>gr.ntua.ece.cslab.panic.core.client.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
