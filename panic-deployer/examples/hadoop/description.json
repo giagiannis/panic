@@ -26,6 +26,10 @@
 				{
 				    "order" : 5,
 				    "path" : "master/start.sh"
+				},
+				{
+				    "order" : 6,
+			    	    "path" : "master/inject_key.ssh"
 				}
 			],
 			"provider_actions": {
