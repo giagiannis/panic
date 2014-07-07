@@ -3,14 +3,11 @@ package gr.ntua.ece.cslab.panic.core.samplers;
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.models.BagClassify;
-import gr.ntua.ece.cslab.panic.core.models.Discretization;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This sampler samples the space according to the achieved values.
@@ -21,9 +18,9 @@ import java.util.logging.Logger;
  */
 public class MaxDiffSampler extends AbstractAdaptiveSampler {
 
-    private List<InputSpacePoint> inputSpacePointsPicked;
-    private List<OutputSpacePoint> outputSpacePointsPicked;
-    private Random rand;
+    private final List<InputSpacePoint> inputSpacePointsPicked;
+    private final List<OutputSpacePoint> outputSpacePointsPicked;
+    private final Random rand;
 
     public MaxDiffSampler() {
         super();
@@ -35,7 +32,7 @@ public class MaxDiffSampler extends AbstractAdaptiveSampler {
     @Override
     public InputSpacePoint next() {
         super.next();
-        InputSpacePoint result = null;
+        InputSpacePoint result ;
         if (this.pointsPicked <= Math.pow(2, this.ranges.size())) { //pick random
             result = this.getRandomPoint();
         } else {
@@ -85,9 +82,7 @@ public class MaxDiffSampler extends AbstractAdaptiveSampler {
         for(String s : p1.getKeysAsCollection()){
             double value = (p1.getValue(s) + p2.getValue(s))/2.0;
             result.addDimension(s, this.roundValue(s, value));
-        }
-        System.out.println(result);
-        
+        }        
         return result;
     }
     
