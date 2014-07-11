@@ -90,7 +90,7 @@ public class Benchmark {
         List<Class<? extends Model>> list = new ArrayList<>();
         Reflections reflections = new Reflections("gr.ntua.ece.cslab");
         for (Class<? extends Model> c : reflections.getSubTypesOf(Model.class)) {
-            if (!c.getName().toLowerCase().contains("abstract")) {
+            if (!c.getName().toLowerCase().contains("abstract") && !c.getName().toLowerCase().contains("deprecated")) {
                 list.add(c);
             }
         }
