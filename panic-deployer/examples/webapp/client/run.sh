@@ -2,7 +2,7 @@
 
 # populate the database with data
 # each populate command fills the table with 100k rows -> 100MB of data
-ab -n 10 -c 10 "http://apache1/queries.php?action=populate" > /root/populate_output.csv
+ab -n 10 -c 1 "http://apache1/queries.php?action=populate" > /root/populate_output.csv
 
 
 for OFFSET in $(seq 100 100 500); do
