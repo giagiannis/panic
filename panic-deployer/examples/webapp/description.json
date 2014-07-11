@@ -1,5 +1,5 @@
 {
-	"name":"Hadoop Cluster",
+	"name":"Web Application Benchmark",
 	"groups" : [
 		{
 			"name":	"mysql",
@@ -10,6 +10,10 @@
 				{
 				    "order" : 1,
 				    "path" : "mysql/setup.sh"
+				},
+				{
+				    "order" : 2,
+				    "path" : "mysql/ganglia.sh"
 				}
 			],
 			"provider_actions": {
@@ -25,6 +29,10 @@
 				{
 				    "order" : 1,
 				    "path" : "apache/setup.sh"
+				},
+				{
+				    "order" : 2,
+				    "path" : "apache/ganglia.sh"
 				}
 			],
 			"provider_actions": {
@@ -40,6 +48,14 @@
 				{
 				    "order" : 1,
 				    "path" : "client/setup.sh"
+				},
+				{
+				    "order" : 2,
+				    "path" : "client/ganglia.sh"
+				},
+				{
+				    "order" : 3,
+				    "path" : "client/run.sh"
 				}
 			],
 			"provider_actions": {

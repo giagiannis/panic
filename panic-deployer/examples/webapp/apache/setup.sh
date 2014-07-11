@@ -1,9 +1,15 @@
 #!/bin/bash
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get -y update
-apt-get -y install apache2 mysql-client libapache2-mod-php5 php5-mysql git
+export GITHUB_URL="https://github.com/giagiannis/cloud-benchmark-apps.git"
 
-echo -e "<?php\nphpinfo();\n?>" > /var/www/index.php
+apt-get -y update >/dev/null
+apt-get -y install apache2 mysql-client libapache2-mod-php5 php5-mysql git >/dev/null
 
-service apache2 restart
+service apache2 restart >/dev/null
+
+
+git clone $GITHUB_URL apps > /dev/null
+
+rm -f /var/www/*	# cleaning the www dir
+cp apps/webapp/*.php /var/www/	# copy everythinh to www dir
