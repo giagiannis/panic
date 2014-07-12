@@ -7,6 +7,8 @@ HBASE_INSTALLATION_DIR="/opt/hbase"
 
 $HADOOP_INSTALLATION_PATH/bin/hadoop namenode -format
 
+sleep 10
+
 $HADOOP_INSTALLATION_PATH/bin/start-dfs.sh
 
 sleep 10
