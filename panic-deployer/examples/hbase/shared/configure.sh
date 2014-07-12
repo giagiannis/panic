@@ -89,8 +89,8 @@ conf_xml hbase.zookeeper.quorum master1 $HBASE_INSTALLATION_DIR/conf/hbase-site.
 conf_xml hbase.zookeeper.property.dataDir /opt/zookeeper $HBASE_INSTALLATION_DIR/conf/hbase-site.xml
 
 
-# remove multiple bindings for slf4j
-rm /opt/hbase/lib/slf4j-*
+# remove multiple bindings for slf4j -- breaks zookeeper
+# rm /opt/hbase/lib/slf4j-*
 }
 
 download_hadoop
