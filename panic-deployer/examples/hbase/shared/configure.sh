@@ -70,6 +70,8 @@ echo "Hadoop configured"
 }
 
 configure_hbase(){
+#just a place holder for hbase configuration
+echo >/dev/null
 }
 
 download_hadoop
