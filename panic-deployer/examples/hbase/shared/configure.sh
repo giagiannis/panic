@@ -27,7 +27,7 @@ download_hbase() {
 echo "Downloading Hbase"
 wget $HBASE_URL -O /tmp/hbase.tar.gz -o /tmp/hbase_wget_logs.txt
 tar xfz /tmp/hbase.tar.gz -C /tmp/
-mv /tmp/hbase-0.98.3/ $HBASE_INSTALLATION_DIR
+mv /tmp/hbase-0.98.3-hadoop1/ $HBASE_INSTALLATION_DIR
 echo "export PATH=\$PATH:/opt/hbase/bin/" >> /etc/profile
 rm /tmp/hbase.tar.gz
 echo "Hbase downloaded and extracted"
@@ -70,9 +70,30 @@ echo "Hadoop configured"
 }
 
 configure_hbase(){
-#just a place holder for hbase configuration
-echo >/dev/null
+# configure hbase-env.sh
+sed  -i 's|# export JAVA_HOME.*|export JAVA_HOME='"$JAVA_HOME"'|' $HBASE_INSTALLATION_DIR/conf/hbase-env.sh
+sed  -i 's|# export HBASE_MANAGES_ZK=true|export HBASE_MANAGES_ZK=true|' $HBASE_INSTALLATION_DIR/conf/hbase-env.sh
+
+#set regionservers
+echo -n > $HBASE_INSTALLATION_DIR/conf/regionservers
+SLAVES=$(cat /etc/hosts | grep slave | wc -l)
+for i in $(seq 1 $SLAVES); do
+  echo slave$i >> $HBASE_INSTALLATION_DIR/conf/regionservers
+done
+
+# configure hbase-site.xml
+conf_xml hbase.rootdir hdfs://master1:9000/hbase $HBASE_INSTALLATION_DIR/conf/hbase-site.xml
+conf_xml hbase.cluster.distributed true $HBASE_INSTALLATION_DIR/conf/hbase-site.xml
+conf_xml hbase.zookeeper.property.clientPort 2222 $HBASE_INSTALLATION_DIR/conf/hbase-site.xml
+conf_xml hbase.zookeeper.quorum master1 $HBASE_INSTALLATION_DIR/conf/hbase-site.xml
+conf_xml hbase.zookeeper.property.dataDir /opt/zookeeper $HBASE_INSTALLATION_DIR/conf/hbase-site.xml
+
+
+# remove multiple bindings for slf4j
+rm /opt/hbase/lib/slf4j-*
 }
 
 download_hadoop
+download_hbase
 configure_hadoop
+configure_hbase
