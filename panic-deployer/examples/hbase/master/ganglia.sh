@@ -2,9 +2,7 @@
 
 install_packages(){
 export DEBIAN_FRONTEND=noninteractive
-apt-get -y install ganglia-monitor 1>/dev/null 2>/dev/null
-apt-get -y install gmetad 1>/dev/null 2>/dev/null
-apt-get -y install ganglia-webfrontend 1>/dev/null 2>/dev/null
+apt-get -y install ganglia-monitor gmetad ganglia-webfrontend 1>>/tmp/apt.log 2>>/tmp/apt.log
 }
 
 setup_web(){
