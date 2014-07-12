@@ -29,7 +29,7 @@
 				},
 				{
 				    "order" : 6,
-			    	    "path" : "master/inject_key.ssh"
+			    	    "path" : "master/inject_key.sh"
 				}
 			],
 			"provider_actions": {
