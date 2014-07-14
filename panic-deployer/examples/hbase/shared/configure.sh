@@ -39,7 +39,7 @@ sed -i -e "/<configuration>/a \ \t<property>\n\t\t<name>$1</name>\n\t\t<value>$2
 
 configure_hadoop(){
 NUMBER_OF_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
-MEMORY_MB=$(free -m | grep -i mem | awk '{print$2}')
+MEMORY_MB=$(free -m | grep -i mem | awk '{print $2}')
 
 # set JAVA_HOME
 sed  -i 's|# export JAVA_HOME.*|export JAVA_HOME='"$JAVA_HOME"'|' $HADOOP_INSTALLATION_PATH/conf/hadoop-env.sh
@@ -71,8 +71,10 @@ echo "Hadoop configured"
 
 configure_hbase(){
 # configure hbase-env.sh
+MEMORY=$(free -m | grep -i mem | awk {'print $2'})
 sed  -i 's|# export JAVA_HOME.*|export JAVA_HOME='"$JAVA_HOME"'|' $HBASE_INSTALLATION_DIR/conf/hbase-env.sh
 sed  -i 's|# export HBASE_MANAGES_ZK=true|export HBASE_MANAGES_ZK=true|' $HBASE_INSTALLATION_DIR/conf/hbase-env.sh
+sed  -i 's|# export HBASE_HEAPSIZE=1000|export HBASE_HEAPSIZE=$MEMORY|' $HBASE_INSTALLATION_DIR/conf/hbase-env.sh
 
 #set regionservers
 echo -n > $HBASE_INSTALLATION_DIR/conf/regionservers
@@ -88,9 +90,7 @@ conf_xml hbase.zookeeper.property.clientPort 2222 $HBASE_INSTALLATION_DIR/conf/h
 conf_xml hbase.zookeeper.quorum master1 $HBASE_INSTALLATION_DIR/conf/hbase-site.xml
 conf_xml hbase.zookeeper.property.dataDir /opt/zookeeper $HBASE_INSTALLATION_DIR/conf/hbase-site.xml
 
-
-# remove multiple bindings for slf4j -- breaks zookeeper
-# rm /opt/hbase/lib/slf4j-*
+echo "Hbase configured"
 }
 
 download_hadoop
