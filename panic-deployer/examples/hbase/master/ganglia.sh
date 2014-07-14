@@ -18,6 +18,8 @@ configure_gmetad(){
 sed -i -e 's/^data_source.*/data_source "master" 10 master1:8649/g' /etc/ganglia/gmetad.conf
 
 sed -i -e '/^data_source / a \data_source "slaves" 10 slave1:8649' /etc/ganglia/gmetad.conf
+
+sed -i -e '/^data_source / a \data_source "tomcat" 10 tomcat1:8649' /etc/ganglia/gmetad.conf
 # gridname
 sed -i -e 's/^# gridname "MyGrid"/gridname "Hadoop cluster"/g' /etc/ganglia/gmetad.conf
 
