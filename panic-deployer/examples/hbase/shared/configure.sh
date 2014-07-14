@@ -74,7 +74,7 @@ configure_hbase(){
 MEMORY=$(free -m | grep -i mem | awk {'print $2'})
 sed  -i 's|# export JAVA_HOME.*|export JAVA_HOME='"$JAVA_HOME"'|' $HBASE_INSTALLATION_DIR/conf/hbase-env.sh
 sed  -i 's|# export HBASE_MANAGES_ZK=true|export HBASE_MANAGES_ZK=true|' $HBASE_INSTALLATION_DIR/conf/hbase-env.sh
-sed  -i 's|# export HBASE_HEAPSIZE=1000|export HBASE_HEAPSIZE=$MEMORY|' $HBASE_INSTALLATION_DIR/conf/hbase-env.sh
+sed  -i "s|# export HBASE_HEAPSIZE=1000|export HBASE_HEAPSIZE=$MEMORY|" $HBASE_INSTALLATION_DIR/conf/hbase-env.sh
 
 #set regionservers
 echo -n > $HBASE_INSTALLATION_DIR/conf/regionservers
