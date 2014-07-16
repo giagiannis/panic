@@ -9,7 +9,7 @@ apt-get -y install ganglia-monitor 1>>/tmp/apt.log 2>>/tmp/apt.log
 
 configure_gmond(){
 # udp_send_channel remove mcat_join and add host
-CLIENT=$(cat /etc/hosts | grep "tomcat1$" | awk '{print $1}')
+CLIENT=$(cat /etc/hosts | grep "client1$" | awk '{print $1}')
 sed -i -e "/^udp_send_channel/ a \  host=$CLIENT" /etc/ganglia/gmond.conf
 sed -i -e "s/  mcast_join/# mcast_join/" /etc/ganglia/gmond.conf
 sed -i -e "s/  bind/# bind/" /etc/ganglia/gmond.conf

@@ -96,7 +96,7 @@
 			"provider_actions": {
 				"attach_public_ipv4" : true
 			}
-		}
+		},
 		{
 			"name": "client",
 			"image" : "78e96a57-2436-45c8-96b5-5eda9eb69be9",
@@ -109,7 +109,7 @@
 				},
 				{
 				    "order" : 2,
-				    "path" : "shared/empty.sh"
+				    "path" : "client/nat.sh"
 				}, 
 				{
 				    "order" : 3,

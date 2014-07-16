@@ -15,7 +15,7 @@ sed -i "s|#JAVA_HOME=/usr/lib/jvm/openjdk-6-jdk|JAVA_HOME=$JAVA_DEFAULT|g" /etc/
 service tomcat7 restart
 
 git clone $GIT_URL /tmp/webapps/
-mvn -f /tmp/webapps/webapp-java/pom.xml package
+mvn -f /tmp/webapps/webapp-java/pom.xml package >> /tmp/mvn_logs.txt
 mv /tmp/webapps/webapp-java/target/webapp-java-1.0.war $TOMCAT_INSTALL_DIR/webapps/webapp-java.war
 rm -rf /tmp/webapps/
 }
