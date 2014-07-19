@@ -39,11 +39,7 @@
 		{
 			"name":	"slave",
 			"image" : "78e96a57-2436-45c8-96b5-5eda9eb69be9",
-<<<<<<< HEAD
-			"flavor" : 152,
-=======
 			"flavor" : 156,
->>>>>>> 8da95c92fc4f340bb56a23032fc5ea82d86e4e80
 			"multiplicity"  : 1,
 			"scripts" : [
 				{
