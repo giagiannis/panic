@@ -20,6 +20,8 @@ sed -i -e 's/^data_source.*/data_source "master" 10 master1:8649/g' /etc/ganglia
 sed -i -e '/^data_source / a \data_source "slaves" 10 slave1:8649' /etc/ganglia/gmetad.conf
 
 sed -i -e '/^data_source / a \data_source "tomcat" 10 tomcat1:8649' /etc/ganglia/gmetad.conf
+
+sed -i -e '/^data_source / a \data_source "client" 10 client1:8649' /etc/ganglia/gmetad.conf
 # gridname
 sed -i -e 's/^# gridname "MyGrid"/gridname "Hadoop cluster"/g' /etc/ganglia/gmetad.conf
 
@@ -46,10 +48,10 @@ service ganglia-monitor restart
 restart_all() {
 service gmetad restart
 service ganglia-monitor restart
-NUMBER_OF_SLAVES=$(cat /etc/hosts | grep slave | wc -l)
-for i in $(seq 1 $NUMBER_OF_SLAVES); do
-  ssh slave$i "service ganglia-monitor restart"
-done
+#NUMBER_OF_SLAVES=$(cat /etc/hosts | grep slave | wc -l)
+#for i in $(seq 1 $NUMBER_OF_SLAVES); do
+#  ssh slave$i "service ganglia-monitor restart"
+#done
 }
 
 install_packages
