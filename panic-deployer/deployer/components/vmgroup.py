@@ -1,3 +1,4 @@
+import logging
 from threading import Thread
 from deployer.components.vm import VM
 from deployer.connectors.generic import AbstractConnector
@@ -60,6 +61,7 @@ class VMGroup:
         """
         if self.__script_index >= len(self.scripts):
             return
+        logging.getLogger("vmgroup").debug(self.name+":executing script with index "+self.__script_index)
         current_script = self.scripts[self.__script_index]
         self.__script_index += 1
         self.__spawn_threads('run_command', args=[current_script])

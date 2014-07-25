@@ -15,6 +15,7 @@ def configure_logger():
     """
     logging.basicConfig()
     logging.getLogger("root").setLevel(conf.LOG_LEVEL)
+    logging.getLogger("vmgroup").setLevel(conf.LOG_LEVEL)
     logging.getLogger("vm").setLevel(conf.LOG_LEVEL)
 
 
