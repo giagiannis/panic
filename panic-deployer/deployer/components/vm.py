@@ -94,7 +94,7 @@ class VM:
         The timeouts and number of tries are defined from configuration files.
         """
         self.__create_ssh_client().close()
-        logging.getLogger("vm").debug(self.name+": VM is visible")
+        logging.getLogger("vm").debug(self.name+": VM is visible ("+self.hostname+")")
         return
 
     def get_addresses(self, ip_version=None, connection_type=None):
@@ -104,7 +104,7 @@ class VM:
 
     def __create_ssh_client(self):
         sshclient = SSHClient()
-        sshclient.set_missing_host_key_policy(paramiko.WarningPolicy())
+        sshclient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         for i in range(1, MAX_WAIT_FOR_LOOPS):
             try:
                 sshclient.connect(hostname=self.hostname, port=22,

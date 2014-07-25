@@ -61,7 +61,7 @@ class VMGroup:
         """
         if self.__script_index >= len(self.scripts):
             return
-        logging.getLogger("vmgroup").debug(self.name+":executing script with index "+self.__script_index)
+        logging.getLogger("vmgroup").debug(self.name_prefix+":executing script with index "+str(self.__script_index))
         current_script = self.scripts[self.__script_index]
         self.__script_index += 1
         self.__spawn_threads('run_command', args=[current_script])
