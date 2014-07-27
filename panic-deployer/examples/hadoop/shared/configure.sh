@@ -70,6 +70,8 @@ conf_xml mapred.job.tracker master1:9001 $HADOOP_INSTALLATION_PATH/conf/mapred-s
 conf_xml mapred.tasktracker.map.tasks.maximum $NUMBER_OF_CORES $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
 conf_xml mapred.tasktracker.reduce.tasks.maximum $NUMBER_OF_CORES $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
 conf_xml mapred.child.java.opts -Xmx${MEMORY_MB}m $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
+conf_xml mapred.compress.map.output true $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
+conf_xml mapred.map.output.compression.codec org.apache.hadoop.io.compress.SnappyCodec $HADOOP_INSTALLATION_PATH/conf/mapred-site.xml
 
 echo "Hadoop configured"
 }

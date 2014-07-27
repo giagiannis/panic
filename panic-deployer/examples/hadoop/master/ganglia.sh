@@ -10,6 +10,9 @@ apt-get -y install ganglia-webfrontend 1>/dev/null 2>/dev/null
 setup_web(){
 ln -s /etc/ganglia-webfrontend/apache.conf /etc/apache2/sites-available/ganglia
 a2ensite ganglia
+a2enmod rewrite0
+sed -i -e 's/readonly/disabled/g' /usr/share/ganglia-webfrontend/conf_default.php
+chmod guo+w /var/lib/ganglia/conf/*
 
 service apache2 restart
 }
