@@ -51,5 +51,10 @@ TIME_CMD="/usr/bin/time -f %e\t%U\t%S -o $TIMEFILE --append"
 # curl $ADULT_DATASET_URL | $HADOOP_BIN fs -put - /adult.dat
 curl $ADULT_DATASET_URL_SORT | $HADOOP_BIN fs -put - /adult_sort.dat
 
-$HAMA_BIN jar $HAMA_JAR kmeans /adult_sort.dat /output  100 100
+CLUSTERS=100
+for CLUSTERS in 40 50 60 70 80; do
+	echo -ne "Kmeans-${CLUSTERS}\t" >> $TIMEFILE
+	$TIME_CMD $HAMA_BIN jar $HAMA_JAR kmeans /adult_sort.dat /output  100 $CLUSTERS 1>>$LOGS 2>>$LOGS
+	tail -n 1 $TIMEFILE
+done
 exit 0
