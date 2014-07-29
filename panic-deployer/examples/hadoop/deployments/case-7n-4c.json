@@ -39,8 +39,8 @@
 		{
 			"name":	"slave",
 			"image" : "78e96a57-2436-45c8-96b5-5eda9eb69be9",
-			"flavor" : 160,
-			"multiplicity"  : 8,
+			"flavor" : 243,
+			"multiplicity"  : 7,
 			"scripts" : [
 				{
 				    "order" : 1,
