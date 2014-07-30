@@ -85,7 +85,7 @@ public class Main extends Benchmark {
             createCSVForModels(file, s, picked);
             System.out.format("Done! [%d ms]\n", System.currentTimeMillis()-start);
             
-            reportOnMetrics(file);
+            reportOnMetrics(file, s);
         }
         System.out.println("Flushing output stream...");
         outputPrintStream.flush();

@@ -1,0 +1,36 @@
+# Sampler used:	class gr.ntua.ece.cslab.panic.core.samplers.UniformSampler
+# Date:	Wed Jul 30 23:05:53 EEST 2014
+Model			MSE	Average	Deviation
+RBF			1394.01506	37.33651	26.52701
+LinearRegression			1194.62849	34.56340	23.96317
+MLPerceptron			534.77888	23.12529	14.97331
+LeastSquares			996.51169	31.56757	19.05022
+Discretization			773.17829	27.80608	18.52815
+RandomSubSpaces			1088.99237	32.99988	23.34526
+IsoRegression			995.86571	31.55734	21.83182
+GaussianCurves			703.28517	26.51952	16.71783
+BagClassify			765.52149	27.66806	18.03818
+# Sampler used:	class gr.ntua.ece.cslab.panic.core.samplers.RandomSampler
+# Date:	Wed Jul 30 23:05:54 EEST 2014
+Model			MSE	Average	Deviation
+RBF			1759.62409	41.94787	34.09057
+LinearRegression			1432.21097	37.84456	31.02397
+MLPerceptron			1019.87709	31.93551	23.28498
+LeastSquares			984.16962	31.37148	20.22171
+Discretization			1860.26171	43.13075	30.75921
+RandomSubSpaces			1098.56038	33.14454	27.17615
+IsoRegression			1295.53045	35.99348	28.64087
+GaussianCurves			872.39635	29.53636	22.43119
+BagClassify			1285.09310	35.84820	29.51462
+# Sampler used:	class gr.ntua.ece.cslab.panic.core.samplers.GreedyDimensionSampler
+# Date:	Wed Jul 30 23:05:55 EEST 2014
+Model			MSE	Average	Deviation
+RBF			1608.75941	40.10934	31.32537
+LinearRegression			1533.17958	39.15584	31.96437
+MLPerceptron			1043.21791	32.29888	22.43179
+LeastSquares			930.33508	30.50139	19.72847
+Discretization			798.33944	28.25490	19.54409
+RandomSubSpaces			1154.61524	33.97963	27.66729
+IsoRegression			1303.37275	36.10225	27.90656
+GaussianCurves			663.64151	25.76124	17.53375
+BagClassify			964.58692	31.05780	24.19134

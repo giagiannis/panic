@@ -45,7 +45,7 @@ public class Benchmark {
 
     protected static Options options;
     protected static Double samplingRate;
-    protected static PrintStream outputPrintStream;
+    protected static PrintStream outputPrintStream, metricsOut;
     protected static String inputFile;
     protected static Sampler[] samplers;
     protected static Model[] models;
@@ -76,6 +76,9 @@ public class Benchmark {
 
         options.addOption("m", "models", true, "define the models to use (if not defined, all the available models will be trained");
         options.getOption("m").setArgName("model1,model2");
+        
+        options.addOption("mo", "metrics-output", true, "the file you want to store the metrics to");
+        
 
         options.addOption(null, "list-models", false, "lists the available models");
         options.addOption(null, "list-samplers", false, "lists the available samplers");
@@ -182,6 +185,12 @@ public class Benchmark {
             samplingRate = 0.2;
         }
         
+        if (cmd.hasOption("mo")) {
+            metricsOut = new PrintStream(cmd.getOptionValue("mo"));
+        } else {
+            metricsOut = System.out;
+        }
+        
         instantiateModels();
         instantiateSamplers();
 
@@ -264,13 +273,15 @@ public class Benchmark {
         outputPrintStream.println();
     }
     
-    public static void reportOnMetrics(CSVFileManager file) {
-        outputPrintStream.print("Model\t\t\tMSE\tAverage\tDeviation");
+    public static void reportOnMetrics(CSVFileManager file, Sampler sampler) {
+        metricsOut.println("# Sampler used:\t"+sampler.getClass().toString());
+        metricsOut.println("# Date:\t"+new Date());
+        metricsOut.println("Model\t\t\tMSE\tAverage\tDeviation");
         for(Model m : models) {
             Metrics met = new Metrics(file.getOutputSpacePoints(), m);
-            outputPrintStream.print(m.getClass().toString().substring(m.toString().lastIndexOf(".") + 7) + "\t\t\t");
-            outputPrintStream.format("%.5f\t%.5f\t%.5f",met.getMSE(), met.getDeviation(), met.getAverageError());
-            outputPrintStream.print("\n");
+            metricsOut.print(m.getClass().toString().substring(m.toString().lastIndexOf(".") + 7) + "\t\t\t");
+            metricsOut.format("%.5f\t%.5f\t%.5f",met.getMSE(), met.getDeviation(), met.getAverageError());
+            metricsOut.print("\n");
         }
     }
 }
