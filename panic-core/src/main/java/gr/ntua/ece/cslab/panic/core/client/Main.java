@@ -21,6 +21,8 @@ import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -59,9 +61,11 @@ public class Main extends Benchmark {
 
             // models training
             int i = 1;
+            List<InputSpacePoint> picked = new LinkedList<>();
             System.out.println("Sampler:\t"+s.getClass().toString());
             while (s.hasMore()) {
                 InputSpacePoint nextSample = s.next();
+                picked.add(nextSample);
                 OutputSpacePoint out = file.getActualValue(nextSample);
                 System.out.format("\t#%d point picked %s\n", i++, nextSample.toString());
                 for (Model m : models) {
@@ -78,8 +82,10 @@ public class Main extends Benchmark {
             // models are created and the results are printed...
             System.out.print("Classifying instances...\t");
             start = System.currentTimeMillis();
-            createCSVForModels(file, s);
+            createCSVForModels(file, s, picked);
             System.out.format("Done! [%d ms]\n", System.currentTimeMillis()-start);
+            
+            reportOnMetrics(file);
         }
         System.out.println("Flushing output stream...");
         outputPrintStream.flush();

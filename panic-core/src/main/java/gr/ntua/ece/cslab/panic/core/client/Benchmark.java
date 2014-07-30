@@ -15,7 +15,9 @@
  */
 package gr.ntua.ece.cslab.panic.core.client;
 
+import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.metrics.Metrics;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
@@ -223,15 +225,21 @@ public class Benchmark {
      *
      * @param file needed to load input domain space and get labels
      * @param sampler sampler object, used to write it to csv as comment
+     * @param picked
      * @throws Exception
      */
-    public static void createCSVForModels(CSVFileManager file, Sampler sampler) throws Exception {
+    public static void createCSVForModels(CSVFileManager file, Sampler sampler, List<InputSpacePoint> picked) throws Exception {
         OutputSpacePoint headerPoint = file.getOutputSpacePoints().get(0);
         outputPrintStream.println("# Created: " + new Date());
         outputPrintStream.println("# Active sampler: "+sampler.getClass().toString());
         outputPrintStream.println("# Runtime options:");
         for (Option p : cmd.getOptions()) {
             outputPrintStream.println("#\t" + p.getLongOpt() + ":\t" + cmd.getOptionValue(p.getLongOpt()));
+        }
+        outputPrintStream.println("#");
+        outputPrintStream.println("# Points picked");
+        for(InputSpacePoint p :picked) {
+            outputPrintStream.println("# \t"+p);
         }
 
         for (String k : headerPoint.getInputSpacePoint().getKeysAsCollection()) {
@@ -254,5 +262,15 @@ public class Benchmark {
         }
         outputPrintStream.println();
         outputPrintStream.println();
+    }
+    
+    public static void reportOnMetrics(CSVFileManager file) {
+        outputPrintStream.print("Model\t\t\tMSE\tAverage\tDeviation");
+        for(Model m : models) {
+            Metrics met = new Metrics(file.getOutputSpacePoints(), m);
+            outputPrintStream.print(m.getClass().toString().substring(m.toString().lastIndexOf(".") + 7) + "\t\t\t");
+            outputPrintStream.format("%.5f\t%.5f\t%.5f",met.getMSE(), met.getDeviation(), met.getAverageError());
+            outputPrintStream.print("\n");
+        }
     }
 }

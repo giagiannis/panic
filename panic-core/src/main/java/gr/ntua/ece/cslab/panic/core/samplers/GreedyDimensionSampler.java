@@ -35,12 +35,23 @@ import java.util.Set;
 public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
 
     private Set<InputSpacePoint> picked;
+    private RandomSampler randomSampler;
     
     public GreedyDimensionSampler() {
         super();
         this.picked = new HashSet<>();
     }
 
+    @Override
+    public void configureSampler() {
+        super.configureSampler();
+        randomSampler = new RandomSampler();
+        randomSampler.setDimensionsWithRanges(this.ranges);
+        randomSampler.setSamplingRate(this.samplingRate);
+        randomSampler.configureSampler();
+    }
+
+    
     @Override
     public InputSpacePoint next() {
         super.next();
@@ -92,7 +103,16 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
                 }
             }
         }
+        if(a==null || b==null)
+            return this.getRandomPoint();
         return this.getMedianPoint(a.getInputSpacePoint(), b.getInputSpacePoint());
+    }
+    
+    private InputSpacePoint getRandomPoint() {
+        InputSpacePoint next = randomSampler.next();
+        while(this.picked.contains(next))
+            next = randomSampler.next();
+        return next;
     }
     
     
@@ -113,8 +133,8 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
         }
         return candidate;
     }
-    
-    
+   
+     
     public static void main(String[] args) throws Exception {
         CSVFileManager file = new CSVFileManager();
         file.setFilename(args[0]);
