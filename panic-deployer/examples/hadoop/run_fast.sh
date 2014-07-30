@@ -14,7 +14,8 @@ MASTER_HOSTNAME=$(python -m deployer -l state-files/${SHORT_DES}-state -a show |
 HOST=$(ssh $MASTER_HOSTNAME "hostname")
 
 if [ "$HOST" == "master1" ]; then
-ssh $MASTER_HOSTNAME<examples/hadoop/master/run_benchmarks.sh
+scp examples/hadoop/master/run_benchmarks.sh ${MASTER_HOSTNAME}:/root/script.sh
+ssh $MASTER_HOSTNAME "chmod +x script.sh; /root/script.sh"
 scp $MASTER_HOSTNAME:/tmp/times.csv results/${SHORT_DES}-state 
 # python -m deployer -l state-files/${SHORT_DES}-state -a terminate && rm state-files/${SHORT_DES}-state && mail-alert "$DESCRIPTION terminated"
 fi
