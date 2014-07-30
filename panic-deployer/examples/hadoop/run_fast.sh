@@ -17,13 +17,13 @@ if [ "$HOST" == "master1" ]; then
 scp examples/hadoop/master/run_benchmarks.sh ${MASTER_HOSTNAME}:/root/script.sh
 ssh $MASTER_HOSTNAME "chmod +x script.sh; /root/script.sh"
 scp $MASTER_HOSTNAME:/tmp/times.csv results/${SHORT_DES}-state 
-# python -m deployer -l state-files/${SHORT_DES}-state -a terminate && rm state-files/${SHORT_DES}-state && mail-alert "$DESCRIPTION terminated"
+python -m deployer -l state-files/${SHORT_DES}-state -a terminate && rm state-files/${SHORT_DES}-state && mail-alert "$DESCRIPTION terminated"
 fi
 }
 
 
 celar_deployments(){
-run_scenario "examples/hadoop/deployments/case-3n-1c.json"
+#run_scenario "examples/hadoop/deployments/case-3n-1c.json"
 run_scenario "examples/hadoop/deployments/case-10n-1c.json"
 run_scenario "examples/hadoop/deployments/case-10n-2c.json"
 run_scenario "examples/hadoop/deployments/case-10n-4c.json"
@@ -40,7 +40,7 @@ run_scenario "examples/hadoop/deployments/case-9n-4c.json"
 }
 
 ggian_deployments(){
-run_scenario "examples/hadoop/deployments/case-2n-1c.json"
+#run_scenario "examples/hadoop/deployments/case-2n-1c.json"
 run_scenario "examples/hadoop/deployments/case-2n-2c.json"
 run_scenario "examples/hadoop/deployments/case-2n-4c.json"
 run_scenario "examples/hadoop/deployments/case-3n-2c.json"
