@@ -20,5 +20,5 @@ if [ "$HOST" == "master1" ]; then
 fi
 }
 
-run_scenario examples/hadoop/deployments/case-7n-2c.json && run_scenario examples/hadoop/deployments/case-8n-1c.json && run_scenario examples/hadoop/deployments/case-9n-1c.json && run_scenario /hadoop/deployments/case-9n-4c.json > /tmp/ggian_logs.txt &
-run_scenario examples/hadoop/deployments/case-10n-1c.json && run_scenario examples/hadoop/deployments/case-10n-4c.json && run_scenario examples/hadoop/deployments/case-10n-2c.json > /tmp/celar_logs.txt 
+run_scenario "examples/hadoop/deployments/case-9n-1c.json" > /tmp/ggian_logs.txt &
+run_scenario "examples/hadoop/deployments/case-9n-4c.json" > /tmp/celar_logs.txt &
