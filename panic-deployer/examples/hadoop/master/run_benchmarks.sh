@@ -20,43 +20,41 @@ echo -n > $LOGS
 
 TIME_CMD="/usr/bin/time -f %e\t%U\t%S -o $TIMEFILE --append"
 
+SLAVES=$(cat /etc/hosts | grep slave | wc -l)
+TASKS_PER_SLAVE=$(ssh slave1 "cat /proc/cpuinfo | grep processor | wc -l")
+REDUCERS=$[SLAVES*TASKS_PER_SLAVE]
 
-
-hadoop fs -mkdir /data/
-# Terasort benchmark
-for MILLIONS in 10 20 30 40 50; do 
-	curl $DATASET_URL/tera-${MILLIONS}M.txt.gz | gzip -d | hadoop fs -put - /data/tera-${MILLIONS}M.txt
-	echo -ne "Terasort-${MILLIONS}\t" >>$TIMEFILE
-	$TIME_CMD $HADOOP_BIN jar $HADOOP_JAR terasort /data/ /output/tera-${MILLIONS}M 1>>$LOGS 2>>$LOGS
-	tail -n 1 $TIMEFILE
-	$HADOOP_BIN fs -rmr /data/tera-${MILLIONS}M.txt /output/tera-${MILLIONS}M 1>>$LOGS 2>>$LOGS
-done
-
-
-
-# Pagerank benchmark
-EDGES=50
-for THOUSANDS in 50 60 70 80 90 100; do
- 	curl $DATASET_URL/page-${THOUSANDS}k.txt.gz | gzip -d | hadoop fs -put - /data/page-${THOUSANDS}k.txt
-	echo -ne "PageRank-${THOUSANDS}-${EDGES}\t" >> $TIMEFILE
-	$TIME_CMD $HAMA_BIN jar $HAMA_JAR pagerank /data/page-${THOUSANDS}k.txt /output/pagerank-${THOUSANDS}-${EDGES} 1000 1>>$LOGS 2>>$LOGS
-	tail -n 1 $TIMEFILE
-	$HADOOP_BIN fs -rmr /data/page-${THOUSANDS}k.txt /output/pagerank-${THOUSANDS}-${EDGES} 1>>$LOGS 2>>$LOGS
-done
-
-
-# K means benchmark
-
-# curl $ADULT_DATASET_URL | $HADOOP_BIN fs -put - /adult.dat
-# curl $ADULT_DATASET_URL_SORT | $HADOOP_BIN fs -put - /adult_sort.dat
-# 
-# CLUSTERS=100
-# for CLUSTERS in 40 50 60 70 80; do
-# 	echo -ne "Kmeans-${CLUSTERS}\t" >> $TIMEFILE
-# 	$TIME_CMD $HAMA_BIN jar $HAMA_JAR kmeans /adult_sort.dat /output  100 $CLUSTERS 1>>$LOGS 2>>$LOGS
+$HADOOP_BIN fs -mkdir /data/
+# # Terasort benchmark
+# for MILLIONS in 10 20 30 40 50; do 
+# 	curl $DATASET_URL/tera-${MILLIONS}M.txt.gz | gzip -d | hadoop fs -put - /data/tera-${MILLIONS}M.txt
+# 	echo -ne "Terasort-${MILLIONS}\t" >>$TIMEFILE
+# 	$TIME_CMD $HADOOP_BIN jar $HADOOP_JAR terasort /data/ /output/tera-${MILLIONS}M 1>>$LOGS 2>>$LOGS
 # 	tail -n 1 $TIMEFILE
+# 	$HADOOP_BIN fs -rmr /data/tera-${MILLIONS}M.txt /output/tera-${MILLIONS}M 1>>$LOGS 2>>$LOGS
 # done
 
+
+
+# # Pagerank benchmark
+# EDGES=50
+# for THOUSANDS in 50 60 70 80 90 100; do
+#  	curl $DATASET_URL/page-${THOUSANDS}k.txt.gz | gzip -d | hadoop fs -put - /data/page-${THOUSANDS}k.txt
+# 	echo -ne "PageRank-${THOUSANDS}-${EDGES}\t" >> $TIMEFILE
+# 	$TIME_CMD $HAMA_BIN jar $HAMA_JAR pagerank /data/page-${THOUSANDS}k.txt /output/pagerank-${THOUSANDS}-${EDGES} 1000 1>>$LOGS 2>>$LOGS
+# 	tail -n 1 $TIMEFILE
+# 	$HADOOP_BIN fs -rmr /data/page-${THOUSANDS}k.txt /output/pagerank-${THOUSANDS}-${EDGES} 1>>$LOGS 2>>$LOGS
+# done
+
+
+# Terasort benchmark - scalable
+for MILLIONS in 10 20 30 40 50; do 
+curl $DATASET_URL/tera-${MILLIONS}M.txt.gz | gzip -d | $HADOOP_BIN fs  -put - /data/tera-${MILLIONS}M.txt
+echo -ne "Terasort-${MILLIONS}\t" >>$TIMEFILE
+$TIME_CMD $HADOOP_BIN jar $HADOOP_JAR terasort -Dmapred.reduce.tasks=$REDUCERS /data/ /output/tera-${MILLIONS}M 1>>$LOGS 2>>$LOGS
+tail -n 1 $TIMEFILE
+$HADOOP_BIN fs -rmr /data/tera-${MILLIONS}M.txt /output/tera-${MILLIONS}M 1>>$LOGS 2>>$LOGS
+done
 
 echo "Benchmark results are ready and can be found in $TIMEFILE"
 
