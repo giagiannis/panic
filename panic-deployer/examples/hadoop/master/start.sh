@@ -11,5 +11,7 @@ $HADOOP_INSTALLATION_PATH/bin/start-dfs.sh
 sleep 30
 
 $HADOOP_INSTALLATION_PATH/bin/start-mapred.sh
+sleep 20
 
 $HAMA_INSTALLATION_PATH/bin/start-bspd.sh
+sleep 20
