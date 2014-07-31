@@ -8,4 +8,6 @@ set output "raw.png"
 
 set grid
 
-plot "raw_1_100.dat" using 1:4 with lines title columnhead, "raw_2_100.dat" using 1:4 with lines title columnhead, "raw_4_100.dat" using 1:4 with lines title columnhead
+plot 	"raw_1_50.dat" using 1:4 with lines title columnhead, \
+	"raw_2_50.dat" using 1:4 with lines title columnhead, \
+	"raw_4_50.dat" using 1:4 with lines title columnhead

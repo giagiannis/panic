@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # how you create data to get some graphs
-METRICS_PATH="../../results"
+[ -z "$METRICS_PATH" ] && METRICS_PATH="../../results"
 
 
 
