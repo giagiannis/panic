@@ -23,7 +23,7 @@ fi
 
 
 celar_deployments(){
-#run_scenario "examples/hadoop/deployments/case-3n-1c.json"
+run_scenario "examples/hadoop/deployments/case-3n-1c.json"
 run_scenario "examples/hadoop/deployments/case-10n-1c.json"
 run_scenario "examples/hadoop/deployments/case-10n-2c.json"
 run_scenario "examples/hadoop/deployments/case-10n-4c.json"
@@ -40,7 +40,7 @@ run_scenario "examples/hadoop/deployments/case-9n-4c.json"
 }
 
 ggian_deployments(){
-#run_scenario "examples/hadoop/deployments/case-2n-1c.json"
+run_scenario "examples/hadoop/deployments/case-2n-1c.json"
 run_scenario "examples/hadoop/deployments/case-2n-2c.json"
 run_scenario "examples/hadoop/deployments/case-2n-4c.json"
 run_scenario "examples/hadoop/deployments/case-3n-2c.json"
