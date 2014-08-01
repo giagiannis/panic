@@ -23,6 +23,8 @@ import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
@@ -99,6 +101,7 @@ public class Benchmark {
                 list.add(c);
             }
         }
+        
         @SuppressWarnings("unchecked")
         Class<? extends Model>[] modelsDiscovered = new Class[list.size()];
         
@@ -122,6 +125,7 @@ public class Benchmark {
                 list.add(c);
             }
         }
+        
         @SuppressWarnings("unchecked")
         Class<? extends Sampler>[] samplersDiscovered = new Class[list.size()];
         int i = 0;

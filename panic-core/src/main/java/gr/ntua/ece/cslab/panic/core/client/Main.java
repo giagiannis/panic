@@ -87,6 +87,9 @@ public class Main extends Benchmark {
             
             reportOnMetrics(file, s);
         }
+        
+        
+        
         System.out.println("Flushing output stream...");
         outputPrintStream.flush();
         System.out.format("Benchmark finished! [took %d ms]\n", System.currentTimeMillis()-benchmarkStart);
