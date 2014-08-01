@@ -57,4 +57,27 @@ public class Metrics {
         return Math.sqrt(this.getMSE());
     }
     
+    /**
+     * Returns the coefficient of determination
+     * @return 
+     */
+    public double getR() {
+        double sum= 0.0;
+        for(OutputSpacePoint p : this.objective) {
+            sum+=p.getValue();
+        }
+        double mean = sum/this.objective.size();
+        double ssTot = 0.0;
+        double ssRes = 0.0;
+        for(OutputSpacePoint p :this.objective){
+            try {
+                ssTot += Math.pow(p.getValue()-mean, 2);
+                ssRes += Math.pow(this.m.getPoint(p.getInputSpacePoint()).getValue()-p.getValue(), 2);
+            } catch (Exception ex) {
+                Logger.getLogger(Metrics.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return 1-(ssRes/ssTot);
+    }
+    
 }
