@@ -76,7 +76,7 @@
 	    "name": "~okeanos",
 	    "auth" :{
 	        "URL" : "https://accounts.okeanos.grnet.gr/identity/v2.0",
-	        "TOKEN" : "fQ9Xyfn8hgvaG8uBs0zdswZVqKRxBa20oCMBkGKmrKs"
+	        "TOKEN" : "MFtPaC8QYOngFQbQ1M2wSoJsf0PCOs4xFDWBMccHmXk"
 	    },
 	    "private_network" : true
 	    
