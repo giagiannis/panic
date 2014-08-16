@@ -277,12 +277,12 @@ public class Benchmark {
         outputPrintStream.println();
     }
     
-    public static void reportOnMetrics(CSVFileManager file, Sampler sampler) {
+    public static void reportOnMetrics(CSVFileManager file, Sampler sampler, List<InputSpacePoint> sampled) {
         metricsOut.println("# Sampler used:\t"+sampler.getClass().toString());
         metricsOut.println("# Date:\t"+new Date());
         metricsOut.println("Model\tMSE\tAverage\tDeviation\tR");
         for(Model m : models) {
-            Metrics met = new Metrics(file.getOutputSpacePoints(), m);
+            Metrics met = new Metrics(file.getOutputSpacePoints(), m, sampled);
             metricsOut.print(m.getClass().toString().substring(m.toString().lastIndexOf(".") + 7) + "\t\t\t");
             metricsOut.format("%.5f\t%.5f\t%.5f\t%.5f",met.getMSE(), met.getDeviation(), met.getAverageError(), met.getR());
             metricsOut.print("\n");
