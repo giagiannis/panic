@@ -17,4 +17,10 @@ require_relative 'panic-data-generator/functions'
 
 include Panic::Functions
 
-a = ExpLinearFunction.new
+a = ExpLinearFunction.new [0.1, 0.8]
+a.noise_amplitude=0.1
+i=0.0
+while i<=1.0
+  puts a.get_value([i, i/2.0])
+  i+=0.1
+end
