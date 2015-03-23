@@ -1,0 +1,61 @@
+#   Copyright 2015 Giannis Giannakopoulos
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+ 
+
+require 'rubygems'
+require 'rake'
+require 'rake/clean'
+require 'rubygems/package_task'
+require 'rdoc/task'
+require 'rake/testtask'
+require 'yard'
+
+spec = Gem::Specification.new do |s|
+  s.name = 'panic-data-generator'
+  s.version = '0.1'
+  s.has_rdoc = true
+  s.extra_rdoc_files = ['README.md', 'LICENSE']
+  s.summary = ''
+  s.description = s.summary
+  s.author = 'Giannis Giannakopoulos'
+  s.email = 'ggian@cslab.ece.ntua.gr'
+  # s.executables = ['your_executable_here']
+  s.files = %w(LICENSE README.md Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
+  s.require_path = "lib"
+  s.bindir = "bin"
+end
+
+Gem::PackageTask.new(spec) do |p|
+  p.gem_spec = spec
+  p.need_tar = true
+  p.need_zip = true
+end
+
+Rake::RDocTask.new do |rdoc|
+  files =['README.md', 'LICENSE', 'lib/**/*.rb']
+  rdoc.rdoc_files.add(files)
+  rdoc.main = "README.md" # page to start on
+  rdoc.title = "panic-data-generator Docs"
+  rdoc.rdoc_dir = 'doc/rdoc' # rdoc output folder
+  rdoc.options << '--line-numbers'
+end
+
+Rake::TestTask.new do |t|
+  t.test_files = FileList['test/**/*.rb']
+end
+
+YARD::Rake::YardocTask.new do |t|
+  t.files   = ['lib/**/*.rb','-', 'README.md', 'LICENSE']   # optional
+  t.stats_options = ['--list-undoc']         # optional
+end
