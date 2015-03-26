@@ -33,7 +33,8 @@ module Panic
       
       # This method is override by any implementing subclass and it contains the actual
       # calculation of the expression to be returned
-      def evaluate_expression
+      def evaluate_expression vector
+        raise NotImplementedError
       end
     end
     
@@ -45,6 +46,8 @@ module Panic
         @coefficients = coefficients
       end
       
+      # returns the evaluation of the expression
+      # c+c1x1+c2x2+...+c3x3
       def evaluate_expression vector
         sum = 0
         @coefficients.length.times { |index|
