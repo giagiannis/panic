@@ -14,13 +14,37 @@
 
 
 require_relative 'panic-data-generator/functions'
-
+require 'optparse'
 include Panic::Functions
 
 
+options = {}
+OptionParser.new do |opts|
+  opts.on(
+    '-nAMPLITUDE', 
+    '--noise AMPLITUDE', 
+    'Define the amplitude of the noise. ') { |o| options[:noise] = o }
+  opts.on(
+    '-cCOEFFICIENTS', 
+    '--coefficients COEFFICIENTS', 
+    'Coefficients indicating the velocity of decrease per dimension (comma separated doubles)') { |o| options[:coefficients] = o }
+  opts.on(
+    '-dCARDINALITIES',
+    '--cardinalities CARDINALITIES',
+    'Cardinality of each dimension (comma separated integers)') { |o| options[:cardinality] = o }
+  opts.on(
+    '-tTYPE',
+    '--type TYPE',
+    'Type of function (default is explinear)') {|o| options[:type] = o}
+end.parse!
+#puts options
 
-a = ExpLinearFunction.new [0.1, 0.8]
-a.noise_amplitude=0.1
+
+conv = options[:coefficients].split(",").map { |x| x=x.to_f  }
+a = ExpLinearFunction.new conv
+a.noise_amplitude=options[:noise].to_f
+
+
 i=0.0
 while i<=1.0
   puts a.get_value([i, i/2.0])
