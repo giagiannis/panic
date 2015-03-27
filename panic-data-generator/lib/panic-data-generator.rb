@@ -43,10 +43,30 @@ end.parse!
 conv = options[:coefficients].split(",").map { |x| x=x.to_f  }
 a = ExpLinearFunction.new conv
 a.noise_amplitude=options[:noise].to_f
-
-
-i=0.0
+for j in (0..(options[:cardinality].split(",").size-1))
+new_res = Array.new
+old_res = Array.new unless old_res
+pivot = 1.0/options[:cardinality].split(',')[j].to_i
+i=pivot/2.0
 while i<=1.0
-  puts a.get_value([i, i/2.0])
-  i+=0.1
+  if(j>0)
+  old_res.each { |tt| 
+    temp = tt.dup
+    temp << i.round(5)
+    new_res << temp
+  }
+  else
+      new_res << [i.round(5)]
+  end
+  i+=pivot
+end
+old_res = new_res.dup
+end
+
+for i in old_res
+  i << a.get_value(i)
+  for f in i
+    print "#{f}\t"
+  end
+  puts
 end
