@@ -63,6 +63,11 @@ end
 old_res = new_res.dup
 end
 
+old_res[0].size().times{ |i|
+  print "x"+(i+1).to_s+"\t"
+}
+puts "y"
+
 for i in old_res
   i << a.get_value(i)
   for f in i

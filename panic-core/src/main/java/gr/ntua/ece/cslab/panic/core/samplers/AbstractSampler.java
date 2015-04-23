@@ -16,9 +16,23 @@ import java.util.List;
  */
 public class AbstractSampler implements Sampler {
 
+    /**
+     * HashMap representing the allowed values for each dimension.
+     */
     protected HashMap<String, List<Double>> ranges;
+    /**
+     * Number indicating the portion of points to be returned by the sampler,
+     * when compared to the entire domain.
+     */
     protected Double samplingRate;
+    /**
+     * Number of points picked up to this point. Each "next" call should call the
+     * super method next, which updates the variable.
+     */
     protected int pointsPicked;
+    /**
+     * This number indicates the cardinality of the input domain space.
+     */
     protected int maxChoices;
 
     public AbstractSampler() {

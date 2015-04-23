@@ -284,7 +284,7 @@ public class Benchmark {
         for(Model m : models) {
             Metrics met = new Metrics(file.getOutputSpacePoints(), m, sampled);
             metricsOut.print(m.getClass().toString().substring(m.toString().lastIndexOf(".") + 7) + "\t\t\t");
-            metricsOut.format("%.5f\t%.5f\t%.5f\t%.5f",met.getMSE(), met.getDeviation(), met.getAverageError(), met.getR());
+            metricsOut.format("%.5f\t%.5f\t%.5f\t%.5f",met.getMSE(), met.getAverageError(), met.getDeviation(), met.getR());
             metricsOut.print("\n");
         }
     }
