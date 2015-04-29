@@ -66,7 +66,7 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
     }
 
     // method used to estimate the next border point
-    private InputSpacePoint getBorderPoint() {
+    protected InputSpacePoint getBorderPoint() {
         int bitsPadding = this.ranges.size();
         int pointIdex = this.pointsPicked - 1; // super.next() is already called
         Integer unpadded = new Integer(Integer.toBinaryString(pointIdex));
@@ -87,7 +87,7 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
     }
 
     // method used in the second step of the algorithm, to fetch 
-    private InputSpacePoint getNextPoint() {
+    protected InputSpacePoint getNextPoint() {
         double maxDifference = 0.0;
         OutputSpacePoint a = null, b = null;
         for(OutputSpacePoint x1 : this.model.getOriginalPointValues()) {
@@ -108,7 +108,7 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
         return this.getMedianPoint(a.getInputSpacePoint(), b.getInputSpacePoint());
     }
     
-    private InputSpacePoint getRandomPoint() {
+    protected InputSpacePoint getRandomPoint() {
         InputSpacePoint next = randomSampler.next();
         while(this.picked.contains(next))
             next = randomSampler.next();
@@ -116,7 +116,7 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
     }
     
     
-    private InputSpacePoint getMedianPoint(InputSpacePoint a, InputSpacePoint b) {
+    protected InputSpacePoint getMedianPoint(InputSpacePoint a, InputSpacePoint b) {
         InputSpacePoint result = new InputSpacePoint();
         for(String s : a.getKeysAsCollection()) {
             result.addDimension(s, this.getClosestAllowedValue(s, (a.getValue(s)+b.getValue(s)/2.0)));
@@ -124,7 +124,7 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
         return result;
     }
     
-    private double getClosestAllowedValue(String key, double value) {
+    protected double getClosestAllowedValue(String key, double value) {
         double candidate = this.ranges.get(key).get(0);
         for (double d : this.ranges.get(key)) {
             if (Math.abs(d - value) < Math.abs(candidate - value)) {
