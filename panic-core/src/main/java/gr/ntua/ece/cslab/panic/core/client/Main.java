@@ -20,6 +20,7 @@ import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
+import gr.ntua.ece.cslab.panic.core.samplers.special.RandomAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,6 +71,9 @@ public class Main extends Benchmark {
                 System.out.format("\t#%d point picked %s\n", i++, nextSample.toString());
                 for (Model m : models) {
                     m.feed(out, false);
+                }
+                if( s instanceof RandomAdaptiveSampler) {
+                    ((RandomAdaptiveSampler)s).addOutputSpacePoint(out);
                 }
             }
             System.out.print("Training models...\t\t");
