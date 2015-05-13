@@ -1,20 +1,14 @@
 package gr.ntua.ece.cslab.panic.core.samplers.special;
 
+import gr.ntua.ece.cslab.panic.core.containers.beans.EigenSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.BorderPointsEstimator;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponents;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.SingularOps;
-import org.ejml.simple.SimpleMatrix;
 
 /**
  * This class implements a Principal Components sampler, which identifies the
@@ -63,6 +57,11 @@ public class PrincipalComponentsSampler extends AbstractAdaptiveSampler {
         PrincipalComponents pc = new PrincipalComponents();
         pc.setInputData(valuesReceived);
         pc.calculateBase();
+        for(OutputSpacePoint o : valuesReceived) {
+            EigenSpacePoint eigenPoint = pc.outputSpaceToEigenSpace(o);
+            OutputSpacePoint outPoint= pc.eigenSpaceToOutputSpace(eigenPoint);
+            System.out.println(o+" transformed to "+eigenPoint+" and then back to "+outPoint);
+        }
     }
 
     public static void main(String[] args) {

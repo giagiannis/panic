@@ -20,12 +20,29 @@ package gr.ntua.ece.cslab.panic.core.containers.beans;
  *
  * @author Giannis Giannakopoulos
  */
-public class OutputSpacePoint  {
+public final class OutputSpacePoint  {
     
     private InputSpacePoint inputSpacePoint;
     private double value;
     private String key;
 
+    public OutputSpacePoint() {
+    }
+
+    public OutputSpacePoint(InputSpacePoint inputSpacePoint, double value, String key) {
+        this.inputSpacePoint = inputSpacePoint;
+        this.value = value;
+        this.key = key;
+    }
+    
+    public OutputSpacePoint(EigenSpacePoint eigenPoint, double[] data) {
+         this.inputSpacePoint = new InputSpacePoint();
+        for(int i=0;i<eigenPoint.getData().length-1;i++) {
+            this.inputSpacePoint.addDimension(eigenPoint.getKeys()[i], data[i]);
+        }
+        this.setKey(eigenPoint.getKeys()[eigenPoint.getKeys().length-1]);
+        this.setValue(data[data.length-1]);
+    }
     
     public double getValue() {
         return value;
@@ -55,12 +72,11 @@ public class OutputSpacePoint  {
     public void setInputSpacePoint(InputSpacePoint inputSpacePoint) {
         this.inputSpacePoint = inputSpacePoint;
     }
-
+    
+    
     @Override
     public String toString() {
         return this.inputSpacePoint.toString()+" -> ("+ this.value+")";
     }
-    
-    
     
 }

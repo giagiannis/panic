@@ -5,6 +5,7 @@
  */
 package gr.ntua.ece.cslab.panic.core.samplers.utils;
 
+import gr.ntua.ece.cslab.panic.core.containers.beans.EigenSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import java.util.Collection;
 import java.util.List;
@@ -64,23 +65,42 @@ public class PrincipalComponents {
         SimpleMatrix A = new SimpleMatrix(values);
         SingularValueDecomposition<DenseMatrix64F> svd
                 = DecompositionFactory.svd(rows, columns, false, true, false);
-
-        if (!svd.decompose(A.getMatrix())) {
-            System.err.println("SVD failed!");
-        } else {
-            System.err.println("SVD succeeded!");
-        }
-
+        svd.decompose(A.getMatrix());
         V = svd.getV(null, true);
         W = svd.getW(null);
-
         SingularOps.descendingOrder(null, false, W, V, true);
+    }
+    
+    public EigenSpacePoint outputSpaceToEigenSpace(OutputSpacePoint point) {
+        DenseMatrix64F res = new DenseMatrix64F(this.mean.length,1 );
+        DenseMatrix64F vec = DenseMatrix64F.wrap(this.toDoubleArray(point).length,1 , this.toDoubleArray(point));
+        DenseMatrix64F meanMatrix = DenseMatrix64F.wrap(this.mean.length,1 , this.mean);
+        CommonOps.subtract(vec, meanMatrix, vec);
+        CommonOps.mult(this.V, vec, res);
+        EigenSpacePoint result = new EigenSpacePoint();
+        result.setData(res.getData());
+        result.setKeys(point);
+        return result;
+    }
+    
+    public OutputSpacePoint eigenSpaceToOutputSpace(EigenSpacePoint point) {
+        DenseMatrix64F res = new DenseMatrix64F(this.mean.length,1 );
+        DenseMatrix64F vec = DenseMatrix64F.wrap(point.getData().length,1 , point.getData());
+        DenseMatrix64F meanMatrix = DenseMatrix64F.wrap(this.mean.length,1 , this.mean);
+        
+        CommonOps.multTransA(this.V, vec, res);
+        CommonOps.add(res, meanMatrix, res);
+        return new OutputSpacePoint(point, res.getData());
 
-        System.out.println("Sorted components");
-
-        System.out.println("W\n" + W);
-
-        System.out.println("V\n" + V);
-
+    }
+    
+    private double[] toDoubleArray(OutputSpacePoint point) {
+        double[] results = new double[point.getInputSpacePoint().getKeysAsCollection().size()+1];
+        int index=0;
+        for(String key : point.getInputSpacePoint().getKeysAsCollection()) {
+            results[index++] = point.getInputSpacePoint().getValue(key);
+        }
+        results[index] = point.getValue();
+        return results;
     }
 }
