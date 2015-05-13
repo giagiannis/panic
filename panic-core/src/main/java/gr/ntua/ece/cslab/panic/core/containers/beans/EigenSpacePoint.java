@@ -56,9 +56,9 @@ public class EigenSpacePoint {
         buffer.append("[");
         for(int i=0;i<this.data.length-1;i++) {
             buffer.append(String.format("%.2f", this.data[i]));
-            buffer.append(",");
+            buffer.append(", ");
         }
-        buffer.append(this.data[this.data.length-1]);
+        buffer.append(String.format("%.2f", this.data[this.data.length-1]));
         buffer.append("]");
         return buffer.toString();
     }

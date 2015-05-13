@@ -60,7 +60,7 @@ public class PrincipalComponentsSampler extends AbstractAdaptiveSampler {
         for(OutputSpacePoint o : valuesReceived) {
             EigenSpacePoint eigenPoint = pc.outputSpaceToEigenSpace(o);
             OutputSpacePoint outPoint= pc.eigenSpaceToOutputSpace(eigenPoint);
-            System.out.println(o+" transformed to "+eigenPoint+" and then back to "+outPoint);
+            System.out.println(o+"\t"+eigenPoint+"\t"+outPoint);
         }
     }
 

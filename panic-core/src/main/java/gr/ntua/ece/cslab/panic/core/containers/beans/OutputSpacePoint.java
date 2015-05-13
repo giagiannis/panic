@@ -76,7 +76,7 @@ public final class OutputSpacePoint  {
     
     @Override
     public String toString() {
-        return this.inputSpacePoint.toString()+" -> ("+ this.value+")";
+        return this.inputSpacePoint.toString()+" -> ("+ String.format("%.4f", this.value)+")";
     }
     
 }
