@@ -5,9 +5,13 @@
  */
 package gr.ntua.ece.cslab.panic.core.samplers.utils;
 
+import gr.ntua.ece.cslab.panic.core.samplers.UniformSampler;
 import gr.ntua.ece.cslab.panic.core.containers.beans.EigenSpacePoint;
+import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
@@ -32,10 +36,6 @@ public class PrincipalComponents {
 
     public int getRank() {
         return rank;
-    }
-
-    public void setRank(int rank) {
-        this.rank = rank;
     }
 
     public void setInputData(List<OutputSpacePoint> points) {
@@ -79,10 +79,6 @@ public class PrincipalComponents {
         eigenValueMatrix = svd.getW(null);
         SingularOps.descendingOrder(null, false, eigenValueMatrix, eigenVectorMatrix, true);
         this.rank = (rows>columns?columns:rows);
-        for(int i=0;i<this.getRank();i++){
-            System.out.println("Eigenvalue:\t"+this.getEigenValue(i));
-            System.out.println("EigenVector:\t"+this.getEigenVector(i));
-        }
     }
     
     public EigenSpacePoint outputSpaceToEigenSpace(OutputSpacePoint point) {
@@ -136,5 +132,30 @@ public class PrincipalComponents {
         }
         results[index] = point.getValue();
         return results;
+    }
+    
+    
+    public static void main(String[] args) {
+        CSVFileManager file = new CSVFileManager();
+        file.setFilename(args[0]);
+        
+        UniformSampler sampler = new UniformSampler();
+        sampler.setDimensionsWithRanges(file.getDimensionRanges());
+        sampler.setSamplingRate(1.0);
+        sampler.configureSampler();
+        
+        List<OutputSpacePoint> points = new LinkedList<>();
+        while(sampler.hasMore()) {
+            InputSpacePoint sample = sampler.next();
+            points.add(file.getActualValue(sample));
+        }
+        
+        PrincipalComponents comps = new PrincipalComponents();
+        comps.setInputData(points);
+        comps.calculateBase();
+        System.out.println(comps.eigenValueMatrix);
+        System.out.println(comps.eigenVectorMatrix);
+//        for(OutputSpacePoint p:points)
+//            System.out.println(comps.outputSpaceToEigenSpace(p).toStringCSV());
     }
 }

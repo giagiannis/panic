@@ -9,7 +9,10 @@
 
 
 # classpath extraction
-export CLASSPATH=$(echo target/lib/* | tr ' ' ':')
-export JAR=$(echo target/*.jar)
-[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.samplers.special.PrincipalComponentsSampler"
+export CLASSPATH="$(echo ${PWD}/target/lib/* | tr ' ' ':')"
+#export JAR=$(echo target/*.jar)
+export JAR="target/classes"
+[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponents"
+
+
 java -cp $CLASSPATH:$JAR $CLASS  $@

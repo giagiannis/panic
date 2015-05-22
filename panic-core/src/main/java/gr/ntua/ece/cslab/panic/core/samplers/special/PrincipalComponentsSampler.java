@@ -4,6 +4,7 @@ import gr.ntua.ece.cslab.panic.core.containers.beans.EigenSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
+import gr.ntua.ece.cslab.panic.core.samplers.UniformSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.BorderPointsEstimator;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponents;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
@@ -57,32 +58,29 @@ public class PrincipalComponentsSampler extends AbstractAdaptiveSampler {
         PrincipalComponents pc = new PrincipalComponents();
         pc.setInputData(valuesReceived);
         pc.calculateBase();
-        for(OutputSpacePoint o : valuesReceived) {
-            EigenSpacePoint eigenPoint = pc.outputSpaceToEigenSpace(o);
-            OutputSpacePoint outPoint= pc.eigenSpaceToOutputSpace(eigenPoint);
-            System.out.println(o+"\t"+eigenPoint+"\t"+outPoint);
-        }
     }
 
     public static void main(String[] args) {
         CSVFileManager file = new CSVFileManager();
         file.setFilename(args[0]);
-
-        PrincipalComponentsSampler sampler = new PrincipalComponentsSampler();
+        
+        UniformSampler sampler = new UniformSampler();
         sampler.setDimensionsWithRanges(file.getDimensionRanges());
-
+        sampler.setSamplingRate(1.0);
         sampler.configureSampler();
-        sampler.setSamplingRate(0.1);
-        while (sampler.hasMore()) {
-            InputSpacePoint s = sampler.next();
-            if (s != null) {
-                sampler.addOutputSpacePoint(file.getActualValue(s));
-            } else {
-                break;
-            }
-            System.out.println(s);
+        
+        List<OutputSpacePoint> points = new LinkedList<>();
+        while(sampler.hasMore()) {
+            points.add(file.getActualValue(sampler.next()));
         }
-
-        sampler.performPCAOnSampledPoints();
+        PrincipalComponents components = new PrincipalComponents();
+        
+        components.setInputData(points);
+        components.calculateBase();
+        
+        for(OutputSpacePoint p :points) {
+            EigenSpacePoint e=components.outputSpaceToEigenSpace(p);
+            System.out.println(e.toStringCSV());
+        }
     }
 }

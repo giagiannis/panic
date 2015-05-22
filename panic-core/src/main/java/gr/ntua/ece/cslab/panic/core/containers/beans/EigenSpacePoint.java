@@ -1,6 +1,5 @@
 package gr.ntua.ece.cslab.panic.core.containers.beans;
 
-import java.util.Collection;
 
 /**
  * EigenSpacePoint holds data from the eigenspace
@@ -60,6 +59,18 @@ public class EigenSpacePoint {
         }
         buffer.append(String.format("%.2f", this.data[this.data.length-1]));
         buffer.append("]");
+        return buffer.toString();
+    }
+    
+    public String toStringCSV() {
+        StringBuilder buffer = new StringBuilder();
+//        buffer.append("[");
+        for(int i=0;i<this.data.length-1;i++) {
+            buffer.append(String.format("%.5f", this.data[i]));
+            buffer.append("\t");
+        }
+        buffer.append(String.format("%.5f", this.data[this.data.length-1]));
+//        buffer.append("]");
         return buffer.toString();
     }
     

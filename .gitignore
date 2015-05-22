@@ -3,3 +3,5 @@ target/
 nbactions.xml
 /panic-data-generator/nbproject/private/nbproject
 nbproject/
+datasets/
+*.dat
