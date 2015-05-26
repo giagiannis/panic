@@ -12,7 +12,7 @@
 export CLASSPATH="$(echo ${PWD}/target/lib/* | tr ' ' ':')"
 #export JAR=$(echo target/*.jar)
 export JAR="target/classes"
-[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponents"
+[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer"
 
 
 java -cp $CLASSPATH:$JAR $CLASS  $@

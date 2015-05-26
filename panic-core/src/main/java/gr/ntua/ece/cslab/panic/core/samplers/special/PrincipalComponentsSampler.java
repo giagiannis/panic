@@ -6,7 +6,7 @@ import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.UniformSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.BorderPointsEstimator;
-import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponents;
+import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,32 +55,32 @@ public class PrincipalComponentsSampler extends AbstractAdaptiveSampler {
     }
 
     public void performPCAOnSampledPoints() {
-        PrincipalComponents pc = new PrincipalComponents();
+        PrincipalComponentsAnalyzer pc = new PrincipalComponentsAnalyzer();
         pc.setInputData(valuesReceived);
-        pc.calculateBase();
+//        pc.calculateBase();
     }
 
     public static void main(String[] args) {
-        CSVFileManager file = new CSVFileManager();
-        file.setFilename(args[0]);
-        
-        UniformSampler sampler = new UniformSampler();
-        sampler.setDimensionsWithRanges(file.getDimensionRanges());
-        sampler.setSamplingRate(1.0);
-        sampler.configureSampler();
-        
-        List<OutputSpacePoint> points = new LinkedList<>();
-        while(sampler.hasMore()) {
-            points.add(file.getActualValue(sampler.next()));
-        }
-        PrincipalComponents components = new PrincipalComponents();
-        
-        components.setInputData(points);
-        components.calculateBase();
-        
-        for(OutputSpacePoint p :points) {
-            EigenSpacePoint e=components.outputSpaceToEigenSpace(p);
-            System.out.println(e.toStringCSV());
-        }
+//        CSVFileManager file = new CSVFileManager();
+//        file.setFilename(args[0]);
+//        
+//        UniformSampler sampler = new UniformSampler();
+//        sampler.setDimensionsWithRanges(file.getDimensionRanges());
+//        sampler.setSamplingRate(1.0);
+//        sampler.configureSampler();
+//        
+//        List<OutputSpacePoint> points = new LinkedList<>();
+//        while(sampler.hasMore()) {
+//            points.add(file.getActualValue(sampler.next()));
+//        }
+//        PrincipalComponentsAnalyzer components = new PrincipalComponentsAnalyzer();
+//        
+//        components.setInputData(points);
+//        components.calculateBase();
+//        
+//        for(OutputSpacePoint p :points) {
+//            EigenSpacePoint e=components.outputSpaceToEigenSpace(p);
+//            System.out.println(e.toStringCSV());
+//        }
     }
 }

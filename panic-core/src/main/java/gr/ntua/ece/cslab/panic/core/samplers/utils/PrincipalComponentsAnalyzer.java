@@ -8,7 +8,6 @@ package gr.ntua.ece.cslab.panic.core.samplers.utils;
 import gr.ntua.ece.cslab.panic.core.containers.beans.EigenSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.samplers.RandomSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.UniformSampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.util.Collection;
@@ -19,22 +18,26 @@ import org.ejml.factory.DecompositionFactory;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
-import org.ejml.simple.SimpleMatrix;
 
 /**
  *
- * @author giannis
+ * @author Giannis Giannakopoulos
  */
-public class PrincipalComponents {
+public class PrincipalComponentsAnalyzer {
 
-    private DenseMatrix64F eigenVectorMatrix, eigenValueMatrix;
     private int rank;
-
-    private DenseMatrix64F data,
+    
+    private DenseMatrix64F 
+            eigenVectorMatrix, 
+            eigenValueMatrix;
+    private DenseMatrix64F 
+            data,
+            meanMatrix,
+            deviationMatrix,
             varianceMatrix,
-            meanMatrix;
+            correlationMatrix;
 
-    public PrincipalComponents() {
+    public PrincipalComponentsAnalyzer() {
     }
 
     public int getRank() {
@@ -62,6 +65,17 @@ public class PrincipalComponents {
         for (int j = 0; j < columns; j++) {
             this.meanMatrix.div(j, this.data.numRows);
         }
+        
+        
+        this.deviationMatrix = new DenseMatrix64F(1, columns);
+        for(int j = 0; j < columns; j++) {
+            double sum = 0;
+            for(int i = 0; i < rows; i++) {
+                sum += Math.pow(this.data.get(i, j)-this.meanMatrix.get(0, j), 2);
+            }
+            sum = Math.sqrt(sum);
+            this.deviationMatrix.set(0, j, sum);
+        }
     }
 
     public void calculateVarianceMatrix() throws Exception {
@@ -83,14 +97,50 @@ public class PrincipalComponents {
             }
         }
     }
+    
+    public void calculateCorrelationMatrix() throws Exception {
+        if(this.data == null || this.data.numCols<=0 || this.data.numRows <=0) {
+            throw  new Exception("Data table not initialized!");
+        }
+        if(this.varianceMatrix == null || this.varianceMatrix.numCols<=0 || this.varianceMatrix.numRows <=0) {
+            throw  new Exception("Variance matrix not initialized!");
+        }
+        
+        correlationMatrix = new DenseMatrix64F(rank, rank);
+        for (int j1 = 0; j1 < rank; j1++) {
+            for (int j2 = j1; j2 < rank; j2++) {
+                correlationMatrix.set(j1, j2, this.varianceMatrix.get(j1, j2)/
+                        (this.deviationMatrix.get(0, j1)*this.deviationMatrix.get(0,j2)));
+                correlationMatrix.set(j2, j1, this.varianceMatrix.get(j1, j2)/
+                        (this.deviationMatrix.get(0, j1)*this.deviationMatrix.get(0,j2)));
+            }
+        }
+        
+    }
 
-    public void calculateBase() {
+    private void calculateBase(DenseMatrix64F matrixToDecompose) {
         SingularValueDecomposition<DenseMatrix64F> svd = 
-                DecompositionFactory.svd(this.varianceMatrix.numRows, 
-                        this.varianceMatrix.numCols, false, true, false);
-        svd.decompose(this.varianceMatrix);
-        System.out.println(svd.getV(null, true));
-        System.out.println(svd.getW(null));
+                DecompositionFactory.svd(
+                        matrixToDecompose.numRows, 
+                        matrixToDecompose.numCols, 
+                        false, 
+                        true, 
+                        false);
+        svd.decompose(matrixToDecompose);
+        DenseMatrix64F W, Vt;
+        Vt=svd.getV(null, true);
+        W=svd.getW(null);
+        SingularOps.descendingOrder(null, false, W, Vt, true);
+        System.out.println(W);
+        System.out.println(Vt);
+    }
+    
+    public void calculateBaseWithVarianceMatrix() {
+        this.calculateBase(this.varianceMatrix);
+    }
+    
+    public void calculateBaseWithCorrelationMatrix() {
+        this.calculateBase(this.correlationMatrix);
     }
 
 //    public EigenSpacePoint outputSpaceToEigenSpace(OutputSpacePoint point) {
@@ -138,16 +188,6 @@ public class PrincipalComponents {
         return new EigenSpacePoint(res.getData());
     }
 
-    // util
-    private double[] toDoubleArray(OutputSpacePoint point) {
-        double[] results = new double[point.getInputSpacePoint().getKeysAsCollection().size() + 1];
-        int index = 0;
-        for (String key : point.getInputSpacePoint().getKeysAsCollection()) {
-            results[index++] = point.getInputSpacePoint().getValue(key);
-        }
-        results[index] = point.getValue();
-        return results;
-    }
 
     public static void main(String[] args) throws Exception {
         CSVFileManager file = new CSVFileManager();
@@ -155,7 +195,7 @@ public class PrincipalComponents {
 
         UniformSampler sampler = new UniformSampler();
         sampler.setDimensionsWithRanges(file.getDimensionRanges());
-        sampler.setSamplingRate(1.0);
+        sampler.setSamplingRate(1);
         sampler.configureSampler();
 
         List<OutputSpacePoint> points = new LinkedList<>();
@@ -165,10 +205,14 @@ public class PrincipalComponents {
         }
 //        System.out.println(points.size());
 //        
-        PrincipalComponents comps = new PrincipalComponents();
+        PrincipalComponentsAnalyzer comps = new PrincipalComponentsAnalyzer();
         comps.setInputData(points);
         comps.calculateVarianceMatrix();
-        comps.calculateBase();
+        comps.calculateCorrelationMatrix();
+        System.out.println("Correlation Matrix analysis");
+        comps.calculateBaseWithCorrelationMatrix();
+        System.out.println("Variance Matrix analysis");
+        comps.calculateBaseWithVarianceMatrix();
 //        for(int i=0;i<comps.getRank();i++) {
 //            System.out.format("Rank %d: eigenvalue: %.5f with vector %s\n", i, comps.getEigenValue(i), comps.getEigenVector(i));
 //        }
