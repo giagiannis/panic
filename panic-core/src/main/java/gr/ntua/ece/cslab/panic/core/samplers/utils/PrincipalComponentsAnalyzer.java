@@ -128,11 +128,11 @@ public class PrincipalComponentsAnalyzer {
                         false);
         svd.decompose(matrixToDecompose);
         DenseMatrix64F W, Vt;
-        Vt=svd.getV(null, true);
+        Vt=svd.getV(null, false);
         W=svd.getW(null);
-        SingularOps.descendingOrder(null, false, W, Vt, true);
-        System.out.println(W);
-        System.out.println(Vt);
+        SingularOps.descendingOrder(null, false, W, Vt, false);
+        this.eigenValueMatrix = W;
+        this.eigenVectorMatrix = Vt;
     }
     
     public void calculateBaseWithVarianceMatrix() {
@@ -143,30 +143,6 @@ public class PrincipalComponentsAnalyzer {
         this.calculateBase(this.correlationMatrix);
     }
 
-//    public EigenSpacePoint outputSpaceToEigenSpace(OutputSpacePoint point) {
-////        System.out.println(this.eigenValueMatrix);
-////        DenseMatrix64F res = new DenseMatrix64F(this.eigenVectorMatrix.numRows, 1);
-////        DenseMatrix64F vec = DenseMatrix64F.wrap(this.toDoubleArray(point).length, 1, this.toDoubleArray(point));
-////        DenseMatrix64F meanMatrix = DenseMatrix64F.wrap(this.mean.length, 1, this.mean);
-////        CommonOps.subtract(vec, meanMatrix, vec);
-////        CommonOps.mult(this.eigenVectorMatrix, vec, res);
-////        EigenSpacePoint result = new EigenSpacePoint();
-////        result.setData(res.getData());
-////        result.setKeys(point);
-////        return result;
-//    }
-//
-//    public OutputSpacePoint eigenSpaceToOutputSpace(EigenSpacePoint point) {
-////        DenseMatrix64F res = new DenseMatrix64F(this.mean.length, 1);
-////        DenseMatrix64F vec = DenseMatrix64F.wrap(point.getData().length, 1, point.getData());
-////        DenseMatrix64F meanMatrix = DenseMatrix64F.wrap(this.mean.length, 1, this.mean);
-////
-////        CommonOps.multTransA(this.eigenVectorMatrix, vec, res);
-////        CommonOps.add(res, meanMatrix, res);
-////        return new OutputSpacePoint(point, res.getData());
-//
-//    }
-
     /**
      * This method returns the eigenvalue of the specified order (starting from
      * 1).
@@ -175,20 +151,33 @@ public class PrincipalComponentsAnalyzer {
      * @return
      */
     public double getEigenValue(int order) {
-        int maxDimension = (eigenValueMatrix.getNumCols() > eigenValueMatrix.getNumRows() ? eigenValueMatrix.getNumRows() : eigenValueMatrix.getNumCols());
-        if (order > maxDimension - 1) {
+        if (order > this.getRank() - 1) {
             return Double.MAX_EXPONENT;
         }
         return eigenValueMatrix.get(order, order);
     }
 
     public EigenSpacePoint getEigenVector(int order) {
-        DenseMatrix64F res = new DenseMatrix64F(1, eigenVectorMatrix.getNumCols());
-        CommonOps.extractRow(eigenVectorMatrix, order, res);
-        return new EigenSpacePoint(res.getData());
+        return new EigenSpacePoint(CommonOps.extractRow(eigenVectorMatrix, order, null).getData());
     }
 
+    public EigenSpacePoint getEigenSpacePoint(OutputSpacePoint outputSpacePoint) {
+        double[] value = outputSpacePoint.getDoubles();
+        DenseMatrix64F pointMatrix = DenseMatrix64F.wrap(value.length, 1, value);
+        DenseMatrix64F transMean  = new DenseMatrix64F(this.meanMatrix.numCols, this.meanMatrix.numRows);
+        CommonOps.transpose(this.meanMatrix, transMean);
+        CommonOps.subtract(pointMatrix, transMean, pointMatrix);
+        DenseMatrix64F result = new DenseMatrix64F(value.length, 1);
+        CommonOps.mult(this.eigenVectorMatrix, pointMatrix,result);
+        
+        
+        EigenSpacePoint point = new EigenSpacePoint();
+        point.setData(result.getData());
+        point.setKeys(outputSpacePoint);
+        return point;
+    }
 
+    
     public static void main(String[] args) throws Exception {
         CSVFileManager file = new CSVFileManager();
         file.setFilename(args[0]);
@@ -203,25 +192,30 @@ public class PrincipalComponentsAnalyzer {
             InputSpacePoint sample = sampler.next();
             points.add(file.getActualValue(sample));
         }
-//        System.out.println(points.size());
-//        
+        
         PrincipalComponentsAnalyzer comps = new PrincipalComponentsAnalyzer();
         comps.setInputData(points);
         comps.calculateVarianceMatrix();
         comps.calculateCorrelationMatrix();
-        System.out.println("Correlation Matrix analysis");
-        comps.calculateBaseWithCorrelationMatrix();
-        System.out.println("Variance Matrix analysis");
+        
         comps.calculateBaseWithVarianceMatrix();
-//        for(int i=0;i<comps.getRank();i++) {
-//            System.out.format("Rank %d: eigenvalue: %.5f with vector %s\n", i, comps.getEigenValue(i), comps.getEigenVector(i));
-//        }
-//        comps.eigenVectorMatrix = CommonOps.extract(comps.eigenVectorMatrix, 0, 2, 0, comps.eigenVectorMatrix.numRows);
-//        
-//        sampler.configureSampler();
-//        for(int i=0;i<30;i++) {
-//            System.out.println(comps.outputSpaceToEigenSpace(file.getActualValue(sampler.next())).toStringCSV());
-//        }
-
+        
+        for(int i=0;i< comps.getRank();i++) {
+            System.out.println(comps.getEigenVector(i).toStringCSV());
+        }
+        
+        System.out.println(comps.eigenValueMatrix);
+        System.out.println(comps.eigenVectorMatrix);
+        sampler = new UniformSampler();
+        sampler.setDimensionsWithRanges(file.getDimensionRanges());
+        sampler.setSamplingRate(1);
+        sampler.configureSampler();
+        
+        while(sampler.hasMore()) {
+            InputSpacePoint sample = sampler.next();
+            OutputSpacePoint point = file.getActualValue(sample);
+            System.out.println(comps.getEigenSpacePoint(point).toStringCSV());
+        }
+        
     }
 }

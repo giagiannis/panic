@@ -74,6 +74,18 @@ public final class OutputSpacePoint  {
     }
     
     
+    /**
+     * Always returns the performance value last
+     * @return 
+     */
+    public double[] getDoubles() {
+        double[] result = new double[this.inputSpacePoint.getKeysAsCollection().size()+1];
+        int i=0;
+        for(String s:this.inputSpacePoint.getKeysAsCollection())
+            result[i++] = this.inputSpacePoint.getValue(s);
+        result[i++] = this.value;
+        return result;
+    }
     @Override
     public String toString() {
         return this.inputSpacePoint.toString()+" -> ("+ String.format("%.4f", this.value)+")";
