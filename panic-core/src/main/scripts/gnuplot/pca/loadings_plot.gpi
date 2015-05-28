@@ -1,0 +1,24 @@
+#!/usr/bin/env gnuplot
+
+
+set terminal postscript eps enhanced color font 'Arial,12'
+
+set title "Loadings plot"
+set xlabel "PC1"
+set ylabel "PC2"
+unset key
+set grid
+
+
+set output "loadings.eps"
+plot filename u 2:3:1 index 0 w labels point ps 3 pt 5 offset 2
+
+
+set title "Scores plot"
+set output "scores.eps"
+plot filename u 1:2 index 1 w point ps 3 pt 5
+
+
+system("epstopdf loadings.eps")
+system("epstopdf scores.eps")
+system("rm *.eps")
