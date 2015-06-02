@@ -295,7 +295,7 @@ public class PrincipalComponentsAnalyzer {
         comps.calculateVarianceMatrix();
         comps.calculateCorrelationMatrix();
         
-        comps.calculateBaseWithCorrelationMatrix();
+        comps.calculateBaseWithVarianceMatrix();
         
         System.err.println("EigenValues info");
         for(int i=0;i<comps.getRank();i++) {
