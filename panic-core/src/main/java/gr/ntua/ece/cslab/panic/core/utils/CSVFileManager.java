@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package gr.ntua.ece.cslab.panic.core.utils;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -41,9 +40,10 @@ public class CSVFileManager {
     private int numberOfInputDimensions;
     private int outputDimensionIndex;
     private char delimiter = '\t';
-    
+    private String[] dimensionNames;
+
     public CSVFileManager() {
-        
+
     }
 
     public String getFilename() {
@@ -54,22 +54,24 @@ public class CSVFileManager {
         this.filename = filename;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
-            String buffer = null;
-            while(reader.ready())
+            String buffer=null;
+            if(reader.ready())
                 buffer = reader.readLine();
-            numberOfInputDimensions  = buffer.split("\t").length -1;
-            outputDimensionIndex  = buffer.split("\t").length -1;
+            this.dimensionNames = buffer.split("\t");
+            this.numberOfInputDimensions = this.dimensionNames.length - 1;
+            this.outputDimensionIndex = this.dimensionNames.length - 1;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(CSVFileManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(CSVFileManager.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
     /**
      * Default number equals to number of column to CSV -1.
-     * @return 
+     *
+     * @return
      */
     public int getNumberOfInputDimensions() {
         return numberOfInputDimensions;
@@ -89,7 +91,8 @@ public class CSVFileManager {
 
     /**
      * Default number equals to number of columns to CSV -1.
-     * @return 
+     *
+     * @return
      */
     public int getOutputDimensionIndex() {
         return outputDimensionIndex;
@@ -97,65 +100,70 @@ public class CSVFileManager {
 
     public void setOutputDimensionIndex(int outputDimensionIndex) {
         this.outputDimensionIndex = outputDimensionIndex;
-    }    
-    
+    }
+
     public List<OutputSpacePoint> getOutputSpacePoints() {
         List<OutputSpacePoint> results = null;
         try {
             CSVReader reader = new CSVReader(new FileReader(filename), delimiter, '#', 1);
             String[] line;
             results = new LinkedList<>();
-            while((line = reader.readNext())!=null) {
+            while ((line = reader.readNext()) != null) {
                 OutputSpacePoint point = new OutputSpacePoint();
                 point.setInputSpacePoint(new InputSpacePoint());
-                for(int i=0;i<numberOfInputDimensions;i++)
-                    point.getInputSpacePoint().addDimension("x"+(i+1), new Double(line[i]));
-                point.setValue("objective", new Double(line[outputDimensionIndex]));
+                for (int i = 0; i < numberOfInputDimensions; i++) {
+                    point.getInputSpacePoint().addDimension(this.dimensionNames[i], new Double(line[i]));
+                }
+                point.setValue(this.dimensionNames[this.dimensionNames.length-1], new Double(line[outputDimensionIndex]));
                 results.add(point);
             }
             reader.close();
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Logger.getLogger(CSVFileManager.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return results;
     }
-    
+
     public List<InputSpacePoint> getInputSpacePoints() {
         List<OutputSpacePoint> points = this.getOutputSpacePoints();
         List<InputSpacePoint> results = new LinkedList<>();
-        for(OutputSpacePoint p :points)
+        for (OutputSpacePoint p : points) {
             results.add(p.getInputSpacePoint());
+        }
         return results;
     }
-    
+
     /**
-     * Method returning the district values of each dimension. Useful for samplers.
+     * Method returning the district values of each dimension. Useful for
+     * samplers.
+     *
      * @return
      */
-  
     public HashMap<String, List<Double>> getDimensionRanges() {
         HashMap<String, Set<Double>> temp = new HashMap<>();
         List<InputSpacePoint> points = this.getInputSpacePoints();
-        for(InputSpacePoint p : points) {
-            for(String key : p.getKeysAsCollection()) {
-                if(temp.get(key) == null)
+        for (InputSpacePoint p : points) {
+            for (String key : p.getKeysAsCollection()) {
+                if (temp.get(key) == null) {
                     temp.put(key, new HashSet<Double>());
+                }
                 temp.get(key).add(p.getValue(key));
             }
         }
         HashMap<String, List<Double>> results = new HashMap<>();
-        for(String s: temp.keySet())
+        for (String s : temp.keySet()) {
             results.put(s, new LinkedList<>(temp.get(s)));
+        }
         return results;
     }
-    
+
     public OutputSpacePoint getActualValue(InputSpacePoint point) {
-        for(OutputSpacePoint p : this.getOutputSpacePoints())
-            if(p.getInputSpacePoint().equals(point))
+        for (OutputSpacePoint p : this.getOutputSpacePoints()) {
+            if (p.getInputSpacePoint().equals(point)) {
                 return p;
+            }
+        }
         return null;
     }
 //    public static void main(String[] args) {
