@@ -1,4 +1,4 @@
-"nodes"	"cores/node"	"graph size (thousands)"	"execution time (ms)"
+nodes	cores	vert	time
 2	1	50	150.36
 2	1	60	179.37
 2	1	70	203.13
