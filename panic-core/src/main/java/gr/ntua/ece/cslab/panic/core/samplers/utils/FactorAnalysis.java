@@ -1,4 +1,4 @@
-package gr.ntua.ece.cslab.panic.core.samplers.special;
+package gr.ntua.ece.cslab.panic.core.samplers.utils;
 
 import com.itemanalysis.psychometrics.factoranalysis.EstimationMethod;
 import com.itemanalysis.psychometrics.factoranalysis.ExploratoryFactorAnalysis;
@@ -6,7 +6,6 @@ import com.itemanalysis.psychometrics.factoranalysis.RotationMethod;
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.UniformSampler;
-import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.util.LinkedList;
 import java.util.List;

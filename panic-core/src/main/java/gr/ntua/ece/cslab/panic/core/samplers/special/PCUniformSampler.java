@@ -9,8 +9,10 @@ import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.BorderPointsEstimator;
+import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,11 +45,11 @@ public class PCUniformSampler extends AbstractAdaptiveSampler {
 
     @Override
     public InputSpacePoint next() {
+//        super.next();
         if(this.pointsPicked<this.firstPhaseThreshold && this.borderPointSampler.hasMorePoints()) {
             return this.borderPointSampler.getBorderPoint();
         } else
             return null;
-//        return super.next(); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -59,11 +61,44 @@ public class PCUniformSampler extends AbstractAdaptiveSampler {
     }
     
     public void analyze() throws Exception {
+        
+        // execute PCA analysis
         this.analyzer = new PrincipalComponentsAnalyzer();
         this.analyzer.setInputData(this.outputSpacePoints);
         this.analyzer.calculateVarianceMatrix();
         this.analyzer.calculateCorrelationMatrix();
+//        this.analyzer.calculateBaseWithVarianceMatrix();
         this.analyzer.calculateBaseWithCorrelationMatrix();
+//        this.analyzer.calculateBaseWithDataMatrix();
+        
+        // check how many principal components are needed
+        int pcs=0;
+        while(this.analyzer.getEigenValueAggregatedScore(pcs)<0.999)
+            pcs++;
+        pcs++;
+        
+        // create the loadings double[][]
+        double[][] loadings = new double[this.analyzer.getRank()][pcs];
+        String[] labels = new String[this.analyzer.getRank()];
+        
+        int index=0;
+        Iterator<String> it= this.outputSpacePoints.get(0).getInputSpacePoint().getKeysAsCollection().iterator();
+        while(it.hasNext())
+            labels[index++]=it.next();
+        labels[index++] = this.outputSpacePoints.get(0).getKey();
+        for(int i=0;i<this.analyzer.getRank();i++)
+            for(int j=0;j<pcs;j++) 
+                loadings[i][j] = this.analyzer.getLoading(j, i);
+        
+        LoadingsAnalyzer loadingsAnalyzer = new LoadingsAnalyzer(loadings);
+        loadingsAnalyzer.setDimensionLabels(labels);
+        System.out.println(loadingsAnalyzer);
+        System.err.println("Distance matrix");
+        System.err.println(loadingsAnalyzer.toStringDistanceMatrix(this.analyzer.getPCWeights(pcs)));
+        
+        System.err.println("Similarity matrix");
+        System.err.println(loadingsAnalyzer.toStringSimilarityMatrix(this.analyzer.getPCWeights(pcs)));
+        
     }
     
     public void addOutputSpacePoint(OutputSpacePoint point) {
@@ -77,7 +112,7 @@ public class PCUniformSampler extends AbstractAdaptiveSampler {
 
         PCUniformSampler sampler = new PCUniformSampler();
         sampler.setDimensionsWithRanges(file.getDimensionRanges());
-        sampler.setSamplingRate(.1);
+        sampler.setSamplingRate(.0);
         sampler.setFirstPhaseThreshold(8);
         sampler.configureSampler();
         
@@ -85,10 +120,11 @@ public class PCUniformSampler extends AbstractAdaptiveSampler {
         for(int i=0;i<8;i++)
             points.add(file.getActualValue(sampler.next()));
         
-        System.out.println(points);
+//        System.err.println(points);
         for(OutputSpacePoint p:points)
             sampler.addOutputSpacePoint(p);
         sampler.analyze();
+//        System.out.println("");
         
 //
 //        List<OutputSpacePoint> points = new LinkedList<>();

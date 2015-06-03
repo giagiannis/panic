@@ -230,9 +230,6 @@ public class PrincipalComponentsAnalyzer {
                 break;
         }
         
-        
-        
-        
         EigenSpacePoint point = new EigenSpacePoint();
         point.setData(resultArray);
         point.setKeys(outputSpacePoint);
@@ -255,6 +252,46 @@ public class PrincipalComponentsAnalyzer {
         }
         return partialSum/globalSum;
     }
+    
+    /**
+     * Method that returns the loadings of the analysis for a specific principal component
+     * and a specific input dimension.
+     * @param princinalComponentOrder
+     * @param dimension
+     * @return 
+     */
+    public double getLoading(int princinalComponentOrder, int dimension) {
+        return this.getEigenVector(princinalComponentOrder).getData()[dimension-0];
+    }
+    
+    /**
+     * Returns the weight of each PC, sorted by their id.
+     * @return 
+     */
+    public double[] getPCWeights() {
+        double[] weights = new double[rank];
+        double sum=0.0;
+        for(int i=0;i<this.getRank();i++) 
+            sum+=this.getEigenValue(i);
+        for(int i=0;i<this.getRank();i++)
+            weights[i] = this.getEigenValue(i)/sum;
+        
+        return weights;
+    }
+    
+    /**
+     * Returns the weight of each PC, upto the specified order.
+     * @param components
+     * @return 
+     */
+    public double[] getPCWeights(int components) {
+        double[] primary = this.getPCWeights();
+        double[] result = new double[(components<primary.length?components:primary.length)];
+        for(int i=0;i<result.length;i++)
+            result[i]=primary[i];
+        return result;
+    }
+    
     // utilities and helper methods
     private void calculateBase(DenseMatrix64F matrixToDecompose) {
         SingularValueDecomposition<DenseMatrix64F> svd
@@ -296,6 +333,7 @@ public class PrincipalComponentsAnalyzer {
         comps.calculateCorrelationMatrix();
         
         comps.calculateBaseWithVarianceMatrix();
+//        comps.calculateBaseWithCorrelationMatrix();
         
         System.err.println("EigenValues info");
         for(int i=0;i<comps.getRank();i++) {
