@@ -11,8 +11,7 @@ set grid
 
 
 set output "loadings.eps"
-plot filename u 2:3:1 index 0 w labels point ps 3 pt 5 offset 1,1
-
+plot filename u 2:3:1 index 0 w labels point ps 4 pt 6 offset -.25,-.25
 
 #set title "Scores plot"
 #set output "scores.eps"
