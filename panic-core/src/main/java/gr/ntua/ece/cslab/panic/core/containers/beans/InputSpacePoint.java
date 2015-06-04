@@ -16,6 +16,8 @@
 
 package gr.ntua.ece.cslab.panic.core.containers.beans;
 
+import java.util.Map;
+
 /**
  * This class represents an Input Space Point as a multidimensional point.
  * @author Giannis Giannakopoulos
@@ -46,4 +48,13 @@ public class InputSpacePoint extends MultiPoint {
         strBuild.delete(strBuild.length()-1,strBuild.length());
         return strBuild.toString();
     }
+    public InputSpacePoint getClone() {
+        InputSpacePoint point = new InputSpacePoint();
+        for(Map.Entry<String, Double> e:this.getValues().entrySet()) {
+            point.addDimension(e.getKey(), e.getValue());
+        }
+        return point;
+    }
+    
+    
 }
