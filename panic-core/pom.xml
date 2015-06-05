@@ -79,6 +79,9 @@
             <version>0.27</version>
         </dependency>
         <dependency>
+            <!--
+            FIXME: Needs manual installation since no repositories contain it.
+            -->
             <groupId>com.itemanalysis</groupId>
             <artifactId>psychometrics</artifactId>
             <version>1.3</version>
@@ -88,5 +91,4 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
-    
 </project>
