@@ -20,6 +20,7 @@ import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
+import gr.ntua.ece.cslab.panic.core.samplers.special.PCUniformSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.special.RandomAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.util.LinkedList;
@@ -46,10 +47,10 @@ public class Main extends Benchmark {
                 m.configureClassifier();
             }
             
-            if(s instanceof AbstractAdaptiveSampler) {
-                AbstractAdaptiveSampler temp = (AbstractAdaptiveSampler) s;
-                temp.setModel(models[0]);
-            }
+//            if(s instanceof AbstractAdaptiveSampler) {
+//                AbstractAdaptiveSampler temp = (AbstractAdaptiveSampler) s;
+//                temp.setModel(models[0]);
+//            }
 
             CSVFileManager file = new CSVFileManager();
             file.setFilename(inputFile);
@@ -72,8 +73,8 @@ public class Main extends Benchmark {
                 for (Model m : models) {
                     m.feed(out, false);
                 }
-                if( s instanceof RandomAdaptiveSampler) {
-                    ((RandomAdaptiveSampler)s).addOutputSpacePoint(out);
+                if( s instanceof AbstractAdaptiveSampler) {
+                    ((AbstractAdaptiveSampler)s).addOutputSpacePoint(out);
                 }
             }
             System.out.print("Training models...\t\t");

@@ -1,6 +1,8 @@
 package gr.ntua.ece.cslab.panic.core.samplers;
 
-import gr.ntua.ece.cslab.panic.core.models.Model;
+import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This class implements various method from the Sampler interface, used as a base class
@@ -8,24 +10,28 @@ import gr.ntua.ece.cslab.panic.core.models.Model;
  * @author Giannis Giannakopoulos
  */
 public abstract class AbstractAdaptiveSampler extends AbstractSampler{
-
-    /**
-     * This model guides the sampler to pick better points.
-     */
-    protected Model model;
     
+    protected List<OutputSpacePoint> outputSpacePoints;
     
     /**
      * Default constructor.
      */
     public AbstractAdaptiveSampler() {
+        this.outputSpacePoints = new LinkedList<>();
     }
 
-    public Model getModel() {
-        return model;
+    public List<OutputSpacePoint> getOutputSpacePoints() {
+        return outputSpacePoints;
     }
 
-    public void setModel(Model model) {
-        this.model = model;
+    public void setOutputSpacePoints(List<OutputSpacePoint> outputSpacePoints) {
+        this.outputSpacePoints = outputSpacePoints;
     }
+    
+    public void addOutputSpacePoint(OutputSpacePoint outputSpacePoint) {
+        if(this.outputSpacePoints!=null) {
+            this.outputSpacePoints.add(outputSpacePoint);
+        }
+    }
+
 }

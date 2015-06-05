@@ -90,8 +90,8 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
     protected InputSpacePoint getNextPoint() {
         double maxDifference = 0.0;
         OutputSpacePoint a = null, b = null;
-        for(OutputSpacePoint x1 : this.model.getOriginalPointValues()) {
-            for(OutputSpacePoint x2 : this.model.getOriginalPointValues()) {
+        for(OutputSpacePoint x1 : this.outputSpacePoints) {
+            for(OutputSpacePoint x2 : this.outputSpacePoints) {
                 InputSpacePoint median = this.getMedianPoint(x1.getInputSpacePoint(), x2.getInputSpacePoint());
                 if(!this.picked.contains(median)) {
                     double current = Math.abs(x1.getValue() - x2.getValue());
@@ -146,7 +146,7 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
         sampler.setSamplingRate(0.3);
         sampler.setDimensionsWithRanges(file.getDimensionRanges());
         sampler.configureSampler();
-        sampler.setModel(model);
+//        sampler.setModel(model);
 
         while (sampler.hasMore()) {
             InputSpacePoint sampledPoint = sampler.next();
@@ -158,6 +158,7 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
             if (outPoint != null) {
                 System.out.println("Outpoint " + outPoint);
             }
+            sampler.addOutputSpacePoint(outPoint);
             model.feed(outPoint, false);
         }
 

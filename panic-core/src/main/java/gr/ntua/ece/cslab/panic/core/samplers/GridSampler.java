@@ -52,7 +52,7 @@ public class GridSampler extends  AbstractSampler {
      * Set the weights of choice for each dimension.
      * @param coefficients 
      */
-    public void setCoefficients(HashMap<String, Double> coefficients) {
+    public void setWeights(HashMap<String, Double> coefficients) {
         this.coefficients = coefficients;
     }
     
@@ -62,7 +62,7 @@ public class GridSampler extends  AbstractSampler {
      * @param coefficients
      * @param labels 
      */
-    public void setWeights(double[] coefficients, String[] labels) {
+    public void setWeights(String[] labels, double[] coefficients) {
         for(int i=0;i<coefficients.length;i++)
             this.coefficients.put(labels[i], coefficients[i]);
     }
