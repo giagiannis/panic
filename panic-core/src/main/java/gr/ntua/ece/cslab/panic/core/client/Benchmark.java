@@ -78,12 +78,11 @@ public class Benchmark {
 
         options.addOption("m", "models", true, "define the models to use (if not defined, all the available models will be trained");
         options.getOption("m").setArgName("model1,model2");
-        
-        options.addOption("mo", "metrics-output", true, "the file you want to store the metrics to");
-        
 
-        options.addOption(null, "list-models", false, "lists the available models");
-        options.addOption(null, "list-samplers", false, "lists the available samplers");
+        options.addOption("mo", "metrics-output", true, "the file you want to store the metrics to");
+
+        options.addOption("lm", "list-models", false, "lists the available models");
+        options.addOption("ls", "list-samplers", false, "lists the available samplers");
 
     }
 
@@ -92,7 +91,6 @@ public class Benchmark {
      *
      * @return
      */
-    
     public static Class<? extends Model>[] discoverModels() {
         List<Class<? extends Model>> list = new ArrayList<>();
         Reflections reflections = new Reflections("gr.ntua.ece.cslab");
@@ -101,10 +99,10 @@ public class Benchmark {
                 list.add(c);
             }
         }
-        
+
         @SuppressWarnings("unchecked")
         Class<? extends Model>[] modelsDiscovered = new Class[list.size()];
-        
+
         int i = 0;
         for (Class<? extends Model> c : list) {
             modelsDiscovered[i++] = c;
@@ -125,7 +123,7 @@ public class Benchmark {
                 list.add(c);
             }
         }
-        
+
         @SuppressWarnings("unchecked")
         Class<? extends Sampler>[] samplersDiscovered = new Class[list.size()];
         int i = 0;
@@ -156,14 +154,20 @@ public class Benchmark {
 
         if (cmd.hasOption("list-models")) {
             for (Class<? extends Model> c : discoverModels()) {
-                System.out.println(c.toString());
+                String className = c.getCanonicalName();
+                String[] split = className.split("\\.");
+                String shortName = split[split.length - 1];
+                System.out.format("%s\t(%s)\n", className, shortName);
             }
             System.exit(1);
         }
 
         if (cmd.hasOption("list-samplers")) {
             for (Class<? extends Sampler> c : discoverSamplers()) {
-                System.out.println(c.toString());
+                String className = c.getCanonicalName();
+                String[] split = className.split("\\.");
+                String shortName = split[split.length - 1];
+                System.out.format("%s\t(%s)\n", className, shortName);
             }
             System.exit(1);
         }
@@ -171,7 +175,7 @@ public class Benchmark {
         if (cmd.hasOption("i")) {
             inputFile = cmd.getOptionValue("i");
         } else {
-            System.err.println("Input file is necessary");
+//            System.err.println("Input file is necessary");
             HelpFormatter format = new HelpFormatter();
             format.printHelp(Main.class.toString(), options);
             System.exit(0);
@@ -188,24 +192,31 @@ public class Benchmark {
         } else {
             samplingRate = 0.2;
         }
-        
+
         if (cmd.hasOption("mo")) {
             metricsOut = new PrintStream(cmd.getOptionValue("mo"));
         } else {
             metricsOut = System.out;
         }
-        
+
         instantiateModels();
         instantiateSamplers();
 
     }
 
     public static void instantiateModels() throws Exception {
+        Class<? extends Model>[] modelsList = discoverModels();
         if (cmd.hasOption("m")) {
             String[] classNames = cmd.getOptionValue("m").split(",");
             models = new Model[classNames.length];
             for (int i = 0; i < classNames.length; i++) {
-                models[i] = (Model) Class.forName(classNames[i]).getConstructor().newInstance();
+                String modelFound = classNames[i];
+                for (Class f : modelsList) {
+                    if (f.getCanonicalName().endsWith("." + classNames[i])) {
+                        modelFound = f.getCanonicalName();
+                    }
+                }
+                models[i] = (Model) Class.forName(modelFound).getConstructor().newInstance();
             }
         } else {
             int i = 0;
@@ -217,18 +228,26 @@ public class Benchmark {
     }
 
     public static void instantiateSamplers() throws Exception {
+        Class<? extends Sampler>[] samplersList = discoverSamplers();
         if (cmd.hasOption("st")) {
             String[] samplersArgs = cmd.getOptionValue("st").split(",");
             samplers = new Sampler[samplersArgs.length];
             int i = 0;
             for (String className : samplersArgs) {
-                samplers[i++] = (Sampler) Class.forName(className).getConstructor().newInstance();
+                String classFound = className;
+                for (Class f : samplersList) {
+                    if (f.getCanonicalName().endsWith("." + className)) {
+                        classFound = f.getCanonicalName();
+                    }
+                }
+                samplers[i++] = (Sampler) Class.forName(classFound).getConstructor().newInstance();
             }
         } else {
-            int i=0;
+            int i = 0;
             samplers = new Sampler[discoverSamplers().length];
-            for(Class<? extends Sampler> c : discoverSamplers())
+            for (Class<? extends Sampler> c : discoverSamplers()) {
                 samplers[i++] = (Sampler) c.getConstructor().newInstance();
+            }
         }
     }
 
@@ -244,15 +263,15 @@ public class Benchmark {
     public static void createCSVForModels(CSVFileManager file, Sampler sampler, List<InputSpacePoint> picked) throws Exception {
         OutputSpacePoint headerPoint = file.getOutputSpacePoints().get(0);
         outputPrintStream.println("# Created: " + new Date());
-        outputPrintStream.println("# Active sampler: "+sampler.getClass().toString());
+        outputPrintStream.println("# Active sampler: " + sampler.getClass().toString());
         outputPrintStream.println("# Runtime options:");
         for (Option p : cmd.getOptions()) {
             outputPrintStream.println("#\t" + p.getLongOpt() + ":\t" + cmd.getOptionValue(p.getLongOpt()));
         }
         outputPrintStream.println("#");
         outputPrintStream.println("# Points picked");
-        for(InputSpacePoint p :picked) {
-            outputPrintStream.println("# \t"+p);
+        for (InputSpacePoint p : picked) {
+            outputPrintStream.println("# \t" + p);
         }
 
         for (String k : headerPoint.getInputSpacePoint().getKeysAsCollection()) {
@@ -276,15 +295,15 @@ public class Benchmark {
         outputPrintStream.println();
         outputPrintStream.println();
     }
-    
+
     public static void reportOnMetrics(CSVFileManager file, Sampler sampler, List<InputSpacePoint> sampled) {
-        metricsOut.println("# Sampler used:\t"+sampler.getClass().toString());
-        metricsOut.println("# Date:\t"+new Date());
+        metricsOut.println("# Sampler used:\t" + sampler.getClass().toString());
+        metricsOut.println("# Date:\t" + new Date());
         metricsOut.println("Model\tMSE\tAverage\tDeviation\tR");
-        for(Model m : models) {
+        for (Model m : models) {
             Metrics met = new Metrics(file.getOutputSpacePoints(), m, sampled);
             metricsOut.print(m.getClass().toString().substring(m.toString().lastIndexOf(".") + 7) + "\t\t\t");
-            metricsOut.format("%.5f\t%.5f\t%.5f\t%.5f",met.getMSE(), met.getAverageError(), met.getDeviation(), met.getR());
+            metricsOut.format("%.5f\t%.5f\t%.5f\t%.5f", met.getMSE(), met.getAverageError(), met.getDeviation(), met.getR());
             metricsOut.print("\n");
         }
     }

@@ -20,8 +20,6 @@ import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
-import gr.ntua.ece.cslab.panic.core.samplers.special.PCUniformSampler;
-import gr.ntua.ece.cslab.panic.core.samplers.special.RandomAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.util.LinkedList;
 import java.util.List;
