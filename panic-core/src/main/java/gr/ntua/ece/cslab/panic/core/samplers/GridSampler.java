@@ -1,14 +1,15 @@
 package gr.ntua.ece.cslab.panic.core.samplers;
 
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * This sampler creates a multi-dimensional grid using weights.
@@ -78,16 +79,17 @@ public class GridSampler extends  AbstractSampler {
     // Common sampler interface methods
     @Override
     public void configureSampler() {
+        super.configureSampler();
         // if the coefficients have not been initialized, initialize them to 1.0
         if(this.coefficients.isEmpty()){
             for(String s:this.ranges.keySet())
                 this.coefficients.put(s, 1.0);
         }
-        super.configureSampler();
         HashMap<String, Double> cardinalities=this.calculateCardinalitiesPerDimension();
         HashMap<String, List<Double>> values = this.calculateValuesPerDimension(cardinalities);
         List<InputSpacePoint> gridPoints = this.powerset(values);
-        this.samples = this.removeForbiddenPoints(gridPoints);
+        gridPoints = this.removeForbiddenPoints(gridPoints);
+        this.samples = this.removePoints(gridPoints);
     }
     
     @Override
@@ -109,19 +111,18 @@ public class GridSampler extends  AbstractSampler {
      */
     private HashMap<String, List<Double>>  calculateValuesPerDimension(HashMap<String, Double> cardinalities) {
         HashMap<String, List<Double>> valuesPerDimension = new HashMap<>(), rangesClone = new HashMap<>();
-        Random random = new Random();
         for(Map.Entry<String, List<Double>> e:this.ranges.entrySet()) 
             rangesClone.put(e.getKey(), new LinkedList<>(e.getValue()));
         
         
         for(String s:cardinalities.keySet()) {
             double pivot=1.0/(cardinalities.get(s)/this.ranges.get(s).size());
-            int start = random.nextInt(this.ranges.get(s).size());
+            double start = pivot/2.0;
             for(double i=0;i<this.ranges.get(s).size();i+=pivot){
                 if (!valuesPerDimension.containsKey(s)) {
                     valuesPerDimension.put(s, new LinkedList<Double>());
                 }
-                int index = ((int) Math.round(i) + start) % this.ranges.get(s).size();
+                int index = ((int) Math.round(i+start)) % this.ranges.get(s).size();
                 valuesPerDimension.get(s).add(this.ranges.get(s).get(index));
             }
         }
@@ -134,7 +135,7 @@ public class GridSampler extends  AbstractSampler {
      */
     private HashMap<String, Double> calculateCardinalitiesPerDimension() {
         HashMap<String, Double> cardinalitiesPerDimension = new HashMap<>();
-        int pointsTotal = (int) Math.round(this.maxChoices*this.samplingRate);
+        int pointsTotal = (int) Math.ceil(this.maxChoices*this.samplingRate);
         double product = 1.0;
         for(Map.Entry<String, Double> e : this.coefficients.entrySet()) {
             Double value = e.getValue();
@@ -208,6 +209,60 @@ public class GridSampler extends  AbstractSampler {
                 result.add(p);
         }
         return result;
+    }
+    
+    
+    /**
+     * This function removes points from the samples in order to reach the 
+     * desired number of points, set by the sampling rate.
+     * @param gridPoints
+     * @return 
+     */
+    private List<InputSpacePoint> removePoints(List<InputSpacePoint> gridPoints) {
+        Collections.sort(gridPoints, new InputSpacePointsComparator(this.coefficients));
+        int maxPointsPicked = (int) Math.floor(this.samplingRate*this.maxChoices);
+        int formerSize = gridPoints.size();
+        double rate = formerSize/(1.0*maxPointsPicked);
+        List<InputSpacePoint> result = new LinkedList<>();
+        for(double i=rate/2.0;i<formerSize;i+=rate) {
+            int index = (int) Math.round(i);
+            result.add(gridPoints.get(index));
+        }
+        return result;
+    }
+    
+    
+    private class InputSpacePointsComparator implements Comparator<InputSpacePoint> {
+        
+        private final String[] orderedLabels;
+        public InputSpacePointsComparator(HashMap<String, Double> coefficients) {
+            this.orderedLabels = new String[coefficients.size()];
+            TreeMap<Double, List<String>> tree = new TreeMap<>();
+            for(Double val : coefficients.values()) 
+                tree.put(val, new LinkedList<String>());
+            for(String  k :coefficients.keySet())
+                tree.get(coefficients.get(k)).add(k);
+            int index=0;
+            for(Double e:tree.descendingKeySet()) {
+                List<String> dimensions = tree.get(e);
+                for(String s:dimensions)
+                    this.orderedLabels[index++] = s;
+            }
+            
+        }
+
+        @Override
+        public int compare(InputSpacePoint o1, InputSpacePoint o2) {
+            for(String s : this.orderedLabels) {
+                if(o1.getValue(s)>o2.getValue(s)) {
+                    return 1;
+                } else if(o1.getValue(s)<o2.getValue(s)) {
+                    return -1;
+                }
+            }
+            return 0;
+        }
+        
     }
 }
 
