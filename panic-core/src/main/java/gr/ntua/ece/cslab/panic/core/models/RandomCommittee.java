@@ -25,7 +25,7 @@ public class RandomCommittee extends AbstractWekaModel{
                 break;
             index++;
         }
-        options[index+1] = "weka.classifiers.functions.MultilayerPerceptron";
+        
         String[] newOptions = new String[index+2];
         System.arraycopy(options, 0, newOptions, 0, newOptions.length);
         newOptions[index+1] = "weka.classifiers.functions.MultilayerPerceptron";
