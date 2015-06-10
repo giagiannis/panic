@@ -110,4 +110,40 @@ public class MultiPoint implements Serializable{
         return new Double(new DecimalFormat(doubleFormat).format(initial));
         
     }
+    
+    public byte[] getBytes() {
+        int count = Integer.SIZE/8;
+        for(String key : this.getKeysAsCollection()) {
+            count+=Integer.SIZE/8;
+            count+=key.getBytes().length;
+            count+=Double.SIZE/8;
+        }
+        ByteBuffer buffer = ByteBuffer.allocate(count);
+        buffer.putInt(this.getKeysAsCollection().size());
+        for(String key : this.getKeysAsCollection()) {
+            buffer.putInt(key.getBytes().length);
+            buffer.put(key.getBytes());
+            buffer.putDouble(this.values.get(key));
+        }
+        return buffer.array();
+    }
+    
+    public void parseBytes(byte[] buffer) {
+        if(this.values == null) {
+            this.values = new HashMap<>();
+        }
+        ByteBuffer bytes = ByteBuffer.wrap(buffer);
+        int count = bytes.getInt();
+        for(int i=0;i<count;i++) {
+            int size = bytes.getInt();
+            byte[] temp = new byte[size];
+            for(int j=0;j<temp.length;j++)
+                temp[j] = bytes.get();
+            double value = bytes.getDouble();
+            String name = new String(temp);
+            this.values.put(name, value);
+        }
+    }
+    
+    
 }
