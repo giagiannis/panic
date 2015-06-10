@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.ntua.ece.cslab.panic.core.samplers.special;
 
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
@@ -88,7 +83,7 @@ public class DimensionWeightSampler extends AbstractAdaptiveSampler {
     // util methods
     
     /**
-     * Configures the grid sampler. Conducts the PC of Factor Analysis, 
+     * Configures the grid sampler. Conducts the PC or Factor Analysis, 
      * and estimates the weights for the Grid.
      * @return 
      */
