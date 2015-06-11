@@ -1,4 +1,4 @@
-#!/bin/bash
+    #!/bin/bash
 #
 # 
 # author: ggian
@@ -16,6 +16,9 @@ export JAR="target/classes"
 #[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.samplers.WeightedGridSampler"
 #[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer"
 [ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.client.Main"
+#[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.utils.SQLiteClient"
+#[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.containers.beans.lists.OutputSpacePointList"
+
 
 
 java -cp $CLASSPATH:$JAR $CLASS  $@
