@@ -16,6 +16,8 @@
 
 package gr.ntua.ece.cslab.panic.core.containers.beans;
 
+import java.nio.ByteBuffer;
+
 /**
  *
  * @author Giannis Giannakopoulos
@@ -91,4 +93,39 @@ public final class OutputSpacePoint  {
         return this.inputSpacePoint.toString()+" -> ("+ String.format("%.4f", this.value)+")";
     }
     
+    // serializers and deserializers
+    public byte[] getBytes() {
+        byte[] inputSpacePointBytes = this.inputSpacePoint.getBytes();
+        
+        int count = 0;
+        count += Integer.SIZE/8;
+        count += this.key.getBytes().length;
+        count += Double.SIZE/8;
+        count += Integer.SIZE/8;
+        count += inputSpacePointBytes.length;
+        
+        ByteBuffer buffer = ByteBuffer.allocate(count);
+        buffer.putInt(this.key.getBytes().length);
+        buffer.put(this.key.getBytes());
+        buffer.putDouble(this.value);
+        buffer.putInt(inputSpacePointBytes.length);
+        buffer.put(inputSpacePointBytes);
+        
+        return buffer.array();
+    }
+    
+    public void parseBytes(byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        
+        int keySize = buffer.getInt();
+        byte[] keyBytes = new byte[keySize];
+        buffer.get(keyBytes);
+        this.key = new String(keyBytes);
+        this.value = buffer.getDouble();
+        int inputSpacePointSize = buffer.getInt();
+        byte[] inputSpacePointBytes = new byte[inputSpacePointSize];
+        buffer.get(inputSpacePointBytes);
+        this.inputSpacePoint = new InputSpacePoint();
+        this.inputSpacePoint.parseBytes(inputSpacePointBytes);
+    }    
 }
