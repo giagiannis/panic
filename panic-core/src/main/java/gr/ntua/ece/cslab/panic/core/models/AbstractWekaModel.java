@@ -62,6 +62,15 @@ public abstract class AbstractWekaModel implements Model {
         result.setValue("objective", this.classifier.classifyInstance(convertPointToInstance(point)));
         return result;
     }
+    
+    @Override
+    public List<OutputSpacePoint> getPoints(List<InputSpacePoint> points) throws Exception {
+        List<OutputSpacePoint> list = new LinkedList<>();
+        for(InputSpacePoint ip: points) {
+            list.add(this.getPoint(ip));
+        }
+        return list;    
+    }
 
     /**
      * Returns the list of sampled points along with their values.

@@ -58,6 +58,15 @@ public interface Model {
      * @throws java.lang.Exception
      */
     public OutputSpacePoint getPoint(InputSpacePoint point) throws Exception;
+    
+    
+    /**
+     * Method used to bulk get multiple OutputSpacePoints for many InputSpacePoints
+     * @param points
+     * @return
+     * @throws Exception 
+     */
+    public List<OutputSpacePoint> getPoints(List<InputSpacePoint> points) throws Exception;
 
     
     /**
