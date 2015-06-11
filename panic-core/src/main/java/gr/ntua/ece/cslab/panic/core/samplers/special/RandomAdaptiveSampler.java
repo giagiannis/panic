@@ -2,7 +2,7 @@ package gr.ntua.ece.cslab.panic.core.samplers.special;
 
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.metrics.Metrics;
+import gr.ntua.ece.cslab.panic.core.metrics.GlobalMetrics;
 import gr.ntua.ece.cslab.panic.core.models.MLPerceptron;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
@@ -204,7 +204,7 @@ public class RandomAdaptiveSampler extends AbstractAdaptiveSampler {
             sampler.addOutputSpacePoint(out);
             m.feed(out);
         }
-        Metrics metrics = new Metrics(file.getOutputSpacePoints(), (Model) m, sampler.getChosenPoints());
+        GlobalMetrics metrics = new GlobalMetrics(file.getOutputSpacePoints(), (Model) m, sampler.getChosenPoints());
         System.out.format("%.5f %.5f %.5f %.5f\n", metrics.getAverageError(), metrics.getDeviation(), metrics.getMSE(), metrics.getR());
     }
 }
