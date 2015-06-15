@@ -22,7 +22,6 @@ import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
-import gr.ntua.ece.cslab.panic.core.utils.DatabaseClient;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;

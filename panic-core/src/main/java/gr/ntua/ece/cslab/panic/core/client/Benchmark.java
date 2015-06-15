@@ -15,22 +15,16 @@
  */
 package gr.ntua.ece.cslab.panic.core.client;
 
-import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.metrics.GlobalMetrics;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
-import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import gr.ntua.ece.cslab.panic.core.utils.DatabaseClient;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.reflections.Reflections;
 
@@ -107,7 +101,6 @@ public class Benchmark {
             }
         }
 
-        @SuppressWarnings("unchecked")
         Class<? extends Model>[] modelsDiscovered = new Class[list.size()];
 
         int i = 0;
@@ -182,7 +175,6 @@ public class Benchmark {
         if (cmd.hasOption("i")) {
             inputFile = cmd.getOptionValue("i");
         } else {
-//            System.err.println("Input file is necessary");
             HelpFormatter format = new HelpFormatter();
             format.printHelp(Main.class.toString(), options);
             System.exit(0);
@@ -265,103 +257,4 @@ public class Benchmark {
             }
         }
     }
-
-//    /**
-//     * Create csv file template where each column contains information about a
-//     * specific model.
-//     *
-//     * @param file needed to load input domain space and get labels
-//     * @param sampler sampler object, used to write it to csv as comment
-//     * @param picked
-//     * @throws Exception
-//     */
-//    public static void createCSVForModels(CSVFileManager file, Sampler sampler, List<InputSpacePoint> picked) throws Exception {
-//        OutputSpacePoint headerPoint = file.getOutputSpacePoints().get(0);
-//        outputPrintStream.println("# Created: " + new Date());
-//        outputPrintStream.println("# Active sampler: " + sampler.getClass().toString());
-//        outputPrintStream.println("# Runtime options:");
-//        for (Option p : cmd.getOptions()) {
-//            outputPrintStream.println("#\t" + p.getLongOpt() + ":\t" + cmd.getOptionValue(p.getLongOpt()));
-//        }
-//        outputPrintStream.println("#");
-//        outputPrintStream.println("# Points picked");
-//        for (InputSpacePoint p : picked) {
-//            outputPrintStream.println("# \t" + p);
-//        }
-//
-//        for (String k : headerPoint.getInputSpacePoint().getKeysAsCollection()) {
-//            outputPrintStream.print(k + "\t");
-//        }
-//        outputPrintStream.print(headerPoint.getKey() + "\t");
-//
-//        for (Model m : models) {
-//            outputPrintStream.print(m.getClass().toString().substring(m.toString().lastIndexOf(".") + 7) + "\t");
-//        }
-//        outputPrintStream.println();
-//
-//        for (OutputSpacePoint p : file.getOutputSpacePoints()) {
-//            outputPrintStream.print(p.getInputSpacePoint().toStringCSVFormat() + "\t");       // input space point
-//            outputPrintStream.format("%.4f\t", p.getValue());
-//            for (Model m : models) {
-//                outputPrintStream.format("%.4f\t", m.getPoint(p.getInputSpacePoint()).getValue());
-//            }
-//            outputPrintStream.println();
-//        }
-//        outputPrintStream.println();
-//        outputPrintStream.println();
-//    }
-//
-//    public static void reportOnMetrics(CSVFileManager file, Sampler sampler, List<InputSpacePoint> sampled) {
-////        if(cmd.hasOption("mo")) {
-////            DatabaseClient writer = new DatabaseClient();
-////            writer.setDatabaseName(cmd.getOptionValue("mo"));
-////            writer.openConnection();
-////            int index = sampler.getClass().toString().lastIndexOf('.');
-////            String samplerName = sampler.getClass().toString().substring(index+1);
-////            for(Model m : models) {
-////                index = m.getClass().toString().lastIndexOf('.');
-////                String modelName = m.getClass().toString().substring(index+1);
-////                GlobalMetrics met = new GlobalMetrics(file.getOutputSpacePoints(), m, sampled);
-////                writer.insertExperimentMetrics(samplerName, modelName, new Double(cmd.getOptionValue("sr")), met.getMSE(), met.getAverageError(), met.getDeviation(), met.getR());
-////            }
-////            writer.closeConnection();
-////            return;
-////        }
-//        metricsOut.println("# Sampler used:\t" + sampler.getClass().toString());
-//        metricsOut.println("# Date:\t" + new Date());
-//        metricsOut.println("Model\tMSE\tAverage\tDeviation\tR");
-//        for (Model m : models) {
-//            GlobalMetrics met = new GlobalMetrics(file.getOutputSpacePoints(), m, sampled);
-//            metricsOut.print(m.getClass().toString().substring(m.toString().lastIndexOf(".") + 7) + "\t\t\t");
-//            metricsOut.format("%.5f\t%.5f\t%.5f\t%.5f", met.getMSE(), met.getAverageError(), met.getDeviation(), met.getR());
-//            metricsOut.print("\n");
-//        }
-//    }
-//    
-//    public static void saveResults(int experimentId, CSVFileManager file, Sampler sampler, List<InputSpacePoint> picked) {
-//        if(!cmd.hasOption("db"))
-//            return;
-//        // create a new experiment
-//        DatabaseClient client = new DatabaseClient();
-//        client.setDatabaseName(cmd.getOptionValue("db"));
-//        client.openConnection();
-////        int experimentId=client.insertExperiment();
-//        
-//        // save the metrics
-//        String samplerName, modelName;
-//        int index=0;
-//        index = sampler.getClass().getCanonicalName().lastIndexOf('.');
-//        samplerName= sampler.getClass().getCanonicalName().substring(index+1);
-//        for(Model model:models) {
-//            index = model.getClass().getCanonicalName().lastIndexOf('.');
-//            modelName= model.getClass().getCanonicalName().substring(index+1);
-//            GlobalMetrics met = new GlobalMetrics(file.getOutputSpacePoints(), model, picked);
-////            client.insertExperimentMetrics(experimentId, samplerName, modelName,
-////                    met.getMSE(), met.getAverageError(), met.getDeviation(), met.getR());
-//        }
-//        
-//        // save the sampled points
-//        
-//        // save the predictions
-//    }
 }
