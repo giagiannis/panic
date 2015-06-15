@@ -3,8 +3,10 @@ package gr.ntua.ece.cslab.panic.core.samplers.special;
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
+import gr.ntua.ece.cslab.panic.core.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.GridSampler;
-import gr.ntua.ece.cslab.panic.core.samplers.utils.BorderPointsEstimator;
+import gr.ntua.ece.cslab.panic.core.samplers.BorderPointsSampler;
+import gr.ntua.ece.cslab.panic.core.samplers.RandomSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;
 import java.util.HashMap;
@@ -25,8 +27,8 @@ import java.util.logging.Logger;
  */
 public class DimensionWeightSampler extends AbstractAdaptiveSampler {
 
-    private Integer firstPhaseThreshold;
-    private final BorderPointsEstimator borderPointSampler;
+    private Integer firstPhaseThreshold=100;
+    private final AbstractSampler firstPhaseSampler;
 
     private GridSampler gridSampler;
 
@@ -37,7 +39,8 @@ public class DimensionWeightSampler extends AbstractAdaptiveSampler {
      */
     public DimensionWeightSampler() {
         this.outputSpacePoints = new LinkedList<>();
-        this.borderPointSampler = new BorderPointsEstimator();
+        this.firstPhaseSampler = new GridSampler();
+//        this.firstPhaseSampler.set
     }
 
     /**
@@ -62,8 +65,8 @@ public class DimensionWeightSampler extends AbstractAdaptiveSampler {
     @Override
     public InputSpacePoint next() {
         super.next();
-        if (this.pointsPicked <= this.firstPhaseThreshold && this.borderPointSampler.hasMorePoints()) {
-            return this.borderPointSampler.getBorderPoint();
+        if (this.pointsPicked <= this.firstPhaseThreshold && this.firstPhaseSampler.hasMore()) {
+            return this.firstPhaseSampler.next();
         }
         if (this.gridSampler == null || !this.gridSampler.hasMore()) {
             this.gridSampler = this.configureGridSampler();
@@ -74,9 +77,11 @@ public class DimensionWeightSampler extends AbstractAdaptiveSampler {
     @Override
     public void configureSampler() {
         super.configureSampler();
-        this.firstPhaseThreshold = (int) Math.round(Math.pow(2, this.ranges.size()));
-        this.borderPointSampler.setRanges(this.ranges);
-        this.borderPointSampler.estimatePoints();
+        if(this.firstPhaseThreshold==0)
+            this.firstPhaseThreshold = (int) Math.round(Math.pow(2, this.ranges.size()));
+        this.firstPhaseSampler.setDimensionsWithRanges(this.ranges);
+        this.firstPhaseSampler.setSamplingRate(this.samplingRate/2);
+        this.firstPhaseSampler.configureSampler();
     }
 
     
@@ -117,7 +122,7 @@ public class DimensionWeightSampler extends AbstractAdaptiveSampler {
             }
         }
 
-        // instantiante LoadingsAnalyzer
+        // instantiate LoadingsAnalyzer
         LoadingsAnalyzer loadingsAnalyzer = new LoadingsAnalyzer(loadings);
         loadingsAnalyzer.setDimensionLabels(labels);
         double[] pcWeights = analyzer.getPCWeights();
@@ -126,11 +131,14 @@ public class DimensionWeightSampler extends AbstractAdaptiveSampler {
         GridSampler sampler = new GridSampler();
         sampler.setDimensionsWithRanges(ranges);
         sampler.setSamplingRate(this.samplingRate);
+        
+        System.out.println(loadingsAnalyzer.toStringDistanceMatrix(pcWeights));
+        System.out.println(loadingsAnalyzer.toString());
 
         HashMap<String, Double> weights = new HashMap<>();
 //        double[] weights = new double[labels.length];
         for (int i = 0; i < labels.length - 1; i++) {
-            Double score = 1.0 / loadingsAnalyzer.getDistance(i, pcWeights);
+            Double score = 1.0 / loadingsAnalyzer.getFirstQuarterDistance(i, pcWeights);
             weights.put(labels[i], score);
         }
         sampler.setWeights(weights);

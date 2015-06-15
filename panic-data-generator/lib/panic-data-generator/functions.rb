@@ -55,6 +55,24 @@ module Panic
         }
         return 1-Math.exp(-sum**2)
       end
+    end  
+    # Function that expresses the performance function as a "bell", in which 
+    # 
+    class GaussFunction < Function
+      def initialize coefficients
+        super()
+        @coefficients = coefficients
+      end
+      
+      # returns the evaluation of the expression
+      # c+c1x1+c2x2+...+c3x3
+      def evaluate_expression vector
+        sum = 0
+        @coefficients.length.times { |index|
+          sum+=@coefficients[index]*(((vector[index]-0.5)**2)/0.5);
+        }
+        return Math.exp(-sum)
+      end
     end
   end
 end

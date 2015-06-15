@@ -45,6 +45,13 @@ public interface Sampler {
     public void setSamplingRate(double samplingRate);
     
     /**
+     * Dual method to the setSamplingRate method, as it sets the number of points to
+     * be returned by the sampler. Call this after the configureSampler method.
+     * @param numberOfPoints 
+     */
+    public void setPointsToPick(Integer numberOfPoints);
+    
+    /**
      * Method used to configure the sampler. This method must be executed last,
      * after all the initialization steps and before start picking the first
      * samples.

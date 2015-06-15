@@ -225,7 +225,7 @@ public class GridSampler extends  AbstractSampler {
         double rate = formerSize/(1.0*maxPointsPicked);
         List<InputSpacePoint> result = new LinkedList<>();
         for(double i=rate/2.0;i<formerSize;i+=rate) {
-            int index = (int) Math.round(i);
+            int index = (int) Math.floor(i);
             result.add(gridPoints.get(index));
         }
         return result;

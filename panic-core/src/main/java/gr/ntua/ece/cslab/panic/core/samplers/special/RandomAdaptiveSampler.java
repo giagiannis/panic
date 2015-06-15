@@ -6,7 +6,7 @@ import gr.ntua.ece.cslab.panic.core.metrics.GlobalMetrics;
 import gr.ntua.ece.cslab.panic.core.models.MLPerceptron;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
-import gr.ntua.ece.cslab.panic.core.samplers.utils.BorderPointsEstimator;
+import gr.ntua.ece.cslab.panic.core.samplers.BorderPointsSampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,14 +32,14 @@ public class RandomAdaptiveSampler extends AbstractAdaptiveSampler {
     private final Random random;
     private final List<InputSpacePoint> chosenPoints;
     private final List<OutputSpacePoint> valuesReceived;
-    private final BorderPointsEstimator borderPointsEstimator;
+    private final BorderPointsSampler firstPhaseSampler;
     private final Map<InputSpacePoint, Set<InputSpacePoint>> forbiddenCombinations;
 
     // CONSTRUCTORS, GETTERS AND SETTERS
     public RandomAdaptiveSampler() {
         this.random = new Random();
         this.chosenPoints = new LinkedList<>();
-        this.borderPointsEstimator = new BorderPointsEstimator();
+        this.firstPhaseSampler = new BorderPointsSampler();
         this.valuesReceived = new LinkedList<>();
         this.forbiddenCombinations = new HashMap<>();
     }
@@ -70,9 +70,9 @@ public class RandomAdaptiveSampler extends AbstractAdaptiveSampler {
     public InputSpacePoint next() {
         super.next();
         InputSpacePoint sampleReturned;
-        if (this.pointsPicked <= this.firstPhaseThreshold && this.borderPointsEstimator.hasMorePoints()) {
+        if (this.pointsPicked <= this.firstPhaseThreshold && this.firstPhaseSampler.hasMore()) {
 //            Logger.getLogger(this.getClass().getName()).info("Returning Border Point");
-            sampleReturned = this.borderPointsEstimator.getBorderPoint();
+            sampleReturned = this.firstPhaseSampler.next();
         } else {
             if (this.random.nextDouble() <= this.exploreRatio) {
 //                System.err.println("2nd Phase: Exploring");
@@ -161,17 +161,12 @@ public class RandomAdaptiveSampler extends AbstractAdaptiveSampler {
     }
 
     // TUNERS AND OTHER METHODS
-    public void addOutputSpacePoint(OutputSpacePoint out) {
-        if (out != null && !this.valuesReceived.contains(out)) {
-            this.valuesReceived.add(out);
-        }
-    }
 
     @Override
     public void configureSampler() {
         super.configureSampler();
-        this.borderPointsEstimator.setRanges(ranges);
-        this.borderPointsEstimator.estimatePoints();
+        this.firstPhaseSampler.setDimensionsWithRanges(ranges);
+        this.firstPhaseSampler.configureSampler();
         this.firstPhaseThreshold = (int) Math.floor((Math.pow(2, this.ranges.size())));
     }
 

@@ -41,7 +41,12 @@ end.parse!
 
 
 conv = options[:coefficients].split(",").map { |x| x=x.to_f  }
-a = ExpLinearFunction.new conv
+if options[:type]=="explinear"
+  a = ExpLinearFunction.new conv
+elsif options[:type]=="gauss"
+  a = GaussFunction.new conv
+end
+
 a.noise_amplitude=options[:noise].to_f
 for j in (0..(options[:cardinality].split(",").size-1))
 new_res = Array.new

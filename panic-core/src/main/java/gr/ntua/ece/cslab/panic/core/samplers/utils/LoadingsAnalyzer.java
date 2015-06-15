@@ -91,6 +91,21 @@ public class LoadingsAnalyzer {
         }
         return distances;
     }
+    
+        /*
+     * Calculates and returns the  weighted distance matrix 
+     * @return 
+     */
+    public double[][] getFirstQuarterDistanceMatrix(double[] weights) {
+        double[][] distances = new double[this.dimensions][this.dimensions];
+        for (int i = 0; i < this.dimensions; i++) {
+            for (int j = i; j < this.dimensions; j++) {
+                distances[i][j] = this.getFirstQuarterDistance(i, j, weights);
+                distances[j][i] = distances[i][j];
+            }
+        }
+        return distances;
+    }
 
     /*
      * Calculates and returns the  weighted similarity matrix 
@@ -150,6 +165,27 @@ public class LoadingsAnalyzer {
 
     public double getDistance(int dimension, double[] weights) {
         return this.getDistance(dimension, this.dimensions - 1, weights);
+    }
+    
+    /**
+     * Returns the weighted Euclidean distance, after each dimensions is mapped
+     * to the first quarter of the loading plot.
+     *
+     * @param dimension1
+     * @param dimension2
+     * @param weights
+     * @return
+     */
+    public double getFirstQuarterDistance(int dimension1, int dimension2, double[] weights) {
+        double sum = 0.0;
+        for (int j = 0; j < components; j++) {
+            sum += ((weights == null ? 1 : weights[j]) * Math.pow(Math.abs(this.loadings[dimension1][j]) - Math.abs(this.loadings[dimension2][j]), 2));
+        }
+        return Math.sqrt(sum);
+    }
+
+    public double getFirstQuarterDistance(int dimension, double[] weights) {
+        return this.getFirstQuarterDistance(dimension, this.dimensions - 1, weights);
     }
 
     /**
@@ -224,7 +260,7 @@ public class LoadingsAnalyzer {
      * @return
      */
     public String toStringDistanceMatrix(double[] weights) {
-        return this.toStringMatrix(this.getDistanceMatrix(weights));
+        return this.toStringMatrix(this.getFirstQuarterDistanceMatrix(weights));
     }
     
     /**

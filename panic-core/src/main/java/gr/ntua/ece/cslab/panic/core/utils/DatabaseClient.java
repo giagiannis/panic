@@ -8,8 +8,10 @@ import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -135,9 +137,10 @@ public class DatabaseClient {
 
     /**
      * Inserts a BLOB containing the models picked by the sampler
+     *
      * @param experimentId
      * @param sampler
-     * @param samples 
+     * @param samples
      */
     public void insertSampledPoints(Integer experimentId, String sampler, List<InputSpacePoint> samples) {
         String sql = "INSERT INTO samples (experiment_id, sampler, list) VALUES ( %d, '%s', ? )";
@@ -153,15 +156,16 @@ public class DatabaseClient {
             Logger.getLogger(DatabaseClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
+
     /**
-     * Method used to insert new model predictions into the database. The predictions
-     * have the form of a compressed byte array, containing all the predicted values
+     * Method used to insert new model predictions into the database. The
+     * predictions have the form of a compressed byte array, containing all the
+     * predicted values
+     *
      * @param experimentId
      * @param model
      * @param sampler
-     * @param points 
+     * @param points
      */
     public void insertModelPredictions(Integer experimentId, String model, String sampler, List<OutputSpacePoint> points) {
         String sql = "INSERT INTO model_predictions (experiment_id, model, sampler, list) VALUES ( %d, '%s', '%s', ? )";
@@ -177,5 +181,65 @@ public class DatabaseClient {
             Logger.getLogger(DatabaseClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
+    /**
+     * Returns the sampled points of a sampler
+     *
+     * @param id
+     * @return
+     */
+    public List<InputSpacePoint> getSampledPoints(Integer id) {
+        String sql = "SELECT list FROM samples WHERE id = %d";
+        String sqlFormatted = String.format(sql, id);
+        List<InputSpacePoint> result = new LinkedList<>();
+        try {
+            Statement stmt = this.connection.createStatement();
+            ResultSet set = stmt.executeQuery(sqlFormatted);
+            if (set.next()) {
+                byte[] bytes = set.getBytes(1);
+                InputSpacePointList r = new InputSpacePointList();
+                r.parseBytes(bytes);
+                result = r.getList();
+            }
+            stmt.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the output space points of a model trained through a specific sampler
+     *
+     * @param id
+     * @return
+     */
+    public List<OutputSpacePoint> getOutputSpacePoints(Integer id) {
+        String sql = "SELECT list FROM model_predictions WHERE id = %d";
+        String sqlFormatted = String.format(sql, id);
+        List<OutputSpacePoint> result = new LinkedList<>();
+        try {
+            Statement stmt = this.connection.createStatement();
+            ResultSet set = stmt.executeQuery(sqlFormatted);
+            if (set.next()) {
+                byte[] bytes = set.getBytes(1);
+                OutputSpacePointList r = new OutputSpacePointList();
+                r.parseBytes(bytes);
+                result = r.getList();
+            }
+            stmt.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        DatabaseClient client = new DatabaseClient();
+        client.setDatabaseName(args[0]);
+        client.openConnection();
+        System.out.println(client.getOutputSpacePoints(211));
+        client.closeConnection();
+    }
+
 }

@@ -1,11 +1,6 @@
-package gr.ntua.ece.cslab.panic.core.samplers.utils;
+package gr.ntua.ece.cslab.panic.core.samplers;
 
 import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class returns all the acceptable border points combinations, based on an
@@ -13,25 +8,17 @@ import java.util.Map;
  * 
  * @author Giannis Giannakopoulos
  */
-public class BorderPointsEstimator {
+public class BorderPointsSampler extends AbstractSampler {
     
-    private Map<String, List<Double>> ranges;
     private Double[] max, min;
     private String[] dimensions;
     private int currentIndex = 0;
 
     
     // Constructor, Getters and Setters
-    public BorderPointsEstimator() {
+    public BorderPointsSampler() {
+        super();
         this.currentIndex = 0;
-    }
-
-    public Map<String, List<Double>> getRanges() {
-        return ranges;
-    }
-
-    public void setRanges(Map<String, List<Double>> ranges) {
-        this.ranges = ranges;
     }
     
     
@@ -41,7 +28,8 @@ public class BorderPointsEstimator {
      * Method used to calculate the number of points to return, etc. Call this 
      * before launching the sampler.
      */
-     public void estimatePoints() {
+    @Override
+     public void configureSampler() {
         // associate each dimension with an ID
         this.dimensions = new String[this.ranges.size()];
         this.max = new Double[this.dimensions.length];
@@ -62,27 +50,28 @@ public class BorderPointsEstimator {
             min[i] = minV;
         }
     }
-    /**
-     * Bulk export of border InputSpacePoints.
-     * @return 
-     */
-    public List<InputSpacePoint> getBorderPoints() {
-        List<InputSpacePoint> results  = new LinkedList<>();
-        
-        int oldIndex = this.currentIndex;
-        this.currentIndex = 0;
-        while(this.hasMorePoints())
-            results.add(this.getBorderPoint());
-        this.currentIndex = oldIndex;
-        
-        return results;
-    }
+//    /**
+//     * Bulk export of border InputSpacePoints.
+//     * @return 
+//     */
+//    public List<InputSpacePoint> getBorderPoints() {
+//        List<InputSpacePoint> results  = new LinkedList<>();
+//        
+//        int oldIndex = this.currentIndex;
+//        this.currentIndex = 0;
+//        while(this.hasMore())
+//            results.add(this.next());
+//        this.currentIndex = oldIndex;
+//        
+//        return results;
+//    }
     
     /**
      * Interactive export of InputSpacePoints
      * @return 
      */
-    public InputSpacePoint getBorderPoint() {
+    @Override
+    public InputSpacePoint next() {
         InputSpacePoint point = new InputSpacePoint();
         for(int i=0;i<this.dimensions.length;i++) {
             boolean flag = this.analyzeIndex(this.currentIndex, i);
@@ -92,7 +81,8 @@ public class BorderPointsEstimator {
         return point;
     }
     
-    public boolean hasMorePoints() {
+    @Override
+    public boolean hasMore() {
         return (this.currentIndex<Math.pow(2, this.dimensions.length));
     }
     // Auxiliary methods
@@ -119,20 +109,19 @@ public class BorderPointsEstimator {
 //        return true;
     }
     
-    public static void main(String[] args) {
-        BorderPointsEstimator p = new BorderPointsEstimator();
-        
-        CSVFileManager file = new CSVFileManager();
-        file.setFilename(args[0]);
-        p.setRanges(file.getDimensionRanges());
-        p.estimatePoints();
-        
-        System.out.println(p.getBorderPoint());
-        System.out.println(p.getBorderPoint());
-        System.out.println("");
-        System.out.println(p.getBorderPoints());        
-        System.out.println("");
-        System.out.println(p.getBorderPoint());
-        System.out.println(p.getBorderPoint());
-    }
+//    public static void main(String[] args) {
+//        BorderPointsSampler p = new BorderPointsSampler();
+//        CSVFileManager file = new CSVFileManager();
+//        file.setFilename(args[0]);
+//        p.setRanges(file.getDimensionRanges());
+//        p.configureSampler();
+//        
+//        System.out.println(p.next());
+//        System.out.println(p.next());
+//        System.out.println("");
+//        System.out.println(p.getBorderPoints());        
+//        System.out.println("");
+//        System.out.println(p.next());
+//        System.out.println(p.next());
+//    }
 }

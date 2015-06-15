@@ -54,6 +54,11 @@ public class AbstractSampler implements Sampler {
     public void setSamplingRate(double samplingRate) {
         this.samplingRate = samplingRate;
     }
+    
+    @Override
+    public void setPointsToPick(Integer numberOfPoints) {
+        this.samplingRate = (numberOfPoints*1.0)/maxChoices;
+    }
 
     @Override
     public boolean hasMore() {
