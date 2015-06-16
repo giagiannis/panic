@@ -21,6 +21,7 @@ import org.ejml.ops.SingularOps;
 public class PrincipalComponentsAnalyzer {
 
     private int rank;
+    private String[] labels;
 
     private DenseMatrix64F eigenVectorMatrix,
             eigenValueMatrix;
@@ -54,24 +55,33 @@ public class PrincipalComponentsAnalyzer {
         return correlationMatrix;
     }
 
+    public String[] getLabels() {
+        return this.labels;
+    }
+    
     // public interface
     public void setInputData(List<OutputSpacePoint> points) {
         int rows = points.size();
         Collection<String> keys = points.get(0).getInputSpacePoint().getKeysAsCollection();
         int columns = keys.size() + 1;
+        this.labels = new String[columns];
+        
+        int index = 0;
+        for(String s : keys) 
+            this.labels[index++] = s;
+        this.labels[index] = points.get(0).getKey();
+        
         this.data = new DenseMatrix64F(rows, columns);
         this.meanMatrix = new DenseMatrix64F(1, columns);
         this.rank = (rows > columns ? columns : rows);
         for (int i = 0; i < rows; i++) {
-            int j = 0;
-            for (String s : keys) {
-                this.data.set(i, j, points.get(i).getInputSpacePoint().getValue(s));
+            for(int j=0;j<labels.length-1;j++) {
+                this.data.set(i, j, points.get(i).getInputSpacePoint().getValue(this.labels[j]));
                 this.meanMatrix.add(0, j, this.data.get(i, j));
-                j += 1;
             }
 
-            this.data.set(i, j, points.get(i).getValue());
-            this.meanMatrix.add(0, j, this.data.get(i, j));
+            this.data.set(i, columns-1, points.get(i).getValue());
+            this.meanMatrix.add(0, columns-1, this.data.get(i, columns-1));
         }
         for (int j = 0; j < columns; j++) {
             this.meanMatrix.div(j, this.data.numRows);
@@ -312,49 +322,47 @@ public class PrincipalComponentsAnalyzer {
         this.eigenVectorMatrix = Vt;
     }
 
-    public static void main(String[] args) throws Exception {
-        CSVFileManager file = new CSVFileManager();
-        file.setFilename(args[0]);
-
-        UniformSampler sampler = new UniformSampler();
-        sampler.setDimensionsWithRanges(file.getDimensionRanges());
-        sampler.setSamplingRate(.1);
-        sampler.configureSampler();
-
-        List<OutputSpacePoint> points = new LinkedList<>();
-        while (sampler.hasMore()) {
-            InputSpacePoint sample = sampler.next();
-            points.add(file.getActualValue(sample));
-        }
-
-        PrincipalComponentsAnalyzer comps = new PrincipalComponentsAnalyzer();
-        comps.setInputData(points);
-        comps.calculateVarianceMatrix();
-        comps.calculateCorrelationMatrix();
-        
-        comps.calculateBaseWithVarianceMatrix();
-//        comps.calculateBaseWithCorrelationMatrix();
-        
-        System.err.println("EigenValues info");
-        for(int i=0;i<comps.getRank();i++) {
-            System.err.format("%d\t%.5f\t%.5f\t%.5f\n", i, comps.getEigenValue(i), comps.getEigenValueScore(i),comps.getEigenValueAggregatedScore(i));
-        }
-        
-        for(int i=0;i<comps.getRank();i++) {
-            System.out.print((i+1)+"\t");
-            for(int j=0;j<2;j++) {
-                System.out.print(comps.getEigenVector(j).getData()[i]+"\t");
-            }
-            System.out.println("");
-        }
-        
-        System.out.println("");
-        System.out.println("");
-        
-        for(OutputSpacePoint p :points) {
-            System.out.println(comps.getEigenSpacePoint(p, 2).toStringCSV());
-        }
-        
-
-    }
+//    public static void main(String[] args) throws Exception {
+//        CSVFileManager file = new CSVFileManager();
+//        file.setFilename(args[0]);
+//
+//        UniformSampler sampler = new UniformSampler();
+//        sampler.setDimensionsWithRanges(file.getDimensionRanges());
+//        sampler.setSamplingRate(.1);
+//        sampler.configureSampler();
+//
+//        List<OutputSpacePoint> points = new LinkedList<>();
+//        while (sampler.hasMore()) {
+//            InputSpacePoint sample = sampler.next();
+//            points.add(file.getActualValue(sample));
+//        }
+//
+//        PrincipalComponentsAnalyzer comps = new PrincipalComponentsAnalyzer();
+//        comps.setInputData(points);
+//        comps.calculateVarianceMatrix();
+//        comps.calculateCorrelationMatrix();
+//        
+//        comps.calculateBaseWithVarianceMatrix();
+////        comps.calculateBaseWithCorrelationMatrix();
+//        
+//        System.err.println("EigenValues info");
+//        for(int i=0;i<comps.getRank();i++) {
+//            System.err.format("%d\t%.5f\t%.5f\t%.5f\n", i, comps.getEigenValue(i), comps.getEigenValueScore(i),comps.getEigenValueAggregatedScore(i));
+//        }
+//        
+//        for(int i=0;i<comps.getRank();i++) {
+//            System.out.print((i+1)+"\t");
+//            for(int j=0;j<2;j++) {
+//                System.out.print(comps.getEigenVector(j).getData()[i]+"\t");
+//            }
+//            System.out.println("");
+//        }
+//        
+//        System.out.println("");
+//        System.out.println("");
+//        
+//        for(OutputSpacePoint p :points) {
+//            System.out.println(comps.getEigenSpacePoint(p, 2).toStringCSV());
+//        }
+//    }
 }

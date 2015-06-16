@@ -5,13 +5,10 @@ import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.GridSampler;
-import gr.ntua.ece.cslab.panic.core.samplers.BorderPointsSampler;
-import gr.ntua.ece.cslab.panic.core.samplers.RandomSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -108,14 +105,8 @@ public class DimensionWeightSampler extends AbstractAdaptiveSampler {
 
         // create the loadings double[][]
         double[][] loadings = new double[analyzer.getRank()][pcs];
-        String[] labels = new String[analyzer.getRank()];
-
-        int index = 0;
-        Iterator<String> it = this.outputSpacePoints.get(0).getInputSpacePoint().getKeysAsCollection().iterator();
-        while (it.hasNext()) {
-            labels[index++] = it.next();
-        }
-        labels[index++] = this.outputSpacePoints.get(0).getKey();
+        String[] labels = analyzer.getLabels();
+        
         for (int i = 0; i < analyzer.getRank(); i++) {
             for (int j = 0; j < pcs; j++) {
                 loadings[i][j] = analyzer.getLoading(j, i);
@@ -136,9 +127,8 @@ public class DimensionWeightSampler extends AbstractAdaptiveSampler {
         System.out.println(loadingsAnalyzer.toString());
 
         HashMap<String, Double> weights = new HashMap<>();
-//        double[] weights = new double[labels.length];
         for (int i = 0; i < labels.length - 1; i++) {
-            Double score = 1.0 / loadingsAnalyzer.getFirstQuarterDistance(i, pcWeights);
+            Double score = 1.0 / loadingsAnalyzer.getDistance(i, pcWeights);
             weights.put(labels[i], score);
         }
         sampler.setWeights(weights);

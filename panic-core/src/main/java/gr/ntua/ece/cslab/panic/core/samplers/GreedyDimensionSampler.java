@@ -133,38 +133,4 @@ public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
         }
         return candidate;
     }
-   
-     
-    public static void main(String[] args) throws Exception {
-        CSVFileManager file = new CSVFileManager();
-        file.setFilename(args[0]);
-
-        Model model = new IsoRegression();
-        model.configureClassifier();
-
-        GreedyDimensionSampler sampler = new GreedyDimensionSampler();
-        sampler.setSamplingRate(0.3);
-        sampler.setDimensionsWithRanges(file.getDimensionRanges());
-        sampler.configureSampler();
-//        sampler.setModel(model);
-
-        while (sampler.hasMore()) {
-            InputSpacePoint sampledPoint = sampler.next();
-            if (sampledPoint == null) {
-                System.out.println("Breaking the habit... Why null?");
-                break;
-            }
-            OutputSpacePoint outPoint = file.getActualValue(sampledPoint);
-            if (outPoint != null) {
-                System.out.println("Outpoint " + outPoint);
-            }
-            sampler.addOutputSpacePoint(outPoint);
-            model.feed(outPoint, false);
-        }
-
-        model.train();
-        for (InputSpacePoint p : file.getInputSpacePoints()) {
-            System.out.println(model.getPoint(p));
-        }
-    }
 }
