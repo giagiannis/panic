@@ -15,6 +15,7 @@ public class LatinHypercubeSampler  extends AbstractSampler {
 
     private Map<String, List<Double>> hyperCubeValues;
     private Random random;
+    
     @Override
     public void configureSampler() {
         super.configureSampler();
@@ -33,7 +34,6 @@ public class LatinHypercubeSampler  extends AbstractSampler {
         
         return sample;
     }
-    
     
     private Map<String, List<Double>> createHyperCubeValues() {
         int slots = (int) Math.floor(this.samplingRate*this.maxChoices);

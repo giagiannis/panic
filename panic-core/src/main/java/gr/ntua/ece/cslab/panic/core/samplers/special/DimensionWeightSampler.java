@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  */
 public class DimensionWeightSampler extends AbstractAdaptiveSampler {
 
-    private Integer firstPhaseThreshold=100;
+    private Integer firstPhaseThreshold=0;
     private final AbstractSampler firstPhaseSampler;
 
     private GridSampler gridSampler;
