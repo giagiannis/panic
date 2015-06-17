@@ -13,13 +13,14 @@ import java.util.Random;
  */
 public class LatinHypercubeSampler  extends AbstractSampler {
 
-    private Map<String, List<Double>> hyperCubeValues;
+    private Map<String, List<Integer>> hyperCubeIndices;
     private Random random;
+    private Integer slots;
     
     @Override
     public void configureSampler() {
         super.configureSampler();
-        this.hyperCubeValues=this.createHyperCubeValues();
+        this.hyperCubeIndices = this.createHyperCubeIndices();
         this.random = new Random();
     }
 
@@ -27,31 +28,39 @@ public class LatinHypercubeSampler  extends AbstractSampler {
     public InputSpacePoint next() {
         super.next();
         InputSpacePoint sample = new InputSpacePoint();
-        for(String s:this.hyperCubeValues.keySet()) {
-            List<Double> list = this.hyperCubeValues.get(s);
-            sample.addDimension(s, list.remove(random.nextInt(list.size())));
+        for(String s:this.hyperCubeIndices.keySet()) {
+            List<Integer> indices = this.hyperCubeIndices.get(s);
+            int index = indices.remove(this.random.nextInt(indices.size()));
+            double value = this.pickPointUniformly(this.translateIndex(s, index));
+            sample.addDimension(s, value);
         }
-        
         return sample;
     }
     
-    private Map<String, List<Double>> createHyperCubeValues() {
-        int slots = (int) Math.floor(this.samplingRate*this.maxChoices);
-        HashMap<String, List<Double>> result = new HashMap<>();
-        for(String s : this.ranges.keySet()) {
-            result.put(s, this.replicateValues(this.ranges.get(s), slots));
+    private Map<String, List<Integer>> createHyperCubeIndices() {
+        this.slots = (int) Math.floor(this.samplingRate*this.maxChoices);
+        HashMap<String, List<Integer>> result = new HashMap<>();
+        for(String s:this.ranges.keySet()) {
+            result.put(s, new ArrayList<Integer>(slots));
+            for(int i=0;i<slots;i++)
+                result.get(s).add(i);
         }
         return result;
     }
     
-    private List<Double> replicateValues(List<Double> initial, int target) {
-        List<Double> result = new ArrayList<>(target);
-        double scalingFactor = (target*1.0)/(initial.size()*1.0);
-        for(int i=0;i<target;i++) {
-            int index = (int) Math.round(i/scalingFactor);
-            index=(index==initial.size()?index-1:index);
-            result.add(initial.get(index));
-        }
-        return result;
+    private List<Double> translateIndex(String dimensionKey, Integer index) {
+        List<Double> wholeList = this.ranges.get(dimensionKey);
+        int startPoint = (int) Math.floor((double)index/(double)slots),
+            endPoint = (int) Math.floor((double)index+1/(double)slots);
+        if(endPoint==startPoint)
+            endPoint++;
+        if(endPoint >= wholeList.size())
+            endPoint=wholeList.size()-1;
+        return wholeList.subList(startPoint, endPoint);
     }
+    
+    private Double pickPointUniformly(List<Double> list) {
+        return list.get(this.random.nextInt(list.size()));
+    }
+    
 }
