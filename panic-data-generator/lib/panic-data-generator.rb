@@ -37,8 +37,6 @@ OptionParser.new do |opts|
     '--type TYPE',
     'Type of function (default is explinear)') {|o| options[:type] = o}
 end.parse!
-#puts options
-
 
 conv = options[:coefficients].split(",").map { |x| x=x.to_f  }
 if options[:type]=="explinear"
