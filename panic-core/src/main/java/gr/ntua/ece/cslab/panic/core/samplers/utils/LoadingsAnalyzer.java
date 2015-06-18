@@ -1,5 +1,9 @@
 package gr.ntua.ece.cslab.panic.core.samplers.utils;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
+
 /**
  * Class that holds the loadings scores
  *
@@ -233,7 +237,31 @@ public class LoadingsAnalyzer {
         }
         return Math.sqrt(sum);
     }
-
+    
+    /**
+     * Returns the dimensions of the input space ordered according to the their distance
+     * from the output dimension. 
+     * @param weights
+     * @return 
+     */
+    public String[] getInputDimensionsOrder(double[] weights) {
+        String[] dimensionsKeys = new String[dimensions-1];
+        
+        TreeMap<Double, List<String>> treeMap = new TreeMap<>();
+        for(int i=0;i<dimensionsKeys.length;i++) {
+            Double d = this.getDistance(i, weights);
+            if(!treeMap.containsKey(d))
+                treeMap.put(d, new LinkedList<String>());
+            treeMap.get(d).add(this.labels[i]);
+        }
+        int index=0;
+        for(Double d:treeMap.keySet()){
+            for(String s:treeMap.get(d))
+                dimensionsKeys[index++] = s;
+        }
+        return dimensionsKeys;
+    }
+    
     // toString methods
     @Override
     public String toString() {

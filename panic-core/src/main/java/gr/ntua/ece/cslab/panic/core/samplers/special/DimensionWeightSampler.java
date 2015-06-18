@@ -90,7 +90,6 @@ public class DimensionWeightSampler extends AbstractAdaptiveSampler {
      * @return 
      */
     private GridSampler configureGridSampler() {
-
         // execute PCA analysis
         PrincipalComponentsAnalyzer analyzer = new PrincipalComponentsAnalyzer();
         analyzer.setInputData(this.outputSpacePoints);
@@ -103,33 +102,19 @@ public class DimensionWeightSampler extends AbstractAdaptiveSampler {
         analyzer.calculateBaseWithVarianceMatrix();
         int pcs = 2;
 
-        // create the loadings double[][]
-        double[][] loadings = new double[analyzer.getRank()][pcs];
-        String[] labels = analyzer.getLabels();
-        
-        for (int i = 0; i < analyzer.getRank(); i++) {
-            for (int j = 0; j < pcs; j++) {
-                loadings[i][j] = analyzer.getLoading(j, i);
-            }
-        }
-
         // instantiate LoadingsAnalyzer
-        LoadingsAnalyzer loadingsAnalyzer = new LoadingsAnalyzer(loadings);
-        loadingsAnalyzer.setDimensionLabels(labels);
+        LoadingsAnalyzer loadingsAnalyzer = analyzer.getLoadingsAnalyzer(pcs);
         double[] pcWeights = analyzer.getPCWeights();
-
+        
         // creates the weights for each dimension
         GridSampler sampler = new GridSampler();
         sampler.setDimensionsWithRanges(ranges);
         sampler.setSamplingRate(this.samplingRate);
         
-        System.out.println(loadingsAnalyzer.toStringDistanceMatrix(pcWeights));
-        System.out.println(loadingsAnalyzer.toString());
-
         HashMap<String, Double> weights = new HashMap<>();
-        for (int i = 0; i < labels.length - 1; i++) {
+        for (int i = 0; i < analyzer.getLabels().length - 1; i++) {
             Double score = 1.0 / loadingsAnalyzer.getDistance(i, pcWeights);
-            weights.put(labels[i], score);
+            weights.put(analyzer.getLabels()[i], score);
         }
         sampler.setWeights(weights);
 

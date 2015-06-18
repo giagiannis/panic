@@ -297,9 +297,21 @@ public class PrincipalComponentsAnalyzer {
     public double[] getPCWeights(int components) {
         double[] primary = this.getPCWeights();
         double[] result = new double[(components<primary.length?components:primary.length)];
-        for(int i=0;i<result.length;i++)
-            result[i]=primary[i];
+        System.arraycopy(primary, 0, result, 0, result.length);
         return result;
+    }
+    
+    public LoadingsAnalyzer getLoadingsAnalyzer(int principalComponents) {
+        LoadingsAnalyzer analyzer = new LoadingsAnalyzer();
+        double[][] loadings = new double[rank][rank];
+        for(int i=0;i<rank;i++) {
+            for(int j=0;j<principalComponents;j++) {
+                loadings[i][j]  = this.getLoading(j, i);
+            }
+        }
+        analyzer.setLoadings(loadings);
+        analyzer.setDimensionLabels(labels);
+        return analyzer;
     }
     
     // utilities and helper methods
