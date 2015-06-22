@@ -66,6 +66,12 @@ end
 old_res = new_res.dup
 end
 
+
+puts "# Cardinalities:\t#{options[:cardinality]}"
+puts "# Coefficients:\t\t#{options[:coefficients]}"
+puts "# Noise:\t\t#{options[:noise]}"
+puts "# Type:\t\t\t#{options[:type]}"
+
 old_res[0].size().times{ |i|
   print "x"+(i+1).to_s+"\t"
 }
