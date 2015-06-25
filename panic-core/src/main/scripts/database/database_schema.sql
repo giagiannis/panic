@@ -9,7 +9,8 @@ CREATE TABLE experiments (
 	experiment_date DATE,
 	experiment_time TIME,
 	sampling_rate DOUBLE,
-	input_file VARCHAR(100)
+	input_file VARCHAR(100),
+	configurations VARCHAR(1000)
 );
 
 CREATE TABLE metrics (

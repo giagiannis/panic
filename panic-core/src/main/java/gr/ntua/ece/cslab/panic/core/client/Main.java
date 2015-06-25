@@ -43,7 +43,7 @@ public class Main extends Benchmark {
         file.setFilename(inputFile);
         
         String fullPath = new File(inputFile).getCanonicalFile().getAbsolutePath() ;
-        int experimentId = dbClient.insertExperiment(samplingRate, fullPath);
+        int experimentId = dbClient.insertExperiment(samplingRate, fullPath, configurations.toString());
         
         for (Sampler s : samplers) {
             instantiateModels();

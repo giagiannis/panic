@@ -80,15 +80,16 @@ public class DatabaseClient {
      *
      * @param samplingRate
      * @param inputFile
+     * @param configurations
      * @return the id of the newly created experiment
      */
-    public Integer insertExperiment(double samplingRate, String inputFile) {
+    public Integer insertExperiment(double samplingRate, String inputFile, String configurations) {
         try {
             String sql = "INSERT INTO experiments "
-                    + "(experiment_date, experiment_time, sampling_rate, input_file) "
+                    + "(experiment_date, experiment_time, sampling_rate, input_file, configurations) "
                     + "VALUES "
-                    + "(DATE(), TIME(), %.5f, '%s');";
-            String sqlQuery = String.format(sql, samplingRate, inputFile);
+                    + "(DATE(), TIME(), %.5f, '%s', '%s');";
+            String sqlQuery = String.format(sql, samplingRate, inputFile, configurations);
             Statement stmt = this.connection.createStatement();
             stmt.executeUpdate(sqlQuery);
             stmt.getGeneratedKeys().next();
@@ -232,14 +233,6 @@ public class DatabaseClient {
             Logger.getLogger(DatabaseClient.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
-    }
-
-    public static void main(String[] args) {
-        DatabaseClient client = new DatabaseClient();
-        client.setDatabaseName(args[0]);
-        client.openConnection();
-        System.out.println(client.getOutputSpacePoints(211));
-        client.closeConnection();
     }
 
 }

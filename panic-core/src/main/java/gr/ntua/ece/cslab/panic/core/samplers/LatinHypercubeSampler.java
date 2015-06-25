@@ -38,7 +38,7 @@ public class LatinHypercubeSampler  extends AbstractSampler {
     }
     
     private Map<String, List<Integer>> createHyperCubeIndices() {
-        this.slots = (int) Math.floor(this.samplingRate*this.maxChoices);
+        this.slots = (int) Math.floor(this.pointsToPick);
         HashMap<String, List<Integer>> result = new HashMap<>();
         for(String s:this.ranges.keySet()) {
             result.put(s, new ArrayList<Integer>(slots));
@@ -50,12 +50,10 @@ public class LatinHypercubeSampler  extends AbstractSampler {
     
     private List<Double> translateIndex(String dimensionKey, Integer index) {
         List<Double> wholeList = this.ranges.get(dimensionKey);
-        int startPoint = (int) Math.floor((double)index/(double)slots),
-            endPoint = (int) Math.floor((double)index+1/(double)slots);
-        if(endPoint==startPoint)
+        int startPoint = (int) Math.floor(((double)index/(double)slots)*wholeList.size()),
+            endPoint = (int) Math.floor(((double)(index+1.0)/(double)slots)*wholeList.size());
+        if(startPoint==endPoint)
             endPoint++;
-        if(endPoint >= wholeList.size())
-            endPoint=wholeList.size()-1;
         return wholeList.subList(startPoint, endPoint);
     }
     
