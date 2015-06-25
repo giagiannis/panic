@@ -15,7 +15,6 @@ import java.util.List;
  * @author Giannis Giannakopoulos
  */
 public class AbstractSampler implements Sampler {
-
     /**
      * HashMap representing the allowed values for each dimension.
      */
@@ -34,11 +33,19 @@ public class AbstractSampler implements Sampler {
      * This number indicates the cardinality of the input domain space.
      */
     protected int maxChoices;
+    
+    
+    protected int pointsToPick;
+    
+    
+    protected HashMap<String, String> configuration;
 
     public AbstractSampler() {
         this.ranges = new HashMap<>();
-        this.samplingRate = Double.MAX_VALUE;
+        this.samplingRate = 0.0;
         this.pointsPicked = 0;
+        this.pointsToPick = 0;
+        this.configuration =  new HashMap<>();
 
     }
 
@@ -57,12 +64,16 @@ public class AbstractSampler implements Sampler {
     
     @Override
     public void setPointsToPick(Integer numberOfPoints) {
-        this.samplingRate = (numberOfPoints*1.0)/maxChoices;
+        this.pointsToPick = numberOfPoints;
     }
 
     @Override
     public boolean hasMore() {
-        return this.pointsPicked < (int) Math.floor(this.maxChoices * this.samplingRate);
+        if(this.samplingRate!=0) {
+            return this.pointsPicked < (int) Math.floor(this.maxChoices * this.samplingRate);
+        } else {
+            return this.pointsPicked < this.pointsToPick;
+        }
     }
 
     @Override
@@ -72,10 +83,39 @@ public class AbstractSampler implements Sampler {
     }
 
     @Override
+    public HashMap<String, String> getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(HashMap<String, String> configuration) {
+        this.configuration = configuration;
+    }
+    
+    @Override
+    public void setConfiguration(String configuration) {
+        this.configuration = new HashMap<>();
+        String[] confArray = configuration.split(",");
+        for(String conf:confArray) {
+            String[] data = conf.split("=");
+            this.configuration.put(data[0], data[1]);
+        }
+    }
+
+    @Override
     public void configureSampler() {
         this.maxChoices = 1;
         for (String s : this.ranges.keySet()) {
             this.maxChoices *= this.ranges.get(s).size();
+        }
+//        System.out.format("Sampling rate %.5f, Points to pick %d\n", this.samplingRate,this.pointsToPick);
+        if(this.samplingRate>0.0 && this.samplingRate<= 1.0)
+            this.pointsToPick = (int)Math.floor(this.samplingRate*this.maxChoices);
+        else if(this.pointsToPick > 0) {
+            this.samplingRate = (1.0*this.pointsToPick)/this.maxChoices;
+        } else {
+            System.err.println("Neither sampling rate nor pointsToPick is set");
+            System.exit(1);
         }
     }
 

@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -80,15 +81,16 @@ public class DatabaseClient {
      *
      * @param samplingRate
      * @param inputFile
+     * @param configurations
      * @return the id of the newly created experiment
      */
-    public Integer insertExperiment(double samplingRate, String inputFile) {
+    public Integer insertExperiment(double samplingRate, String inputFile, String configurations) {
         try {
             String sql = "INSERT INTO experiments "
-                    + "(experiment_date, experiment_time, sampling_rate, input_file) "
+                    + "(experiment_date, experiment_time, sampling_rate, input_file, configurations) "
                     + "VALUES "
-                    + "(DATE(), TIME(), %.5f, '%s');";
-            String sqlQuery = String.format(sql, samplingRate, inputFile);
+                    + "(DATE(), TIME(), %.5f, '%s', '%s');";
+            String sqlQuery = String.format(sql, samplingRate, inputFile, configurations);
             Statement stmt = this.connection.createStatement();
             stmt.executeUpdate(sqlQuery);
             stmt.getGeneratedKeys().next();

@@ -16,6 +16,7 @@ public class LoadingsAnalyzer {
 
     private int dimensions, components;
     private String[] labels;
+    private double[] pcWeights;
 
     public LoadingsAnalyzer() {
     }
@@ -72,6 +73,14 @@ public class LoadingsAnalyzer {
         return this.components;
     }
 
+    public double[] getPcWeights() {
+        return pcWeights;
+    }
+
+    public void setPcWeights(double[] pcWeights) {
+        this.pcWeights = pcWeights;
+    }
+
     /**
      * Calculates and returns the distance matrix
      *
@@ -95,8 +104,8 @@ public class LoadingsAnalyzer {
         }
         return distances;
     }
-    
-        /*
+
+    /*
      * Calculates and returns the  weighted distance matrix 
      * @return 
      */
@@ -170,7 +179,7 @@ public class LoadingsAnalyzer {
     public double getDistance(int dimension, double[] weights) {
         return this.getDistance(dimension, this.dimensions - 1, weights);
     }
-    
+
     /**
      * Returns the weighted Euclidean distance, after each dimensions is mapped
      * to the first quarter of the loading plot.
@@ -223,45 +232,65 @@ public class LoadingsAnalyzer {
             throw new IllegalArgumentException("Division with zero!");
         }
         for (int j = 0; j < components; j++) {
-            sum += (weights==null?1:weights[j])*(this.loadings[dimension1][j] * this.loadings[dimension2][j]);
+            sum += (weights == null ? 1 : weights[j]) * (this.loadings[dimension1][j] * this.loadings[dimension2][j]);
         }
-//        System.err.println("Similarity inner product:\t"+sum);
-
         return sum / (this.getNorm(dimension1) * this.getNorm(dimension2));
     }
 
     private double getNorm(int dimension) {
         double sum = 0.0;
         for (int j = 0; j < components; j++) {
-            sum += (this.loadings[dimension][j]*this.loadings[dimension][j]);
+            sum += (this.loadings[dimension][j] * this.loadings[dimension][j]);
         }
         return Math.sqrt(sum);
     }
-    
+
     /**
-     * Returns the dimensions of the input space ordered according to the their distance
-     * from the output dimension. 
+     * Returns the dimensions of the input space ordered according to the their
+     * distance from the output dimension.
+     *
      * @param weights
-     * @return 
+     * @return
      */
     public String[] getInputDimensionsOrder(double[] weights) {
-        String[] dimensionsKeys = new String[dimensions-1];
-        
+        String[] dimensionsKeys = new String[dimensions - 1];
+
         TreeMap<Double, List<String>> treeMap = new TreeMap<>();
-        for(int i=0;i<dimensionsKeys.length;i++) {
+        for (int i = 0; i < dimensionsKeys.length; i++) {
             Double d = this.getDistance(i, weights);
-            if(!treeMap.containsKey(d))
+            if (!treeMap.containsKey(d)) {
                 treeMap.put(d, new LinkedList<String>());
+            }
             treeMap.get(d).add(this.labels[i]);
         }
-        int index=0;
-        for(Double d:treeMap.keySet()){
-            for(String s:treeMap.get(d))
+        int index = 0;
+        for (Double d : treeMap.keySet()) {
+            for (String s : treeMap.get(d)) {
                 dimensionsKeys[index++] = s;
+            }
         }
         return dimensionsKeys;
     }
-    
+
+    public String[] getInputDimensionsOrder() {
+        String[] dimensionsKeys = new String[dimensions - 1];
+        TreeMap<Double, List<String>> treeMap = new TreeMap<>();
+        for (int i = 0; i < dimensionsKeys.length; i++) {
+            Double d = this.getDistance(i, pcWeights);
+            if (!treeMap.containsKey(d)) {
+                treeMap.put(d, new LinkedList<String>());
+            }
+            treeMap.get(d).add(this.labels[i]);
+        }
+        int index = 0;
+        for (Double d : treeMap.keySet()) {
+            for (String s : treeMap.get(d)) {
+                dimensionsKeys[index++] = s;
+            }
+        }
+        return dimensionsKeys;
+    }
+
     // toString methods
     @Override
     public String toString() {
@@ -290,7 +319,7 @@ public class LoadingsAnalyzer {
     public String toStringDistanceMatrix(double[] weights) {
         return this.toStringMatrix(this.getFirstQuarterDistanceMatrix(weights));
     }
-    
+
     /**
      * Returns a String containing the similarity matrix.
      *

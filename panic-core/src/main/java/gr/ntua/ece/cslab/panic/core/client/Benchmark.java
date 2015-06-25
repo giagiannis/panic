@@ -20,6 +20,7 @@ import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.utils.DatabaseClient;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -46,6 +47,7 @@ public class Benchmark {
     protected static Model[] models;
     protected static CommandLine cmd;
     protected static DatabaseClient dbClient;
+    protected static HashMap<String, String> configurations = new HashMap<>();
 
     /**
      * Method used to setup the commons-cli argument parsing. Each implemented
@@ -84,6 +86,8 @@ public class Benchmark {
         options.addOption(null, "skip-metrics", false, "do not save the metrics");
         options.addOption(null, "skip-samples", false, "do not save the chosen samples");
         options.addOption(null, "skip-predictions", false, "do not save the models' predictions");
+        
+        options.addOption("c", "configuration", true, "passes configuration parameters to the samplers/models");
 
     }
 
@@ -204,6 +208,15 @@ public class Benchmark {
             }
         }
         
+        if(cmd.hasOption("c")) {
+            String configurationString=cmd.getOptionValue("c");
+            String[] perModel = configurationString.split("\\|");
+            for(String c:perModel) {
+                String[] array=c.split(":");
+                configurations.put(array[0], array[1]);
+            }
+        }
+        
         
 
         instantiateModels();
@@ -247,7 +260,11 @@ public class Benchmark {
                         classFound = f.getCanonicalName();
                     }
                 }
-                samplers[i++] = (Sampler) Class.forName(classFound).getConstructor().newInstance();
+                Sampler sObject = (Sampler) Class.forName(classFound).getConstructor().newInstance();
+                String shortName = classFound.substring(classFound.lastIndexOf('.')+1);
+                if(configurations.containsKey(shortName))
+                    sObject.setConfiguration(configurations.get(shortName));
+                samplers[i++] = sObject;
             }
         } else {
             int i = 0;

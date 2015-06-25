@@ -41,6 +41,7 @@ public class CSVFileManager {
     private int outputDimensionIndex;
     private char delimiter = '\t';
     private String[] dimensionNames;
+    private int quoteLines=0;
 
     public CSVFileManager() {
 
@@ -54,9 +55,14 @@ public class CSVFileManager {
         this.filename = filename;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
-            String buffer=null;
-            if(reader.ready())
+            String buffer=new String();
+            while(reader.ready()) {
                 buffer = reader.readLine();
+                if(!buffer.trim().startsWith("#") && buffer.trim().length()!=0)
+                    break;
+                else
+                    quoteLines+=1;
+            }
             this.dimensionNames = buffer.split("\t");
             this.numberOfInputDimensions = this.dimensionNames.length - 1;
             this.outputDimensionIndex = this.dimensionNames.length - 1;
@@ -105,7 +111,7 @@ public class CSVFileManager {
     public List<OutputSpacePoint> getOutputSpacePoints() {
         List<OutputSpacePoint> results = null;
         try {
-            CSVReader reader = new CSVReader(new FileReader(filename), delimiter, '#', 1);
+            CSVReader reader = new CSVReader(new FileReader(filename), delimiter, '#', this.quoteLines+1);
             String[] line;
             results = new LinkedList<>();
             while ((line = reader.readNext()) != null) {

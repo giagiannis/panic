@@ -64,4 +64,12 @@ public interface Sampler {
      * @return 
      */
     public boolean hasMore();
+    
+    
+    public HashMap<String, String> getConfiguration();
+
+    public void setConfiguration(HashMap<String, String> configuration);
+    
+    public void setConfiguration(String configuration);
+
 }
