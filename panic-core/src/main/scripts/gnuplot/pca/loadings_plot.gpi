@@ -8,9 +8,10 @@ set xlabel "PC1"
 set ylabel "PC2"
 unset key
 set grid
+set macro
 
 
-set output "loadings.eps"
+set output filename.".eps"
 plot filename u 2:3:1 index 0 w labels point ps 4 pt 6 offset -.25,-.25
 
 #set title "Scores plot"
@@ -18,6 +19,6 @@ plot filename u 2:3:1 index 0 w labels point ps 4 pt 6 offset -.25,-.25
 #plot filename u 1:2 index 1 w point ps 3 pt 5
 
 
-system("epstopdf loadings.eps")
+system("epstopdf ".filename.".eps")
 #system("epstopdf scores.eps")
 system("rm *.eps")

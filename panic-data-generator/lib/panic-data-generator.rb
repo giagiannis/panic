@@ -43,6 +43,8 @@ if options[:type]=="explinear"
   a = ExpLinearFunction.new conv
 elsif options[:type]=="gauss"
   a = GaussFunction.new conv
+elsif options[:type]=="linear"
+  a = LinearFunction.new conv
 end
 
 a.noise_amplitude=options[:noise].to_f
