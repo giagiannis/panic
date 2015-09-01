@@ -21,6 +21,7 @@ import gr.ntua.ece.cslab.panic.core.utils.DatabaseClient;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -251,8 +252,8 @@ public class Benchmark {
         Class<? extends Sampler>[] samplersList = discoverSamplers();
         if (cmd.hasOption("st")) {
             String[] samplersArgs = cmd.getOptionValue("st").split(",");
-            samplers = new Sampler[samplersArgs.length];
-            int i = 0;
+//            samplers = new Sampler[samplersArgs.length];
+            List<Sampler> samplersListToArray = new LinkedList<>();
             for (String className : samplersArgs) {
                 String classFound = className;
                 for (Class f : samplersList) {
@@ -262,10 +263,41 @@ public class Benchmark {
                 }
                 Sampler sObject = (Sampler) Class.forName(classFound).getConstructor().newInstance();
                 String shortName = classFound.substring(classFound.lastIndexOf('.')+1);
-                if(configurations.containsKey(shortName))
+                int count=1;
+                String conf = null;
+                if(configurations.containsKey(shortName)) {
+                    conf = configurations.get(shortName);
                     sObject.setConfiguration(configurations.get(shortName));
-                samplers[i++] = sObject;
+                    if(sObject.getConfiguration().containsKey("instances"))
+                        count = new Integer(sObject.getConfiguration().get("instances"));
+                }
+                for(int i=0;i<count;i++) {
+                    sObject = (Sampler) Class.forName(classFound).getConstructor().newInstance();
+                    if(conf!=null)
+                        sObject.setConfiguration(conf);
+                    samplersListToArray.add(sObject);
+                }
+//                samplers[i++] = sObject;
             }
+            samplers = new Sampler[samplersListToArray.size()];
+            for(int i=0;i<samplers.length;i++)
+                samplers[i] = samplersListToArray.get(i);
+//            String[] samplersArgs = cmd.getOptionValue("st").split(",");
+//            samplers = new Sampler[samplersArgs.length];
+//            int i = 0;
+//            for (String className : samplersArgs) {
+//                String classFound = className;
+//                for (Class f : samplersList) {
+//                    if (f.getCanonicalName().endsWith("." + className)) {
+//                        classFound = f.getCanonicalName();
+//                    }
+//                }
+//                Sampler sObject = (Sampler) Class.forName(classFound).getConstructor().newInstance();
+//                String shortName = classFound.substring(classFound.lastIndexOf('.')+1);
+//                if(configurations.containsKey(shortName))
+//                    sObject.setConfiguration(configurations.get(shortName));
+//                samplers[i++] = sObject;
+//            }
         } else {
             int i = 0;
             samplers = new Sampler[discoverSamplers().length];

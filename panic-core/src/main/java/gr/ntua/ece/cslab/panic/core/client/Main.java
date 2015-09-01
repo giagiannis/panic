@@ -45,9 +45,19 @@ public class Main extends Benchmark {
         String fullPath = new File(inputFile).getCanonicalFile().getAbsolutePath() ;
         int experimentId = dbClient.insertExperiment(samplingRate, fullPath, configurations.toString());
         
+        System.out.format("Experiment id: %d\n", experimentId);
+        List<ExecutionThread> threads = new LinkedList<>();
         for (Sampler s : samplers) {
             instantiateModels();
-            instantiateSamplers();
+//            Model[] localModels = new Model[models.length];
+//            System.arraycopy(models, 0, localModels, 0, models.length);
+//            ExecutionThread t = new ExecutionThread(s, experimentId, samplingRate, file, dbClient, localModels);
+//            threads.add(t);
+            
+            
+            System.out.format("Sampler: %s\n", s.getClass().getSimpleName());
+            instantiateModels();
+//            instantiateSamplers();
             
             
             // model initialization
@@ -80,7 +90,7 @@ public class Main extends Benchmark {
             }
             
             // write results to DB
-            
+            System.out.format("\tFlushing results to database... ");
             int index = s.getClass().getCanonicalName().lastIndexOf('.');
             String samplerShortName = s.getClass().getCanonicalName().substring(index+1);
             dbClient.insertSampledPoints(experimentId, samplerShortName, picked);
@@ -96,7 +106,7 @@ public class Main extends Benchmark {
                 dbClient.insertExperimentMetrics(experimentId, modelShortName, samplerShortName,
                         metrics.getMSE(), metrics.getAverageError(), metrics.getDeviation(), metrics.getR());
             }
-
+            System.out.println("Done!");
         }
     }
 

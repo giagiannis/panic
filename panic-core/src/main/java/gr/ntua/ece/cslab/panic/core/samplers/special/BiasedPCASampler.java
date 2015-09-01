@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author Giannis Giannakopoulos
  */
-public class LHSPCASampler extends AbstractAdaptiveSampler {
+public class BiasedPCASampler extends AbstractAdaptiveSampler {
 
     private AbstractSampler unbiasedSampler;
     private TotalOrderingSampler biasedSampler;
@@ -31,7 +31,7 @@ public class LHSPCASampler extends AbstractAdaptiveSampler {
     private final List<HashMap<String, List<Double>>> rangesExamined;
     private HashMap<String, List<Double>> currentRanges;
 
-    public LHSPCASampler() {
+    public BiasedPCASampler() {
         super();
         this.rangesToExamine = new LinkedList<>();
         this.rangesExamined = new LinkedList<>();
@@ -77,25 +77,20 @@ public class LHSPCASampler extends AbstractAdaptiveSampler {
 //            System.out.println("=== Configuration");
             LoadingsAnalyzer analyzer = this.performPCA(this.currentRanges);
             String[] ordering = analyzer.getInputDimensionsOrder();
-
-//            for(String s:ordering)
-//                System.err.format("%s \t", s);
-//            System.err.println("");
+            
             RangeBisectionPartitioner partitioner = new RangeBisectionPartitioner();
             partitioner.setRanges(this.currentRanges);
             partitioner.setDimensionKey(ordering[0]);
             partitioner.configure();
-            if (RangeBisectionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegionRanges()).isEmpty()) {
-                System.err.println("higher: No need to add the range");
-            } else {
+            
+            if(partitioner.getHigherRegionRanges()!=null && RangeBisectionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegionRanges()).size()>=this.ranges.size()) {
                 this.rangesToExamine.add(partitioner.getHigherRegionRanges());
             }
-
-            if (RangeBisectionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegionRanges()).isEmpty()) {
-                System.err.println("lower: No need to add the range");
-            } else {
+            
+            if(partitioner.getLowerRegionRanges()!=null && RangeBisectionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegionRanges()).size()>=this.ranges.size()) {
                 this.rangesToExamine.add(partitioner.getLowerRegionRanges());
             }
+
 
             this.rangesExamined.add(this.currentRanges);
             this.currentRanges = this.rangesToExamine.remove(0);
@@ -120,7 +115,7 @@ public class LHSPCASampler extends AbstractAdaptiveSampler {
             analyzer.calculateCorrelationMatrix();
             analyzer.calculateBaseWithVarianceMatrix();
         } catch (Exception ex) {
-            Logger.getLogger(LHSPCASampler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BiasedPCASampler.class.getName()).log(Level.SEVERE, null, ex);
         }
         int numberOfPC = 2;
         LoadingsAnalyzer loadingsAnalyzer = analyzer.getLoadingsAnalyzer(numberOfPC);

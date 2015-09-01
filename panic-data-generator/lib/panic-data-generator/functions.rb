@@ -93,6 +93,24 @@ module Panic
         return sum
       end
     end
+    
+    
+    class ReverseLinearFunction < Function
+      def initialize coefficients
+        super()
+        @coefficients = coefficients
+      end
+      
+      # returns the evaluation of the expression
+      # 1/(c+c1x1+c2x2+...+c3x3)
+      def evaluate_expression vector
+        sum = 0
+        @coefficients.length.times { |index|
+          sum+=@coefficients[index]*vector[index]
+        }
+        return 1.0/sum
+      end
+    end
 
   end
 end

@@ -343,9 +343,9 @@ public class PrincipalComponentsAnalyzer {
         DenseMatrix64F W, Vt;
         Vt = svd.getV(null, true);
         W = svd.getW(null);
+        SingularOps.descendingOrder(null, false, W, Vt, true);
         Vt.reshape(this.rank, this.rank);
         W.reshape(this.rank, this.rank);
-        SingularOps.descendingOrder(null, false, W, Vt, true);
         this.eigenValueMatrix = W;
         this.eigenVectorMatrix = Vt;
     }
@@ -356,7 +356,7 @@ public class PrincipalComponentsAnalyzer {
 
         UniformSampler sampler = new UniformSampler();
         sampler.setDimensionsWithRanges(file.getDimensionRanges());
-        sampler.setSamplingRate(.1);
+        sampler.setSamplingRate(1);
         sampler.configureSampler();
 
         List<OutputSpacePoint> points = new LinkedList<>();
@@ -374,12 +374,13 @@ public class PrincipalComponentsAnalyzer {
 //        comps.calculateBaseWithVarianceMatrix();
 //        comps.calculateBaseWithCorrelationMatrix();
 
-        Integer numberOfEigenVectorToPrint = 3;
+        Integer numberOfEigenVectorToPrint = 2;
         Integer count = comps.getEigenVector(0).getData().length;
         String[] keys = comps.getLabels();
 //        System.err.println("PC1\tPC2\n");
         for (int i = 0; i < count; i++) {
-            System.out.print(keys[i]+"\t");
+            // the zeros are used for gnuplot usage
+            System.out.print(keys[i]+"\t0\t0\t");
             for (int j = 0; j < numberOfEigenVectorToPrint; j++) {
                 System.out.print(comps.getEigenVector(j).getData()[i]+"\t");
             }
@@ -389,14 +390,19 @@ public class PrincipalComponentsAnalyzer {
         LoadingsAnalyzer anal = comps.getLoadingsAnalyzer(numberOfEigenVectorToPrint);
         anal.setPcWeights(comps.getPCWeights());
 //        System.err.println(anal.getPcWeights()[0]);
-        int index=0;
+        System.err.println("Loadings\n"+anal);
+        
+        int i=0;
+        System.err.println("Distances");
         for(String s:anal.getDimensionLabels()) {
-            System.err.println(s+":\t"+anal.getDistance(index++));
+            System.err.format("%s:\t%.5f\n", s, anal.getDistance(i++));
         }
         
-        for(int i=0;i<numberOfEigenVectorToPrint;i++)
-            System.err.println(comps.getEigenValue(i));
-
+        System.err.println("Angles");
+        i=0;
+        for(String s:keys) {
+            System.err.format("%s:\t%.5f\n", s, anal.getAngle(i++));
+        }
 //        System.err.println("EigenValues info");
 //        for(int i=0;i<comps.getRank();i++) {
 //            System.err.format("%d\t%.5f\t%.5f\t%.5f\n", i, comps.getEigenValue(i), comps.getEigenValueScore(i),comps.getEigenValueAggregatedScore(i));

@@ -42,9 +42,11 @@ public class CSVFileManager {
     private char delimiter = '\t';
     private String[] dimensionNames;
     private int quoteLines=0;
+    
+    private HashMap<InputSpacePoint, OutputSpacePoint> hashMap;
 
     public CSVFileManager() {
-
+        
     }
 
     public String getFilename() {
@@ -66,6 +68,7 @@ public class CSVFileManager {
             this.dimensionNames = buffer.split("\t");
             this.numberOfInputDimensions = this.dimensionNames.length - 1;
             this.outputDimensionIndex = this.dimensionNames.length - 1;
+            this.hashMap = new HashMap<>();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(CSVFileManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -122,6 +125,7 @@ public class CSVFileManager {
                 }
                 point.setValue(this.dimensionNames[this.dimensionNames.length-1], new Double(line[outputDimensionIndex]));
                 results.add(point);
+                this.hashMap.put(point.getInputSpacePoint(), point);
             }
             reader.close();
         } catch (IOException ex) {
@@ -165,12 +169,13 @@ public class CSVFileManager {
     }
 
     public OutputSpacePoint getActualValue(InputSpacePoint point) {
-        for (OutputSpacePoint p : this.getOutputSpacePoints()) {
-            if (p.getInputSpacePoint().equals(point)) {
-                return p;
-            }
-        }
-        return null;
+//        for (OutputSpacePoint p : this.getOutputSpacePoints()) {
+//            if (p.getInputSpacePoint().equals(point)) {
+//                return p;
+//            }
+//        }
+        return this.hashMap.get(point);
+//        return null;
     }
 //    public static void main(String[] args) {
 //        CSVFileManager loader = new CSVFileManager();
