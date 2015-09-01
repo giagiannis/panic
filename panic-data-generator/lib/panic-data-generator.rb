@@ -38,11 +38,17 @@ OptionParser.new do |opts|
     'Type of function (default is explinear)') {|o| options[:type] = o}
 end.parse!
 
+if not options.has_key? :coefficients then
+	puts "Type help to see usage"
+	exit
+end
 conv = options[:coefficients].split(",").map { |x| x=x.to_f  }
 if options[:type]=="explinear"
   a = ExpLinearFunction.new conv
 elsif options[:type]=="gauss"
   a = GaussFunction.new conv
+elsif options[:type]=="linear"
+  a = LinearFunction.new conv
 end
 
 a.noise_amplitude=options[:noise].to_f

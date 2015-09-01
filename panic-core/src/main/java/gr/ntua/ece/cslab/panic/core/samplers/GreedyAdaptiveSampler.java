@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * GreedyDimensionSampler is a greedy algorithm executing adaptive sampling.
+ * GreedyAdaptiveSampler is a greedy algorithm executing adaptive sampling.
  * <br/>
  * The algorithm works in two phases:
  * <br/>
@@ -32,12 +32,12 @@ import java.util.Set;
  *
  * @author Giannis Giannakopoulos
  */
-public class GreedyDimensionSampler extends AbstractAdaptiveSampler {
+public class GreedyAdaptiveSampler extends AbstractAdaptiveSampler {
 
     private Set<InputSpacePoint> picked;
     private RandomSampler randomSampler;
     
-    public GreedyDimensionSampler() {
+    public GreedyAdaptiveSampler() {
         super();
         this.picked = new HashSet<>();
     }

@@ -1,23 +1,29 @@
 #!/usr/bin/env gnuplot
 
 
-set terminal postscript eps enhanced color font 'Arial,12'
+set terminal postscript eps enhanced color font 'Arial,24' size 5.0,5.0
 
 set title "Loadings plot"
 set xlabel "PC1"
 set ylabel "PC2"
 unset key
 set grid
+set yrange [-1:1]
+set xrange [-1:1]
 
 
-set output "loadings.eps"
-plot filename u 2:3:1 index 0 w labels point ps 4 pt 6 offset -.25,-.25
+set output filename.".eps"
+set object circle at 0,0 size 1 fc rgb "blue"
+#set arrow 1 from -.77314332506681545761,-1 to .77314332506681545761, 1 nohead lt 6 lc "black"
+plot filename u 4:5:1 index 0 w labels point ps 6 pt 6 offset -.25, -.25,\
+	''	u 2:3:4:5 w vectors lw 5 lc "black" nohead
+	
 
 #set title "Scores plot"
 #set output "scores.eps"
 #plot filename u 1:2 index 1 w point ps 3 pt 5
 
 
-system("epstopdf loadings.eps")
+system("epstopdf ".filename.".eps")
 #system("epstopdf scores.eps")
-system("rm *.eps")
+system("rm ".filename.".eps")

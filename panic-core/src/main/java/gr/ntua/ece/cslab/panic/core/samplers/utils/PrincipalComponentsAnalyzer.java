@@ -16,6 +16,7 @@ import org.ejml.ops.SingularOps;
 
 /**
  * This class analyzes the dataset based on their principal components.
+ *
  * @author Giannis Giannakopoulos
  */
 public class PrincipalComponentsAnalyzer {
@@ -58,30 +59,31 @@ public class PrincipalComponentsAnalyzer {
     public String[] getLabels() {
         return this.labels;
     }
-    
+
     // public interface
     public void setInputData(List<OutputSpacePoint> points) {
         int rows = points.size();
         Collection<String> keys = points.get(0).getInputSpacePoint().getKeysAsCollection();
         int columns = keys.size() + 1;
         this.labels = new String[columns];
-        
+
         int index = 0;
-        for(String s : keys) 
+        for (String s : keys) {
             this.labels[index++] = s;
+        }
         this.labels[index] = points.get(0).getKey();
-        
+
         this.data = new DenseMatrix64F(rows, columns);
         this.meanMatrix = new DenseMatrix64F(1, columns);
         this.rank = (rows > columns ? columns : rows);
         for (int i = 0; i < rows; i++) {
-            for(int j=0;j<labels.length-1;j++) {
+            for (int j = 0; j < labels.length - 1; j++) {
                 this.data.set(i, j, points.get(i).getInputSpacePoint().getValue(this.labels[j]));
                 this.meanMatrix.add(0, j, this.data.get(i, j));
             }
 
-            this.data.set(i, columns-1, points.get(i).getValue());
-            this.meanMatrix.add(0, columns-1, this.data.get(i, columns-1));
+            this.data.set(i, columns - 1, points.get(i).getValue());
+            this.meanMatrix.add(0, columns - 1, this.data.get(i, columns - 1));
         }
         for (int j = 0; j < columns; j++) {
             this.meanMatrix.div(j, this.data.numRows);
@@ -100,7 +102,8 @@ public class PrincipalComponentsAnalyzer {
 
     /**
      * Calculates the Variance-Covariance matrix
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void calculateVarianceMatrix() throws Exception {
         if (this.data == null || this.data.numCols <= 0 || this.data.numRows <= 0) {
@@ -124,7 +127,8 @@ public class PrincipalComponentsAnalyzer {
 
     /**
      * Calculates the Correlation matrix
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void calculateCorrelationMatrix() throws Exception {
         if (this.data == null || this.data.numCols <= 0 || this.data.numRows <= 0) {
@@ -159,7 +163,7 @@ public class PrincipalComponentsAnalyzer {
     public void calculateBaseWithCorrelationMatrix() {
         this.calculateBase(this.correlationMatrix);
     }
-    
+
     /**
      * Calculates the Principal Components based on the original Data matrix.
      */
@@ -183,18 +187,20 @@ public class PrincipalComponentsAnalyzer {
 
     /**
      * Returns the EigenVector of the specified order
+     *
      * @param order The order of the EigenVector to be returned
-     * @return The EigenVector 
+     * @return The EigenVector
      */
     public EigenSpacePoint getEigenVector(int order) {
         return new EigenSpacePoint(CommonOps.extractRow(eigenVectorMatrix, order, null).getData());
     }
-    
+
     /**
-     * Transforms an OutputSpacePoint to an EigenSpace point based on the 
-     * basis calculated before.
+     * Transforms an OutputSpacePoint to an EigenSpace point based on the basis
+     * calculated before.
+     *
      * @param outputSpacePoint
-     * @return 
+     * @return
      */
     public EigenSpacePoint getEigenSpacePoint(OutputSpacePoint outputSpacePoint) {
         double[] value = outputSpacePoint.getDoubles();
@@ -210,110 +216,120 @@ public class PrincipalComponentsAnalyzer {
         point.setKeys(outputSpacePoint);
         return point;
     }
-    
+
     /**
-     * Transforms an OutputSpacePoint to an EigenSpace point based on the 
-     * basis calculated before keeping only the first numComponents Principal Components.
+     * Transforms an OutputSpacePoint to an EigenSpace point based on the basis
+     * calculated before keeping only the first numComponents Principal
+     * Components.
+     *
      * @param outputSpacePoint
      * @param numComponents
-     * @return 
+     * @return
      */
     public EigenSpacePoint getEigenSpacePoint(OutputSpacePoint outputSpacePoint, int numComponents) throws Exception {
-        if(numComponents>rank || numComponents<1){
+        if (numComponents > rank || numComponents < 1) {
             throw new Exception("numComponents should be between 1 and rank");
         }
-        
+
         double[] value = outputSpacePoint.getDoubles();
         DenseMatrix64F pointMatrix = DenseMatrix64F.wrap(value.length, 1, value);
-        
+
         DenseMatrix64F transMean = new DenseMatrix64F(this.meanMatrix.numCols, this.meanMatrix.numRows);
         CommonOps.transpose(this.meanMatrix, transMean);
         CommonOps.subtract(pointMatrix, transMean, pointMatrix);
         DenseMatrix64F result = new DenseMatrix64F(value.length, 1);
         CommonOps.mult(this.eigenVectorMatrix, pointMatrix, result);
-        
+
         double[] resultArray = new double[numComponents];
-        int i=0;
-        for(double d:result.getData()) {
+        int i = 0;
+        for (double d : result.getData()) {
             resultArray[i++] = d;
-            if(i==numComponents)
+            if (i == numComponents) {
                 break;
+            }
         }
-        
+
         EigenSpacePoint point = new EigenSpacePoint();
         point.setData(resultArray);
         point.setKeys(outputSpacePoint);
         return point;
     }
-    
+
     public double getEigenValueScore(int order) {
         double sum = 0.0;
-        for(int i=0;i<this.getRank();i++)
-            sum+=this.getEigenValue(i);
-        return this.getEigenValue(order)/sum;
-    } 
-    
-    public double getEigenValueAggregatedScore(int order) {
-        double globalSum = 0.0, partialSum=0.0;
-        for(int i=0;i<this.getRank();i++) {
-            globalSum+=this.getEigenValue(i);
-            if(i<=order)
-                partialSum+=this.getEigenValue(i);
+        for (int i = 0; i < this.getRank(); i++) {
+            sum += this.getEigenValue(i);
         }
-        return partialSum/globalSum;
+        return this.getEigenValue(order) / sum;
     }
-    
+
+    public double getEigenValueAggregatedScore(int order) {
+        double globalSum = 0.0, partialSum = 0.0;
+        for (int i = 0; i < this.getRank(); i++) {
+            globalSum += this.getEigenValue(i);
+            if (i <= order) {
+                partialSum += this.getEigenValue(i);
+            }
+        }
+        return partialSum / globalSum;
+    }
+
     /**
-     * Method that returns the loadings of the analysis for a specific principal component
-     * and a specific input dimension.
+     * Method that returns the loadings of the analysis for a specific principal
+     * component and a specific input dimension.
+     *
      * @param princinalComponentOrder
      * @param dimension
-     * @return 
+     * @return
      */
     public double getLoading(int princinalComponentOrder, int dimension) {
-        return this.getEigenVector(princinalComponentOrder).getData()[dimension-0];
+        return this.getEigenVector(princinalComponentOrder).getData()[dimension - 0];
     }
-    
+
     /**
      * Returns the weight of each PC, sorted by their id.
-     * @return 
+     *
+     * @return
      */
     public double[] getPCWeights() {
         double[] weights = new double[rank];
-        double sum=0.0;
-        for(int i=0;i<this.getRank();i++) 
-            sum+=this.getEigenValue(i);
-        for(int i=0;i<this.getRank();i++)
-            weights[i] = this.getEigenValue(i)/sum;
-        
+        double sum = 0.0;
+        for (int i = 0; i < this.getRank(); i++) {
+            sum += this.getEigenValue(i);
+        }
+        for (int i = 0; i < this.getRank(); i++) {
+            weights[i] = this.getEigenValue(i) / sum;
+        }
+
         return weights;
     }
-    
+
     /**
      * Returns the weight of each PC, upto the specified order.
+     *
      * @param components
-     * @return 
+     * @return
      */
     public double[] getPCWeights(int components) {
         double[] primary = this.getPCWeights();
-        double[] result = new double[(components<primary.length?components:primary.length)];
+        double[] result = new double[(components < primary.length ? components : primary.length)];
         System.arraycopy(primary, 0, result, 0, result.length);
         return result;
     }
-    
+
     public LoadingsAnalyzer getLoadingsAnalyzer(int principalComponents) {
         LoadingsAnalyzer analyzer = new LoadingsAnalyzer();
         double[][] loadings = new double[rank][rank];
-        for(int i=0;i<rank;i++) {
-            for(int j=0;j<principalComponents;j++) {
-                loadings[i][j]  = this.getLoading(j, i);
+        for (int i = 0; i < rank; i++) {
+            for (int j = 0; j < principalComponents; j++) {
+                loadings[i][j] = this.getLoading(j, i);
             }
         }
         analyzer.setLoadings(loadings);
         analyzer.setDimensionLabels(labels);
         return analyzer;
     }
-    
+
     // utilities and helper methods
     private void calculateBase(DenseMatrix64F matrixToDecompose) {
         SingularValueDecomposition<DenseMatrix64F> svd
@@ -327,36 +343,66 @@ public class PrincipalComponentsAnalyzer {
         DenseMatrix64F W, Vt;
         Vt = svd.getV(null, true);
         W = svd.getW(null);
+        SingularOps.descendingOrder(null, false, W, Vt, true);
         Vt.reshape(this.rank, this.rank);
         W.reshape(this.rank, this.rank);
-        SingularOps.descendingOrder(null, false, W, Vt, true);
         this.eigenValueMatrix = W;
         this.eigenVectorMatrix = Vt;
     }
 
-//    public static void main(String[] args) throws Exception {
-//        CSVFileManager file = new CSVFileManager();
-//        file.setFilename(args[0]);
-//
-//        UniformSampler sampler = new UniformSampler();
-//        sampler.setDimensionsWithRanges(file.getDimensionRanges());
-//        sampler.setSamplingRate(.1);
-//        sampler.configureSampler();
-//
-//        List<OutputSpacePoint> points = new LinkedList<>();
-//        while (sampler.hasMore()) {
-//            InputSpacePoint sample = sampler.next();
-//            points.add(file.getActualValue(sample));
-//        }
-//
-//        PrincipalComponentsAnalyzer comps = new PrincipalComponentsAnalyzer();
-//        comps.setInputData(points);
-//        comps.calculateVarianceMatrix();
-//        comps.calculateCorrelationMatrix();
-//        
+    public static void main(String[] args) throws Exception {
+        CSVFileManager file = new CSVFileManager();
+        file.setFilename(args[0]);
+
+        UniformSampler sampler = new UniformSampler();
+        sampler.setDimensionsWithRanges(file.getDimensionRanges());
+        sampler.setSamplingRate(1);
+        sampler.configureSampler();
+
+        List<OutputSpacePoint> points = new LinkedList<>();
+        while (sampler.hasMore()) {
+            InputSpacePoint sample = sampler.next();
+            points.add(file.getActualValue(sample));
+        }
+
+        PrincipalComponentsAnalyzer comps = new PrincipalComponentsAnalyzer();
+        comps.setInputData(points);
+        comps.calculateVarianceMatrix();
+        comps.calculateCorrelationMatrix();
+
+        comps.calculateBaseWithDataMatrix();
 //        comps.calculateBaseWithVarianceMatrix();
-////        comps.calculateBaseWithCorrelationMatrix();
-//        
+//        comps.calculateBaseWithCorrelationMatrix();
+
+        Integer numberOfEigenVectorToPrint = 2;
+        Integer count = comps.getEigenVector(0).getData().length;
+        String[] keys = comps.getLabels();
+//        System.err.println("PC1\tPC2\n");
+        for (int i = 0; i < count; i++) {
+            // the zeros are used for gnuplot usage
+            System.out.print(keys[i]+"\t0\t0\t");
+            for (int j = 0; j < numberOfEigenVectorToPrint; j++) {
+                System.out.print(comps.getEigenVector(j).getData()[i]+"\t");
+            }
+            System.out.println("");
+        }
+        
+        LoadingsAnalyzer anal = comps.getLoadingsAnalyzer(numberOfEigenVectorToPrint);
+        anal.setPcWeights(comps.getPCWeights());
+//        System.err.println(anal.getPcWeights()[0]);
+        System.err.println("Loadings\n"+anal);
+        
+        int i=0;
+        System.err.println("Distances");
+        for(String s:anal.getDimensionLabels()) {
+            System.err.format("%s:\t%.5f\n", s, anal.getDistance(i++));
+        }
+        
+        System.err.println("Angles");
+        i=0;
+        for(String s:keys) {
+            System.err.format("%s:\t%.5f\n", s, anal.getAngle(i++));
+        }
 //        System.err.println("EigenValues info");
 //        for(int i=0;i<comps.getRank();i++) {
 //            System.err.format("%d\t%.5f\t%.5f\t%.5f\n", i, comps.getEigenValue(i), comps.getEigenValueScore(i),comps.getEigenValueAggregatedScore(i));
@@ -376,5 +422,5 @@ public class PrincipalComponentsAnalyzer {
 //        for(OutputSpacePoint p :points) {
 //            System.out.println(comps.getEigenSpacePoint(p, 2).toStringCSV());
 //        }
-//    }
+    }
 }

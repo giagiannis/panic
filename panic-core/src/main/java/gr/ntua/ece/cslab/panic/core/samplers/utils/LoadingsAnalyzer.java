@@ -80,6 +80,20 @@ public class LoadingsAnalyzer {
     public void setPcWeights(double[] pcWeights) {
         this.pcWeights = pcWeights;
     }
+    
+    public double getAngle(int dimension1, int dimension2) {
+        double normA = Math.sqrt(Math.pow(loadings[dimension1][0], 2)+Math.pow(loadings[dimension1][1], 2));
+        double normB = Math.sqrt(Math.pow(loadings[dimension2][0], 2)+Math.pow(loadings[dimension2][1], 2));
+        double dotProduct = (this.loadings[dimension1][0]*this.loadings[dimension2][0]+
+                this.loadings[dimension1][1]*this.loadings[dimension2][1]);
+        double cos = dotProduct/(normA*normB);
+        double angle = Math.acos(cos);
+        return Math.toDegrees(angle);
+    }
+    
+    public double getAngle(int dimension) {
+        return this.getAngle(this.loadings.length-1, dimension);
+    }
 
     /**
      * Calculates and returns the distance matrix
@@ -181,6 +195,51 @@ public class LoadingsAnalyzer {
     }
 
     /**
+     * Distance metric between two dimensions. * The distance metric used is the
+     * Euclidian distance
+     *
+     * @param dimension1
+     * @param dimension2
+     * @return
+     */
+    public double getDistanceSymmetric(int dimension1, int dimension2) {
+        return this.getDistanceSymmetric(dimension1, dimension2, null);
+    }
+
+    /**
+     * Distance metric between the performance dimension and another dimension.
+     * The distance metric used is the Euclidian distance
+     *
+     * @param dimension
+     * @return
+     */
+    public double getDistanceSymmetric(int dimension) {
+        return this.getDistance(dimension, this.dimensions - 1);
+    }
+
+    /**
+     * Returns the weighted Euclidean distance. If the specified weights are
+     * null, then the un-weighted distance is returned.
+     *
+     * @param dimension1
+     * @param dimension2
+     * @param weights
+     * @return
+     */
+    public double getDistanceSymmetric(int dimension1, int dimension2, double[] weights) {
+        double sum = 0.0;
+        for (int j = 0; j < components; j++) {
+            sum += ((weights == null ? 1 : weights[j]) * Math.pow(this.loadings[dimension1][j] + this.loadings[dimension2][j], 2));
+//            System.err.println(sum);
+        }
+        return Math.sqrt(sum);
+    }
+
+    public double getDistanceSymmetric(int dimension, double[] weights) {
+        return this.getDistance(dimension, this.dimensions - 1, weights);
+    }
+
+    /**
      * Returns the weighted Euclidean distance, after each dimensions is mapped
      * to the first quarter of the loading plot.
      *
@@ -257,7 +316,12 @@ public class LoadingsAnalyzer {
 
         TreeMap<Double, List<String>> treeMap = new TreeMap<>();
         for (int i = 0; i < dimensionsKeys.length; i++) {
-            Double d = this.getDistance(i, weights);
+	Double d;
+            if(this.getAngle(i)>90)
+                d = this.getDistanceSymmetric(i, weights);
+            else
+                d = this.getDistance(i, weights);
+            
             if (!treeMap.containsKey(d)) {
                 treeMap.put(d, new LinkedList<String>());
             }
@@ -276,7 +340,11 @@ public class LoadingsAnalyzer {
         String[] dimensionsKeys = new String[dimensions - 1];
         TreeMap<Double, List<String>> treeMap = new TreeMap<>();
         for (int i = 0; i < dimensionsKeys.length; i++) {
-            Double d = this.getDistance(i, pcWeights);
+            Double d;
+            if(this.getAngle(i)>90)
+                d = this.getDistanceSymmetric(i);
+            else
+                d = this.getDistance(i);
             if (!treeMap.containsKey(d)) {
                 treeMap.put(d, new LinkedList<String>());
             }
