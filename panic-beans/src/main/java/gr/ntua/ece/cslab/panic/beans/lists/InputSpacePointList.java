@@ -1,6 +1,6 @@
-package gr.ntua.ece.cslab.panic.core.containers.beans.lists;
+package gr.ntua.ece.cslab.panic.beans.lists;
 
-import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.InputSpacePoint;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;

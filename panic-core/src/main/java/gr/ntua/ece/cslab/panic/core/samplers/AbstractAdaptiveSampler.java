@@ -1,6 +1,6 @@
 package gr.ntua.ece.cslab.panic.core.samplers;
 
-import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.OutputSpacePoint;
 import java.util.LinkedList;
 import java.util.List;
 

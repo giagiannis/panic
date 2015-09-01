@@ -16,7 +16,7 @@
 
 package gr.ntua.ece.cslab.panic.core.samplers;
 
-import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.InputSpacePoint;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;

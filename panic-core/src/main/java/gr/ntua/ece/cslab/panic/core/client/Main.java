@@ -15,8 +15,8 @@
  */
 package gr.ntua.ece.cslab.panic.core.client;
 
-import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.metrics.GlobalMetrics;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;

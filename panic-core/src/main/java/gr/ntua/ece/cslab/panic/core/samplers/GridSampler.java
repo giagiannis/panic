@@ -1,6 +1,6 @@
 package gr.ntua.ece.cslab.panic.core.samplers;
 
-import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.InputSpacePoint;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;

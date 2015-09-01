@@ -25,14 +25,15 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 class RunServer {
 
+    public static String CONFIGURATION_FILE="panic.properties";
     public static void main(String[] args) throws Exception {
 
         Properties prop = new Properties();
-        InputStream resourceFile = RunServer.class.getClassLoader().getResourceAsStream("server.properties");
+        InputStream resourceFile = RunServer.class.getClassLoader().getResourceAsStream(CONFIGURATION_FILE);
         if (resourceFile != null) {
             prop.load(resourceFile);
         } else {
-            System.err.println("File not exist...");
+            System.err.println("Properties file not found in the classpath!");
             System.exit(1);
         }
 

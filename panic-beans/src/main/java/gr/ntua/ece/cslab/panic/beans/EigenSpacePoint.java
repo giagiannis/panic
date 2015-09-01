@@ -1,4 +1,4 @@
-package gr.ntua.ece.cslab.panic.core.containers.beans;
+package gr.ntua.ece.cslab.panic.beans;
 
 
 /**

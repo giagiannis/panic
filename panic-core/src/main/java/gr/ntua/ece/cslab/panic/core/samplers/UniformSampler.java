@@ -16,7 +16,7 @@
 
 package gr.ntua.ece.cslab.panic.core.samplers;
 
-import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.InputSpacePoint;
 
 /**
  * Creates a grid out of the input space and returns the grid points.

@@ -6,12 +6,7 @@
         <artifactId>panic</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <name>PANIC Client</name>
-    <version>0.1</version>
-    <description>
-        PANIC client, used to interact with the PANIC server, written in Java
-    </description>
-    <artifactId>panic-client</artifactId>
+    <artifactId>panic-rpm</artifactId>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>1.7</maven.compiler.source>

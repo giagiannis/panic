@@ -1,9 +1,9 @@
 package gr.ntua.ece.cslab.panic.core.utils;
 
-import gr.ntua.ece.cslab.panic.core.containers.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.containers.beans.lists.InputSpacePointList;
-import gr.ntua.ece.cslab.panic.core.containers.beans.lists.OutputSpacePointList;
+import gr.ntua.ece.cslab.panic.beans.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.lists.InputSpacePointList;
+import gr.ntua.ece.cslab.panic.beans.lists.OutputSpacePointList;
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
