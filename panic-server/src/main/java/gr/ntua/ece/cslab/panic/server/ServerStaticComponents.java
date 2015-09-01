@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Giannis Giannakopoulos.
+ * Copyright 2015 giannis.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package gr.ntua.ece.cslab.panic.server;
 
-package gr.ntua.ece.cslab.panic.server.rest;
-
-import javax.ws.rs.Path;
+import java.util.Properties;
+import org.eclipse.jetty.server.Server;
 
 /**
  *
- * @author Giannis Giannakopoulos
+ * @author giannis
  */
-@Path("/application/{application-id}/")
-public class ApplicationManagementREST {
-    
-//    @Path("start/")
-//    @Path("stop/")
-    
+class ServerStaticComponents {
+    static Properties properties;
+    static Server server;
     
 }

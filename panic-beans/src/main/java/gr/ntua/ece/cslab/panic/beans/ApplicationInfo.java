@@ -16,15 +16,13 @@
 
 package gr.ntua.ece.cslab.panic.beans;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import javax.xml.bind.annotation.XmlRootElement;
 /**
  *
  * @author Giannis Giannakopoulos
  */
+@XmlRootElement
 public class ApplicationInfo implements Serializable {
     private static final long serialVersionUID = 1L;
     
