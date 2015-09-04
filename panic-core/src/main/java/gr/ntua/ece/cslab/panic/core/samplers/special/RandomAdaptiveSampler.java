@@ -1,7 +1,7 @@
 package gr.ntua.ece.cslab.panic.core.samplers.special;
 
-import gr.ntua.ece.cslab.panic.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.metrics.GlobalMetrics;
 import gr.ntua.ece.cslab.panic.core.models.MLPerceptron;
 import gr.ntua.ece.cslab.panic.core.models.Model;

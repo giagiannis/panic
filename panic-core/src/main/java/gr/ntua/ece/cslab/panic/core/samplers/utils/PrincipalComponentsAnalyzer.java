@@ -1,8 +1,8 @@
 package gr.ntua.ece.cslab.panic.core.samplers.utils;
 
-import gr.ntua.ece.cslab.panic.beans.EigenSpacePoint;
-import gr.ntua.ece.cslab.panic.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.EigenSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.UniformSampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.util.Collection;

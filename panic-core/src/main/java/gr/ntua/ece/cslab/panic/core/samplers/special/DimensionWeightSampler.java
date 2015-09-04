@@ -1,7 +1,7 @@
 package gr.ntua.ece.cslab.panic.core.samplers.special;
 
-import gr.ntua.ece.cslab.panic.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.GridSampler;

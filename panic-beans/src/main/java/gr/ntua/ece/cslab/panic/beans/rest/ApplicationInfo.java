@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.beans;
+package gr.ntua.ece.cslab.panic.beans.rest;
 
+import gr.ntua.ece.cslab.panic.beans.containers.DeploymentSpace;
 import java.io.Serializable;
+import java.util.UUID;
 import javax.xml.bind.annotation.XmlRootElement;
 /**
  *
@@ -28,16 +30,10 @@ public class ApplicationInfo implements Serializable {
     
     private String id;
     private String name;
-    private String status;
-    private long beginTimestamp;
-    private long endTimestamp;
-    
+    private DeploymentSpace deploymentSpace;
 
     public ApplicationInfo() {
-        this.beginTimestamp = -1;
-        this.endTimestamp = -1;
-        this.status = "NOT_STARTED";
-        this.id = null;
+        this.id = UUID.randomUUID().toString();
     }
     
     public String getId() {
@@ -56,27 +52,19 @@ public class ApplicationInfo implements Serializable {
         this.name = name;
     }
 
-    public String getStatus() {
-        return status;
+    public DeploymentSpace getDeploymentSpace() {
+        return deploymentSpace;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setDeploymentSpace(DeploymentSpace deploymentSpace) {
+        this.deploymentSpace = deploymentSpace;
     }
 
-    public long getBeginTimestamp() {
-        return beginTimestamp;
+    @Override
+    public String toString() {
+        return String.format("(%s, %s, %s)", 
+                this.id, this.name, this.deploymentSpace);
     }
-
-    public void setBeginTimestamp(long beginTimestamp) {
-        this.beginTimestamp = beginTimestamp;
-    }
-
-    public long getEndTimestamp() {
-        return endTimestamp;
-    }
-
-    public void setEndTimestamp(long endTimestamp) {
-        this.endTimestamp = endTimestamp;
-    }
+    
+    
 }

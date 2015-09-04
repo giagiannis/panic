@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.beans;
+package gr.ntua.ece.cslab.panic.beans.containers;
 
 import java.nio.ByteBuffer;
 

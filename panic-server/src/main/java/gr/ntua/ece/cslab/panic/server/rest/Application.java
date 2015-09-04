@@ -15,14 +15,16 @@
  */
 package gr.ntua.ece.cslab.panic.server.rest;
 
-import gr.ntua.ece.cslab.panic.beans.ApplicationInfo;
-import javax.ws.rs.Consumes;
+import gr.ntua.ece.cslab.panic.beans.containers.DeploymentSpace;
+import gr.ntua.ece.cslab.panic.beans.lists.ApplicationInfoList;
+import gr.ntua.ece.cslab.panic.beans.rest.ApplicationInfo;
+import java.util.LinkedList;
+import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
 
 
 /**
@@ -33,15 +35,23 @@ import javax.ws.rs.core.MediaType;
 public class Application {
     // get the list of applications
     @GET
-    public void getApplications() {
-        
+    public ApplicationInfoList getApplications() {
+        ApplicationInfo info = new ApplicationInfo();
+        info.setId("1");
+        info.setName("gigili");
+        ApplicationInfoList list = new ApplicationInfoList();
+        list.setApplications(new LinkedList<ApplicationInfo>());
+        list.getApplications().add(info);
+//        list.getApplications().add(info);
+        System.out.println(list);
+        return list;
     }
     
     // add new application
     @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
+//    @Consumes("*/*")
     public String newApplication(ApplicationInfo application) {
-        System.err.println(application.getName());
+        System.err.println(application);
         return "all good";
     }
     
@@ -52,23 +62,25 @@ public class Application {
         ApplicationInfo info = new ApplicationInfo();
         info.setId(id);
         info.setName("paparia mantoles");
-        info.setStatus("Whatever");
+        info.setDeploymentSpace(new DeploymentSpace());
+        info.getDeploymentSpace().addValue("hello", 2.0);
+        info.getDeploymentSpace().addValue("hello", 3.0);
         return info;
     }
     
-    // return the deployment space of a specific application
-    @GET
-    @Path("{id}/deployment/")
-    public void getDeploymentSpace(@PathParam("id") String id) {
-        
-    }
-    
-    // set the deployment space of an application
-    @PUT
-    @Path("{id}/deployment/")
-    public void setDeploymentSpace(@PathParam("id") String id) {
-        
-    }
+//    // return the deployment space of a specific application
+//    @GET
+//    @Path("{id}/deployment/")
+//    public void getDeploymentSpace(@PathParam("id") String id) {
+//        
+//    }
+//    
+//    // set the deployment space of an application
+//    @PUT
+//    @Path("{id}/deployment/")
+//    public void setDeploymentSpace(@PathParam("id") String id) {
+//        
+//    }
     
     // batch train
     @PUT

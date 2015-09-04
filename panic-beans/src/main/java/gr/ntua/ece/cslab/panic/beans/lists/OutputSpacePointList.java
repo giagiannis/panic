@@ -1,6 +1,6 @@
 package gr.ntua.ece.cslab.panic.beans.lists;
 
-import gr.ntua.ece.cslab.panic.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;

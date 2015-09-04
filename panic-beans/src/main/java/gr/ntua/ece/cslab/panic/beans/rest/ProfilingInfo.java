@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.beans;
+package gr.ntua.ece.cslab.panic.beans.rest;
 
 import java.io.Serializable;
 import java.util.HashMap;

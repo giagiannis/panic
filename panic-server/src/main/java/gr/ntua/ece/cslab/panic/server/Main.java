@@ -16,7 +16,6 @@
 package gr.ntua.ece.cslab.panic.server;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import gr.ntua.ece.cslab.panic.server.shared.SystemLogger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;

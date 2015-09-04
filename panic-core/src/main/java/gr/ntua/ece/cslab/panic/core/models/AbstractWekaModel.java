@@ -15,8 +15,8 @@
  */
 package gr.ntua.ece.cslab.panic.core.models;
 
-import gr.ntua.ece.cslab.panic.beans.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.beans.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import java.util.LinkedList;
 import java.util.List;
 import weka.classifiers.Classifier;
