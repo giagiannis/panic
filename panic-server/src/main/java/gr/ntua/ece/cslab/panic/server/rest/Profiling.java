@@ -18,6 +18,7 @@ package gr.ntua.ece.cslab.panic.server.rest;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 /**
  *
@@ -26,10 +27,16 @@ import javax.ws.rs.Path;
 @Path("/profiling/")
 public class Profiling {
     
+    @GET
+    @Path("{id}/status/")
+    public void getStatus(@PathParam("id") String id) {
+        
+    }
+    
     // returns samples of the specific profiling scenario
     @GET
     @Path("{id}/samples/")
-    public void getSamples(String id) {
+    public void getSamples(@PathParam("id") String id) {
         
     }
     
@@ -37,14 +44,14 @@ public class Profiling {
     // all the deployment space
     @GET
     @Path("{id}/model/")
-    public void getModeledPoints(String id) {
+    public void getModeledPoints(@PathParam("id") String id) {
         
     }
     
     // insert new sample(s) to the profiling
     @PUT
     @Path("{id}/samples/")
-    public void insertSamples(String id) {
+    public void insertSamples(@PathParam("id") String id) {
         
     }
     

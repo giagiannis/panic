@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<applicationInfo>
+    <deploymentSpace>
+        <ranges>
+            <entry>
+                <key>ram</key>
+                <value>
+                    <values>1.0</values>
+                    <values>2.0</values>
+                    <values>3.0</values>
+                    <values>4.0</values>
+                    <values>5.0</values>
+                    <values>6.0</values>
+                    <values>7.0</values>
+                    <values>8.0</values>
+                </value>
+            </entry>
+            <entry>
+                <key>cores</key>
+                <value>
+                    <values>1.0</values>
+                    <values>2.0</values>
+                    <values>4.0</values>
+                    <values>8.0</values>
+                </value>
+            </entry>
+        </ranges>
+    </deploymentSpace>
+    <name>example app 1</name>
+</applicationInfo>

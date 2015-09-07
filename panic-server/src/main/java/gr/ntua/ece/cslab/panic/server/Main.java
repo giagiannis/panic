@@ -16,6 +16,7 @@
 package gr.ntua.ece.cslab.panic.server;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import gr.ntua.ece.cslab.panic.server.cache.ApplicationsCache;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -133,11 +134,16 @@ class Main {
 
     }
 
+    private static void allocateCaches() {
+        ApplicationsCache.allocateCache();
+    }
+    
     public static void main(String[] args) throws Exception {
         configureLogger();
         loadProperties();
         addShutdownHook();
         configureServer();
+        allocateCaches();
 
         ServerStaticComponents.server.start();
         Logger.getLogger(Main.class.getName()).info("Server is started");

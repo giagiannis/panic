@@ -71,7 +71,7 @@ public class AbstractClient {
         }
 
         int responseCode = con.getResponseCode();
-        Logger.getLogger("Orchestrator client").info("Response code of request is " + responseCode);
+//        Logger.getLogger("Orchestrator client").info("Response code of request is " + responseCode);
         StringBuilder builder = new StringBuilder();
 
         try (InputStream in = con.getInputStream()) {

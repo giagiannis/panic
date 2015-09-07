@@ -6,7 +6,7 @@
 package gr.ntua.ece.cslab.panic.beans.lists;
 
 import gr.ntua.ece.cslab.panic.beans.rest.ApplicationInfo;
-import java.util.LinkedList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -15,17 +15,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class ApplicationInfoList{
-    private LinkedList<ApplicationInfo> applications;
+    private List<ApplicationInfo> applications;
 
     public ApplicationInfoList() {
     }
     
     
-    public LinkedList<ApplicationInfo> getApplications() {
+    public List<ApplicationInfo> getApplications() {
         return applications;
     }
 
-    public void setApplications(LinkedList<ApplicationInfo> applications) {
+    public void setApplications(List<ApplicationInfo> applications) {
         this.applications = applications;
     }
     

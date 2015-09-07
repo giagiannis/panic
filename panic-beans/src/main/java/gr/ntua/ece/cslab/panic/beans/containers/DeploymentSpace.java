@@ -1,30 +1,34 @@
 package gr.ntua.ece.cslab.panic.beans.containers;
 
 import java.util.HashMap;
-import java.util.LinkedList;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Giannis Giannakopoulos
  */
-public class DeploymentSpace extends HashMap<String, LinkedList<Double>>{
-
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class DeploymentSpace {
+    private final HashMap<String, ValueList> ranges;
     public DeploymentSpace() {
-        super();
+        this.ranges = new HashMap<>();
     }
     
     public void addValue(String key, Double value) {
-        if(!this.containsKey(key) || this.get(key)==null)
-            this.put(key, new LinkedList<Double>());
-        this.get(key).add(value);
+        if(!this.ranges.containsKey(key) || this.ranges.get(key)==null)
+            this.ranges.put(key, new ValueList());
+        this.ranges.get(key).getValues().add(value);
     }
-    
-    
-    public static void main(String[] args) {
-        DeploymentSpace foo = new DeploymentSpace();
-        foo.addValue("hello", 1.0);
-        foo.addValue("hello", 2.0);
-        foo.addValue("hello", 3.0);
-        System.out.println(foo);
+
+    public HashMap<String, ValueList> getRanges() {
+        return ranges;
+    }
+
+    @Override
+    public String toString() {
+        return this.ranges.toString();
     }
 }

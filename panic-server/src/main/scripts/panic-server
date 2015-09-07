@@ -3,7 +3,12 @@
 
 # the default classpath of the execution
 
+[ -z "$PANIC_SERVER_HOME" ] && PANIC_SERVER_HOME="."
+#CLASSPATH="$(ls $PANIC_SERVER_HOME/lib/* $PANIC_SERVER_HOME/*.jar| tr '\n' ':' )$PANIC_SERVER_HOME/conf"
+CLASSPATH="$PANIC_SERVER_HOME/classes:$(ls $PANIC_SERVER_HOME/lib/*| tr '\n' ':' )$PANIC_SERVER_HOME/conf"
 
+MAIN_CLASS="gr.ntua.ece.cslab.panic.server.Main"
+echo $CLASSPATH
 
 # executable
-java -cp $CLASSPATH:$CONF_DIR 
+java -cp $CLASSPATH $MAIN_CLASS
