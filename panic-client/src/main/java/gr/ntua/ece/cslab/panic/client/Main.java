@@ -8,11 +8,7 @@ package gr.ntua.ece.cslab.panic.client;
 import gr.ntua.ece.cslab.panic.beans.containers.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.beans.rest.ApplicationInfo;
 import gr.ntua.ece.cslab.panic.client.conf.ClientConfiguration;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
-import javax.security.auth.login.Configuration;
 import javax.xml.bind.JAXB;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -22,7 +18,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class Main {
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         if(args.length<2) {
             System.err.println("Please provide section and command to begin!");
             System.exit(1);
@@ -48,7 +44,7 @@ public class Main {
                     break;
                 case "create":
                     if(args.length!=3) {
-                        System.err.println("Usage: application show [filename]");
+                        System.err.println("Usage: application create [filename]");
                         System.exit(0);
                     } 
                     ApplicationInfo info = new ApplicationInfo();
@@ -62,9 +58,6 @@ public class Main {
                     JAXB.marshal(info, a);
                     System.out.println(a.toString());
                     System.out.println(info);
-//                    String appFile = args[2];
-//                    FileReader reader = new FileReader(appFile);
-//                    ApplicationInfo info=JAXB.unmarshal(reader, ApplicationInfo.class);
                     break;
                 case "show":
                     throw new NotImplementedException();

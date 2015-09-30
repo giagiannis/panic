@@ -8,7 +8,7 @@
 CLASSPATH="$PANIC_SERVER_HOME/classes:$(ls $PANIC_SERVER_HOME/lib/*| tr '\n' ':' )$PANIC_SERVER_HOME/conf"
 
 MAIN_CLASS="gr.ntua.ece.cslab.panic.server.Main"
-echo $CLASSPATH
+#echo $CLASSPATH
 
 # executable
 java -cp $CLASSPATH $MAIN_CLASS

@@ -5,22 +5,13 @@
  */
 package gr.ntua.ece.cslab.panic.client;
 
-import gr.ntua.ece.cslab.panic.beans.lists.ApplicationInfoList;
-import gr.ntua.ece.cslab.panic.beans.rest.ApplicationInfo;
 import gr.ntua.ece.cslab.panic.client.conf.ClientConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.logging.Logger;import javax.xml.bind.JAXB;
-;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 
 /**
  *
@@ -42,7 +33,7 @@ public class AbstractClient {
     }
     
     
-    protected String issueRequest(String requestType, String document, String input) throws MalformedURLException, IOException {
+    protected String issueRequest(String requestType, String document, String input) throws MalformedURLException, IOException, Exception {
         String urlString = "http://" + configuration.getHost() + ":" + configuration.getPort() + "/" + document;
         URL url = new URL(urlString);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -71,7 +62,9 @@ public class AbstractClient {
         }
 
         int responseCode = con.getResponseCode();
-//        Logger.getLogger("Orchestrator client").info("Response code of request is " + responseCode);
+        if(responseCode!=200) {
+        	throw new Exception("Error code:"+responseCode);
+        }
         StringBuilder builder = new StringBuilder();
 
         try (InputStream in = con.getInputStream()) {

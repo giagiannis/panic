@@ -15,17 +15,17 @@
  */
 package gr.ntua.ece.cslab.panic.server.rest;
 
-import gr.ntua.ece.cslab.panic.beans.containers.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.beans.lists.ApplicationInfoList;
 import gr.ntua.ece.cslab.panic.beans.rest.ApplicationInfo;
 import gr.ntua.ece.cslab.panic.server.cache.ApplicationsCache;
-import java.util.LinkedList;
-import java.util.List;
+
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -35,7 +35,6 @@ import javax.ws.rs.PathParam;
 public class Application {
 
     // get the list of applications
-
     @GET
     public ApplicationInfoList getApplications() {
         ApplicationInfoList list = new ApplicationInfoList();
@@ -45,49 +44,63 @@ public class Application {
 
     // add new application
     @PUT
-    public String newApplication(ApplicationInfo application) {
+    public ApplicationInfo newApplication(ApplicationInfo application) {
+    	System.out.println(application);
         ApplicationsCache.insertApplication(application);
-        return "asd";
+        return application;
     }
 
     // return an application for a specific id
     @GET
     @Path("{id}/")
     public ApplicationInfo getApplication(@PathParam("id") String id) {
-        return ApplicationsCache.getApplication(id);
+    	ApplicationInfo a = ApplicationsCache.getApplication(id);
+    	if(a!=null) {
+    		return a;
+    	} else {
+    		throw new WebApplicationException(404);
+    	}
     }
-//    // return the deployment space of a specific application
-//    @GET
-//    @Path("{id}/deployment/")
-//    public void getDeploymentSpace(@PathParam("id") String id) {
-//        
-//    }
-//    
-//    // set the deployment space of an application
-//    @PUT
-//    @Path("{id}/deployment/")
-//    public void setDeploymentSpace(@PathParam("id") String id) {
-//        
-//    }
-    // batch train
-    @PUT
-    @Path("{id}/batch/")
-    public void batchTrain(@PathParam("id") String id) {
+    
+    // delete application
+    @DELETE
+    @Path("{id}/")
+    public void deleteApplication(@PathParam("id") String id) {
+    	System.err.println("Delete application called "+ id);
+    	if(ApplicationsCache.deleteApplication(id)) {
+    		System.err.println("Found");
+    		throw new WebApplicationException(200);
+    	} else {
+    		System.err.println("Not Found");
+    		throw new WebApplicationException(404);
+    	}
+    }
 
+    // batch train
+    @POST
+    @Path("{id}/batch-profile/")
+    public void batchProfile(@PathParam("id") String id) {
+
+    }
+    
+    @POST
+    @Path("{id}/batch-train/")
+    public void batchTraing(@PathParam("id") String id) {
+        
     }
 
     // FUTURE PLANS -  used for online usage
     // start profiling for online usage
-    @POST
-    @Path("{id}/start/")
-    public void startProfiling() {
-
-    }
-
-    // stop profiling for online usage
-    @POST
-    @Path("{id}/stop/")
-    public void stopProfiling() {
-
-    }
+//    @POST
+//    @Path("{id}/start/")
+//    public void startProfiling() {
+//
+//    }
+//
+//    // stop profiling for online usage
+//    @POST
+//    @Path("{id}/stop/")
+//    public void stopProfiling() {
+//
+//    }
 }

@@ -53,4 +53,20 @@ public class ApplicationsCache {
         System.out.println(applications);
         return new LinkedList<>(applications.values());
     }
+    
+    /**
+     * Returns true if the application was found and deleted, else returns false
+     * @param id
+     * @return
+     */
+    public static boolean deleteApplication(String id) {
+    	if(applications.containsKey(id)) {
+    		applications.remove(id);
+    		return true;
+    	} else {
+    		return false;
+    	}
+    		
+    	
+    }
 }
