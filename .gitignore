@@ -5,3 +5,6 @@ nbactions.xml
 nbproject/
 datasets/
 *.dat
+.classpath
+.project
+.settings/
