@@ -132,7 +132,7 @@ public abstract class AbstractWekaModel implements Model {
     protected static Instances getInstances(List<OutputSpacePoint> points) {
         
         OutputSpacePoint first = points.get(0);
-        Instance inst = convertPointToInstance(first);
+//        Instance inst = convertPointToInstance(first);
         FastVector att  = new FastVector(first.getInputSpacePoint().numberDimensions()+1);
         int index=0;
         for(String s:first.getInputSpacePoint().getKeysAsCollection())

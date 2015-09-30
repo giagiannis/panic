@@ -10,7 +10,7 @@ import gr.ntua.ece.cslab.panic.beans.rest.ApplicationInfo;
 import gr.ntua.ece.cslab.panic.client.conf.ClientConfiguration;
 import java.io.StringWriter;
 import javax.xml.bind.JAXB;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+//import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *
@@ -60,13 +60,13 @@ public class Main {
                     System.out.println(info);
                     break;
                 case "show":
-                    throw new NotImplementedException();
+//                    throw new NotImplementedException();
                 case "batch-train":
-                    throw new NotImplementedException();
+//                    throw new NotImplementedException();
                 case "start-profiling":
-                    throw new NotImplementedException();
+//                    throw new NotImplementedException();
                 case "stop-profiling":
-                    throw new NotImplementedException();
+//                    throw new NotImplementedException();
                 default:
                     System.err.println("Usage: application <command>\n"
                             + "\tCommand may be one of: "

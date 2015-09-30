@@ -23,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 /**
  * Represents a multidimensional point. The dimensions are indexed using a key

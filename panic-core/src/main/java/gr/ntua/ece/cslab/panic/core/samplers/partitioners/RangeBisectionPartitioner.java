@@ -2,7 +2,7 @@ package gr.ntua.ece.cslab.panic.core.samplers.partitioners;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
-import java.util.Collections;
+//import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -77,11 +77,11 @@ public class RangeBisectionPartitioner {
     }
 
     // private methods
-    private Double getMedianElement(List<Double> list) {
-        Collections.sort(list);
-        double median = list.get(list.size() / 2);
-        return median;
-    }
+//    private Double getMedianElement(List<Double> list) {
+//        Collections.sort(list);
+//        double median = list.get(list.size() / 2);
+//        return median;
+//    }
 
     private List<Double> getLeftSublist(List<Double> list) {
         int mean = list.size()/2;

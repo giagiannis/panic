@@ -118,17 +118,17 @@ public class GlobalMetrics {
         return sum;
     }
     
-    private double findSSReg(double mean) throws Exception {
-        double sum=0.0;
-        for(OutputSpacePoint p : this.objective) {
-            for (InputSpacePoint in : this.sampled) {
-                if(p.getInputSpacePoint().equals(in)){
-                    sum+=Math.pow(this.m.getPoint(in).getValue()-mean,2);
-                }
-            }
-        }
-        return sum;
-    }
+//    private double findSSReg(double mean) throws Exception {
+//        double sum=0.0;
+//        for(OutputSpacePoint p : this.objective) {
+//            for (InputSpacePoint in : this.sampled) {
+//                if(p.getInputSpacePoint().equals(in)){
+//                    sum+=Math.pow(this.m.getPoint(in).getValue()-mean,2);
+//                }
+//            }
+//        }
+//        return sum;
+//    }
     
     private double findSSRes(double mean) throws Exception {
         double sum=0.0;

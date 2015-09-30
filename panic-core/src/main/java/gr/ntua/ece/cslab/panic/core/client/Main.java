@@ -46,7 +46,7 @@ public class Main extends Benchmark {
         int experimentId = dbClient.insertExperiment(samplingRate, fullPath, configurations.toString());
         
         System.out.format("Experiment id: %d\n", experimentId);
-        List<ExecutionThread> threads = new LinkedList<>();
+//        List<ExecutionThread> threads = new LinkedList<>();
         for (Sampler s : samplers) {
             instantiateModels();
 //            Model[] localModels = new Model[models.length];

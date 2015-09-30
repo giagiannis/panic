@@ -11,7 +11,8 @@ import java.util.List;
  * @author Giannis Giannakopoulos
  */
 public class InputSpacePointList implements Serializable {
-    private List<InputSpacePoint> list;
+	private static final long serialVersionUID = 1L;
+	private List<InputSpacePoint> list;
 
     // getters and setters
     public InputSpacePointList() {

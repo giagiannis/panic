@@ -69,6 +69,7 @@ public class CSVFileManager {
             this.numberOfInputDimensions = this.dimensionNames.length - 1;
             this.outputDimensionIndex = this.dimensionNames.length - 1;
             this.hashMap = new HashMap<>();
+            reader.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(CSVFileManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

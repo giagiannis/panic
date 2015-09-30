@@ -76,7 +76,7 @@ public class Application {
     	}
     }
 
-    // batch train
+    // batch profile: models, samplers
     @POST
     @Path("{id}/batch-profile/")
     public void batchProfile(@PathParam("id") String id) {
@@ -88,19 +88,4 @@ public class Application {
     public void batchTraing(@PathParam("id") String id) {
         
     }
-
-    // FUTURE PLANS -  used for online usage
-    // start profiling for online usage
-//    @POST
-//    @Path("{id}/start/")
-//    public void startProfiling() {
-//
-//    }
-//
-//    // stop profiling for online usage
-//    @POST
-//    @Path("{id}/stop/")
-//    public void stopProfiling() {
-//
-//    }
 }

@@ -7,7 +7,6 @@ import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.LatinHypercubeSampler;
-import gr.ntua.ece.cslab.panic.core.samplers.TotalOrderingSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.partitioners.RangeBisectionPartitioner;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;

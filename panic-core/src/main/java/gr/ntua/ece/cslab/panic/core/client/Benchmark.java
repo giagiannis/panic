@@ -106,6 +106,7 @@ public class Benchmark {
             }
         }
 
+        @SuppressWarnings("unchecked")
         Class<? extends Model>[] modelsDiscovered = new Class[list.size()];
 
         int i = 0;
@@ -232,7 +233,7 @@ public class Benchmark {
             models = new Model[classNames.length];
             for (int i = 0; i < classNames.length; i++) {
                 String modelFound = classNames[i];
-                for (Class f : modelsList) {
+                for (Class<? extends Model> f : modelsList) {
                     if (f.getCanonicalName().endsWith("." + classNames[i])) {
                         modelFound = f.getCanonicalName();
                     }
@@ -256,7 +257,7 @@ public class Benchmark {
             List<Sampler> samplersListToArray = new LinkedList<>();
             for (String className : samplersArgs) {
                 String classFound = className;
-                for (Class f : samplersList) {
+                for (Class<? extends Sampler> f : samplersList) {
                     if (f.getCanonicalName().endsWith("." + className)) {
                         classFound = f.getCanonicalName();
                     }
