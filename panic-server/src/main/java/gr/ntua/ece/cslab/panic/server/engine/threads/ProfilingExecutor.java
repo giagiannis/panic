@@ -5,9 +5,9 @@ import gr.ntua.ece.cslab.panic.server.engine.JobType;
 
 public class ProfilingExecutor extends Thread{
 	
-	private String threadId;
-	private JobType jobType;
-	private JobStatus jobStatus;
+	protected String threadId;
+	protected JobType jobType;
+	protected JobStatus jobStatus;
 	
 	public ProfilingExecutor() {
 		

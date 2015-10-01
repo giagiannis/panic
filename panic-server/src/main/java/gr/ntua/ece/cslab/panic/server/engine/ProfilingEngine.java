@@ -6,7 +6,7 @@ public interface ProfilingEngine {
 	 * Creates a new profiling job. 
 	 * @param job
 	 */
-	public void submitJob(ProfilingEngineJob job);
+	public void submitJob(ProfilingEngineJobInfo job);
 	
 	/**
 	 * Returns the state of profiling job.
