@@ -6,7 +6,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 @Path("server/")
-public class Server {
+public class ServerResource {
 	
 	@GET
 	@Path("")

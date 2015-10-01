@@ -32,7 +32,7 @@ import javax.ws.rs.WebApplicationException;
  * @author Giannis Giannakopoulos
  */
 @Path("application/")
-public class Application {
+public class ApplicationResource {
 
     // get the list of applications
     @GET
@@ -82,6 +82,7 @@ public class Application {
     public void batchProfile(@PathParam("id") String id) {
 
     }
+    
     
     @POST
     @Path("{id}/batch-train/")

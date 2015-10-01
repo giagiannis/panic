@@ -25,7 +25,7 @@ import javax.ws.rs.PathParam;
  * @author Giannis Giannakopoulos
  */
 @Path("/profiling/")
-public class Profiling {
+public class ProfilingResource {
     
     @GET
     @Path("{id}/status/")
