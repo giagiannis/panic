@@ -5,9 +5,10 @@
  */
 package gr.ntua.ece.cslab.panic.beans.lists;
 
-import gr.ntua.ece.cslab.panic.beans.rest.ApplicationInfo;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import gr.ntua.ece.cslab.panic.beans.api.ApplicationInfo;
 
 /**
  *

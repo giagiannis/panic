@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package gr.ntua.ece.cslab.panic.beans.rest;
+package gr.ntua.ece.cslab.panic.beans.api;
 
 import gr.ntua.ece.cslab.panic.beans.containers.DeploymentSpace;
 import java.io.Serializable;
