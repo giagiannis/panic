@@ -6,7 +6,8 @@
 package gr.ntua.ece.cslab.panic.client;
 
 import gr.ntua.ece.cslab.panic.beans.lists.ApplicationInfoList;
-import gr.ntua.ece.cslab.panic.beans.rest.ApplicationInfo;
+import gr.ntua.ece.cslab.panic.beans.api.ApplicationInfo;
+import gr.ntua.ece.cslab.panic.beans.api.ProfilingJobInfo;
 import gr.ntua.ece.cslab.panic.client.conf.ClientConfiguration;
 
 import java.io.StringReader;
@@ -88,10 +89,32 @@ public class ApplicationClient extends AbstractClient {
     	return true;
     }
     
+    /**
+     * Creates a new profile
+     * @param id
+     * @param profilingJobInfo
+     * @return
+     */
+    public ProfilingJobInfo profile(String id, ProfilingJobInfo profilingJobInfo) {
+    	String returnValue;
+    	try {
+    		StringWriter writer = new StringWriter();
+    		JAXB.marshal(profilingJobInfo, writer);
+    		returnValue = this.issueRequest("POST", APPLICATION_ROOT_URL+id+"/profile/", writer.toString());
+    	} catch (Exception e) {
+    		return null;
+    	}
+    	StringReader reader  = new StringReader(returnValue);
+    	return JAXB.unmarshal(reader, ProfilingJobInfo.class);
+    }
+    
     
     public static void main(String[] args) throws Exception {
         ApplicationClient client = new ApplicationClient();
         client.setConfiguration(new ClientConfiguration("localhost", 9999));
         System.out.println(client.listApplications().getApplications());
+//        BatchTrainParameters params  = new BatchTrainParameters();
+//        params.getSamples().getList().add(e)
+//        client.batchTrain("5669b2fa-2fd8-4d44-b675-5f0d7571251e", );
     }
 }

@@ -1,0 +1,12 @@
+#!/bin/bash
+# This script is used to handle the PANIC server
+
+# the default classpath of the execution
+
+[ -z "$PANIC_SERVER_HOME" ] && PANIC_SERVER_HOME="."
+CLASSPATH="$PANIC_SERVER_HOME/classes:$(ls $PANIC_SERVER_HOME/lib/*| tr '\n' ':' )$PANIC_SERVER_HOME/conf"
+
+[ -z "$MAIN_CLASS" ] && MAIN_CLASS="gr.ntua.ece.cslab.panic.server.Main"
+
+# executable
+java -cp $CLASSPATH $MAIN_CLASS

@@ -9,8 +9,7 @@ import java.util.logging.Logger;
  * @author Giannis Giannakopoulos
  */
 public class RandomCommittee extends AbstractWekaModel{
-    
-    
+	
     public RandomCommittee() {
         super();
         this.classifier = new weka.classifiers.meta.RandomCommittee();

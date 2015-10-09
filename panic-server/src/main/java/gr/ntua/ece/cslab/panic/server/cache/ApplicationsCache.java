@@ -5,8 +5,9 @@
  */
 package gr.ntua.ece.cslab.panic.server.cache;
 
+import gr.ntua.ece.cslab.panic.beans.api.ApplicationInfo;
 import gr.ntua.ece.cslab.panic.beans.containers.DeploymentSpace;
-import gr.ntua.ece.cslab.panic.beans.rest.ApplicationInfo;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;

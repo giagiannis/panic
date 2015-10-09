@@ -5,8 +5,8 @@
  */
 package gr.ntua.ece.cslab.panic.client;
 
+import gr.ntua.ece.cslab.panic.beans.api.ApplicationInfo;
 import gr.ntua.ece.cslab.panic.beans.containers.DeploymentSpace;
-import gr.ntua.ece.cslab.panic.beans.rest.ApplicationInfo;
 import gr.ntua.ece.cslab.panic.client.conf.ClientConfiguration;
 import java.io.StringWriter;
 import javax.xml.bind.JAXB;

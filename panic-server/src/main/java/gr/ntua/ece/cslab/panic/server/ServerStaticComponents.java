@@ -16,14 +16,18 @@
 package gr.ntua.ece.cslab.panic.server;
 
 import java.util.Properties;
+
 import org.eclipse.jetty.server.Server;
+
+import gr.ntua.ece.cslab.panic.server.engine.ProfilingEngine;
 
 /**
  *
  * @author giannis
  */
-class ServerStaticComponents {
-    static Properties properties;
-    static Server server;
+public class ServerStaticComponents {
+    public static Properties properties;
+    public static Server server;
+    public static ProfilingEngine engine;
     
 }
