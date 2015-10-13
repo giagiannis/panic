@@ -18,6 +18,7 @@ package gr.ntua.ece.cslab.panic.server.rest;
 import gr.ntua.ece.cslab.panic.beans.api.ApplicationInfo;
 import gr.ntua.ece.cslab.panic.beans.api.ProfilingJobInfo;
 import gr.ntua.ece.cslab.panic.beans.lists.ApplicationInfoList;
+import gr.ntua.ece.cslab.panic.server.ServerStaticComponents;
 import gr.ntua.ece.cslab.panic.server.cache.ApplicationsCache;
 
 import javax.ws.rs.DELETE;
@@ -67,7 +68,6 @@ public class ApplicationResource {
     @DELETE
     @Path("{id}/")
     public void deleteApplication(@PathParam("id") String id) {
-    	System.err.println("Delete application called "+ id);
     	if(ApplicationsCache.deleteApplication(id)) {
     		System.err.println("Found");
     		throw new WebApplicationException(200);
@@ -75,30 +75,13 @@ public class ApplicationResource {
     		System.err.println("Not Found");
     		throw new WebApplicationException(404);
     	}
-    }
-
-//    // batch profile: models, samplers
-//    @POST
-//    @Path("{id}/batch-profile/")
-//    public void batchProfile(@PathParam("id") String id) {
-//
-//    }
-//    
-//    
-//    @POST
-//    @Path("{id}/batch-train/")
-//    public ProfilingJobInfo batchTraing(@PathParam("id") String id, BatchTrainParameters parameters) {
-////    	ServerStaticComponents.engine.submitJob();
-//    	System.err.println(parameters);
-//    	ProfilingJobInfo info = new ProfilingJobInfo();
-//    	return info;
-//    }
-    
+    }    
     
     @POST
     @Path("{id}/profile/")
     public ProfilingJobInfo profile(@PathParam("id") String applicationId, ProfilingJobInfo profilingInfo) {
-    	// FIXME: Implement the code for the profiling engine first
-    	return new ProfilingJobInfo();
+    	String id=ServerStaticComponents.engine.submitJob(ApplicationsCache.getApplication(applicationId), profilingInfo);
+    	profilingInfo.setId(id);
+    	return profilingInfo;
     }
 }
