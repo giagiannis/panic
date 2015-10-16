@@ -100,9 +100,11 @@ public class Main extends Benchmark {
                 index = m.getClass().getCanonicalName().lastIndexOf('.');
                 String modelShortName = m.getClass().getCanonicalName().substring(index+1);
                 
-                dbClient.insertModelPredictions(experimentId, modelShortName, samplerShortName, m.getPoints(file.getInputSpacePoints()));
-                GlobalMetrics metrics = new GlobalMetrics(file.getOutputSpacePoints(), m, picked);
+                if(savePredictions) {
+                	dbClient.insertModelPredictions(experimentId, modelShortName, samplerShortName, m.getPoints(file.getInputSpacePoints()));
+                }
                 
+                GlobalMetrics metrics = new GlobalMetrics(file.getOutputSpacePoints(), m, picked);
                 dbClient.insertExperimentMetrics(experimentId, modelShortName, samplerShortName,
                         metrics.getMSE(), metrics.getAverageError(), metrics.getDeviation(), metrics.getR());
             }

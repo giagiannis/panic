@@ -7,7 +7,6 @@
 # description: this script is used to debug panic core algorithms
 
 
-
 # classpath extraction
 export CLASSPATH="$(echo ${PWD}/target/lib/* | tr ' ' ':')"
 #export JAR=$(echo target/*.jar)

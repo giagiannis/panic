@@ -112,6 +112,22 @@ module Panic
       end
     end
 
+    class LogFunction < Function
+	    def initialize coefficients
+		    super()
+		    @coefficients = coefficients
+	    end
+
+
+	    def evaluate_expression vector
+		    sum = 0
+		    @coefficients.length.times{ |index|
+			    sum+=@coefficients[index]*vector[index]
+		    }
+		    return  Math.log(sum)
+	    end
+    end
+
   end
 end
 

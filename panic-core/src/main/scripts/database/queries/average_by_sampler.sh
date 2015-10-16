@@ -2,10 +2,11 @@
 
 # first argument is experiment id
 
-[ $# -lt 1 ] && echo "Need experiment_id as first argument!" && exit 1
+[ $# -lt 2 ] && echo "Need database_bame and experiment_id as first and second arguments!" && exit 1
 
-EXPERIMENT_ID=$1
-[ -z "$DATABASE"] && DATABASE="foo.db"
+
+DATABASE=$1
+EXPERIMENT_ID=$2
 
 echo "Experiment details"
 echo "=================="

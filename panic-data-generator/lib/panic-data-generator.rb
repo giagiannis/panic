@@ -49,6 +49,8 @@ elsif options[:type]=="gauss"
   a = GaussFunction.new conv
 elsif options[:type]=="linear"
   a = LinearFunction.new conv
+elsif options[:type]=="log"
+  a = LogFunction.new conv
 end
 
 a.noise_amplitude=options[:noise].to_f

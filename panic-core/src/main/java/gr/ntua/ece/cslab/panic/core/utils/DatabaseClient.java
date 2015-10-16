@@ -26,6 +26,8 @@ public class DatabaseClient {
 
     private String databaseName;
     private Connection connection;
+    
+    private String username, password, databaseHost="localhost";
 
     // constructor, getters and setters
     public DatabaseClient() {
@@ -39,7 +41,32 @@ public class DatabaseClient {
         this.databaseName = databaseName;
     }
 
-    // methods to manage connections and DB
+    public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	
+	public String getDatabaseHost() {
+		return databaseHost;
+	}
+
+	public void setDatabaseHost(String databaseHost) {
+		this.databaseHost = databaseHost;
+	}
+
+	// methods to manage connections and DB
     /**
      * Opens a new connection to the specified database.
      *
@@ -47,9 +74,16 @@ public class DatabaseClient {
      */
     public boolean openConnection() {
         try {
-            Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection("jdbc:sqlite:" + this.databaseName);
-            this.connection.setAutoCommit(false);
+        	if(this.username.equals("") && this.password.equals("")) {
+        		Class.forName("org.sqlite.JDBC");
+        		this.connection = DriverManager.getConnection("jdbc:sqlite:" + this.databaseName);
+            	this.connection.setAutoCommit(false);
+        	} else { // MySQL
+        		Class.forName("com.mysql.jdbc.Driver");
+        		System.out.println("jdbc:mysql://"+databaseHost+":3306/"+databaseName+"?user="+this.username+"&password="+this.password);
+        		this.connection = DriverManager.getConnection("jdbc:mysql://"+databaseHost+":3306/"+databaseName+"?user="+this.username+"&password="+this.password);
+        		this.connection.setAutoCommit(false);
+        	}
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(DatabaseClient.class.getName()).log(Level.SEVERE, null, ex);
             return false;
@@ -88,12 +122,13 @@ public class DatabaseClient {
             String sql = "INSERT INTO experiments "
                     + "(experiment_date, experiment_time, sampling_rate, input_file, configurations) "
                     + "VALUES "
-                    + "(DATE(), TIME(), %.5f, '%s', '%s');";
+                    + "(DATE(NOW()), TIME(NOW()), %.5f, '%s', '%s');";
             String sqlQuery = String.format(sql, samplingRate, inputFile, configurations);
             Statement stmt = this.connection.createStatement();
-            stmt.executeUpdate(sqlQuery);
-            stmt.getGeneratedKeys().next();
-            int id = stmt.getGeneratedKeys().getInt(1);
+            stmt.executeUpdate(sqlQuery, Statement.RETURN_GENERATED_KEYS);
+	    ResultSet rs=stmt.getGeneratedKeys();
+	    rs.next();
+            int id = rs.getInt(1);
             this.connection.commit();
             return id;
         } catch (SQLException ex) {

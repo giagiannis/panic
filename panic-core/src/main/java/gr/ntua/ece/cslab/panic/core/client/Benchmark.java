@@ -49,6 +49,7 @@ public class Benchmark {
     protected static CommandLine cmd;
     protected static DatabaseClient dbClient;
     protected static HashMap<String, String> configurations = new HashMap<>();
+	protected static boolean savePredictions=true;
 
     /**
      * Method used to setup the commons-cli argument parsing. Each implemented
@@ -83,7 +84,10 @@ public class Benchmark {
         options.getOption("o").setArgName("output");
         
         
-        options.addOption("db", "database", true, "saves the results into a database (sqlite)");
+        options.addOption("db", "database", true, "saves the results into a database (sqlite/mysql)");
+        options.addOption("", "db-user", true, "define the MySQL user");
+        options.addOption("", "db-pass", true, "define the MySQL password");
+        options.addOption("", "db-host", true, "define the MySQL host");
         options.addOption(null, "skip-metrics", false, "do not save the metrics");
         options.addOption(null, "skip-samples", false, "do not save the chosen samples");
         options.addOption(null, "skip-predictions", false, "do not save the models' predictions");
@@ -202,7 +206,16 @@ public class Benchmark {
             System.err.println("Need database connection! (sqlite file)");
             System.exit(1);
         }  else {
-            dbClient = new DatabaseClient();
+        	dbClient = new DatabaseClient();
+        	if(cmd.hasOption("db-user")) {
+        		dbClient.setUsername(cmd.getOptionValue("db-user"));
+        	}
+        	if(cmd.hasOption("db-pass")) {
+        		dbClient.setPassword(cmd.getOptionValue("db-pass"));
+        	}
+        	if(cmd.hasOption("db-host")) {
+        		dbClient.setDatabaseHost(cmd.getOptionValue("db-host"));
+        	}
             dbClient.setDatabaseName(cmd.getOptionValue("db"));
             if(!dbClient.openConnection()) {
                 System.err.println("Could not open db! Exiting..");
@@ -217,6 +230,10 @@ public class Benchmark {
                 String[] array=c.split(":");
                 configurations.put(array[0], array[1]);
             }
+        }
+        
+        if(cmd.hasOption("skip-predictions")) {
+        	savePredictions = false;
         }
         
         
