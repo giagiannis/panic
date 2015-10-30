@@ -17,6 +17,7 @@ package gr.ntua.ece.cslab.panic.core.client;
 
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
+import gr.ntua.ece.cslab.panic.core.samplers.budget.AbstractBudgetStrategy;
 import gr.ntua.ece.cslab.panic.core.utils.DatabaseClient;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -78,6 +79,7 @@ public class Benchmark {
 
         options.addOption("lm", "list-models", false, "lists the available models");
         options.addOption("ls", "list-samplers", false, "lists the available samplers");
+        options.addOption("lb", "list-budget", false, "lists the available budget strategies");
         
         options.addOption("mo", "metrics-output", true, "<deprecated> if specifed, redirects the metrics to an SQLite database (must be created)");
         options.addOption("o", "output", true, "<deprecated> define the output file\ndefault: stdout");
@@ -85,15 +87,14 @@ public class Benchmark {
         
         
         options.addOption("db", "database", true, "saves the results into a database (sqlite/mysql)");
-        options.addOption("", "db-user", true, "define the MySQL user");
-        options.addOption("", "db-pass", true, "define the MySQL password");
-        options.addOption("", "db-host", true, "define the MySQL host");
+        options.addOption(null, "db-user", true, "define the MySQL user");
+        options.addOption(null, "db-pass", true, "define the MySQL password");
+        options.addOption(null, "db-host", true, "define the MySQL host");
         options.addOption(null, "skip-metrics", false, "do not save the metrics");
         options.addOption(null, "skip-samples", false, "do not save the chosen samples");
         options.addOption(null, "skip-predictions", false, "do not save the models' predictions");
         
         options.addOption("c", "configuration", true, "passes configuration parameters to the samplers/models");
-
     }
 
     /**
@@ -142,6 +143,29 @@ public class Benchmark {
         }
         return samplersDiscovered;
     }
+    
+    /**
+     * Use reflections to retrieve the supported samplers inside the classpath.
+     *
+     * @return
+     */
+    public static Class<? extends AbstractBudgetStrategy>[] discoverBudgetStrategies() {
+        List<Class<? extends AbstractBudgetStrategy>> list = new ArrayList<>();
+        Reflections reflections = new Reflections("gr.ntua.ece.cslab");
+        for (Class<? extends AbstractBudgetStrategy> c : reflections.getSubTypesOf(AbstractBudgetStrategy.class)) {
+            if (!c.getName().toLowerCase().contains("abstract")) {
+                list.add(c);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        Class<? extends AbstractBudgetStrategy>[] budgetStrategiesDiscovered = new Class[list.size()];
+        int i = 0;
+        for (Class<? extends AbstractBudgetStrategy> c : list) {
+            budgetStrategiesDiscovered[i++] = c;
+        }
+        return budgetStrategiesDiscovered;
+    }
 
     /**
      * Method used to configure the benchmarking tool in order to set the
@@ -180,6 +204,13 @@ public class Benchmark {
                 System.out.format("%s\t(%s)\n", className, shortName);
             }
             System.exit(1);
+        }
+        if(cmd.hasOption("list-budget")) {
+        	for(Class<? extends AbstractBudgetStrategy> c:  discoverBudgetStrategies()) {
+                String className = c.getCanonicalName();
+                System.out.format("%s\n", className);
+        	}
+        	System.exit(1);
         }
 
         if (cmd.hasOption("i")) {

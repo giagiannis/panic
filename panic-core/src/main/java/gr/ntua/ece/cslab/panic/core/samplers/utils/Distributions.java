@@ -18,7 +18,14 @@ public class Distributions {
      * @param toIndex
      * @return 
      */
-    public static int getRandomIndex(int fromIndex, int toIndex) {
+    public static int getUniformIndex(int fromIndex, int toIndex) {
         return random.nextInt(toIndex-fromIndex)+fromIndex;
+    }
+    
+    
+    public static int getGaussIndex(int fromIndex, int toIndex) {
+    	double index=(random.nextGaussian()+3.0)/6.0;
+    	return (int)Math.round(index*(toIndex-fromIndex)+fromIndex);
+    	
     }
 }

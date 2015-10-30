@@ -1,17 +1,21 @@
 package gr.ntua.ece.cslab.panic.core.samplers.special;
 
-
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractSampler;
+import gr.ntua.ece.cslab.panic.core.samplers.GridSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.LatinHypercubeSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.TotalOrderingSampler;
+import gr.ntua.ece.cslab.panic.core.samplers.budget.AbstractBudgetStrategy;
+import gr.ntua.ece.cslab.panic.core.samplers.budget.ConstantBudgetStrategy;
+import gr.ntua.ece.cslab.panic.core.samplers.budget.ConstantTreeLevelMultiplierBudgetStrategy;
 import gr.ntua.ece.cslab.panic.core.samplers.partitioners.RangeBisectionPartitioner;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;
+import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTree;
+
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -23,104 +27,173 @@ import java.util.logging.Logger;
  */
 public class BiasedPCASampler extends AbstractAdaptiveSampler {
 
-    private AbstractSampler unbiasedSampler;
-    private TotalOrderingSampler biasedSampler;
-    private Integer numberOfPhases = 4;
-    private Integer samplesPerPhase;
+	private AbstractSampler unbiasedSampler;
+	private AbstractSampler biasedSampler;
+	private AbstractBudgetStrategy budgetStrategy;
+	private final RegionTree regionTree;
 
-    private final List<HashMap<String, List<Double>>> rangesToExamine;
-    private final List<HashMap<String, List<Double>>> rangesExamined;
-    private HashMap<String, List<Double>> currentRanges;
+	// params
+	private String biasedSamplerClassName;
 
-    public BiasedPCASampler() {
-        super();
-        this.rangesToExamine = new LinkedList<>();
-        this.rangesExamined = new LinkedList<>();
-    }
+	public BiasedPCASampler() {
+		super();
+		this.regionTree = new RegionTree();
+	}
 
-    public Integer getNumberOfPhases() {
-        return numberOfPhases;
-    }
+	@Override
+	public void configureSampler() {
+		super.configureSampler();
 
-    public void setNumberOfPhases(Integer numberOfPhases) {
-        this.numberOfPhases = numberOfPhases;
-    }
+		this.regionTree.addChild(this.ranges);
+		this.regionTree.next();
 
-    @Override
-    public void configureSampler() {
-        super.configureSampler();
+		String budgetStrategyName = "gr.ntua.ece.cslab.panic.core.samplers.budget.ConstantTreeLevelMultiplierBudgetStrategy";
+		if (this.configuration.containsKey("budget.strategy")) {
+			budgetStrategyName = this.configuration.get("budget.strategy");
+		}
+		this.configureBudgetStrategy(budgetStrategyName);
+		this.configureUnbiasedSampler();
 
-        if (this.configuration.containsKey("samplesPerPhase")) {
-            this.samplesPerPhase = new Integer(this.configuration.get("samplesPerPhase"));
-        } else {
-            this.samplesPerPhase = (int) Math.round((this.maxChoices * this.samplingRate) / this.numberOfPhases);
-        }
-        this.unbiasedSampler = new LatinHypercubeSampler();
-        this.unbiasedSampler.setDimensionsWithRanges(this.ranges);
-        this.unbiasedSampler.setPointsToPick(samplesPerPhase);
-        this.unbiasedSampler.configureSampler();
-        this.currentRanges = this.ranges;
-//        System.out.println(this.configuration);
-//        System.out.println("samplesPerPhase: "+this.configuration.get("samplesPerPhase"));
-//        }
-    }
+		if (this.configuration.containsKey("biased.sampler")) {
+			this.biasedSamplerClassName = this.configuration.get("biased.sampler");
+		} else {
+			this.biasedSamplerClassName = "gr.ntua.ece.cslab.panic.core.samplers.GridSampler";
+		}
+	}
 
-    @Override
-    public InputSpacePoint next() {
-        super.next();
-        InputSpacePoint sample;
-        if (this.unbiasedSampler.hasMore()) {
-            sample = this.unbiasedSampler.next();
-        } else if (this.biasedSampler != null && this.biasedSampler.hasMore()) {
-            sample = this.biasedSampler.next();
-        } else {
-            // revalidation phase
-//            System.out.println("=== Configuration");
-            LoadingsAnalyzer analyzer = this.performPCA(this.currentRanges);
-            String[] ordering = analyzer.getInputDimensionsOrder();
-            
-            RangeBisectionPartitioner partitioner = new RangeBisectionPartitioner();
-            partitioner.setRanges(this.currentRanges);
-            partitioner.setDimensionKey(ordering[0]);
-            partitioner.configure();
-            
-            if(partitioner.getHigherRegionRanges()!=null && RangeBisectionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegionRanges()).size()>=this.ranges.size()) {
-                this.rangesToExamine.add(partitioner.getHigherRegionRanges());
-            }
-            
-            if(partitioner.getLowerRegionRanges()!=null && RangeBisectionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegionRanges()).size()>=this.ranges.size()) {
-                this.rangesToExamine.add(partitioner.getLowerRegionRanges());
-            }
+	@Override
+	public InputSpacePoint next() {
+		super.next();
+		InputSpacePoint sample;
+		if (this.unbiasedSampler.hasMore()) {
+			sample = this.unbiasedSampler.next();
+		} else if (this.biasedSampler != null && this.biasedSampler.hasMore()) {
+			sample = this.biasedSampler.next();
+		} else {
+			// revalidation phase
+			this.splitRegion();
+			this.regionTree.next();
+			this.configureBiasedSampler();
+			sample = this.biasedSampler.next();
+		}
+		return sample;
+	}
 
+	private void configureUnbiasedSampler() {
+		this.unbiasedSampler = new LatinHypercubeSampler();
+		this.unbiasedSampler.setDimensionsWithRanges(this.ranges);
+		this.unbiasedSampler.setPointsToPick(this.budgetStrategy.estimateBudget(this.regionTree.getCurrent()));
+		this.unbiasedSampler.configureSampler();
+	}
 
-            this.rangesExamined.add(this.currentRanges);
-            this.currentRanges = this.rangesToExamine.remove(0);
-            LoadingsAnalyzer newAnalyzer = this.performPCA(this.currentRanges);
+	private void configureBiasedSampler() {
+		LoadingsAnalyzer analyzer = this.performPCA(this.regionTree.getCurrent().getRegion());
+		try {
+			this.biasedSampler = (AbstractSampler) Class.forName(biasedSamplerClassName).newInstance();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		this.biasedSampler.setDimensionsWithRanges(this.regionTree.getCurrent().getRegion());
 
-            this.biasedSampler = new TotalOrderingSampler();
-            this.biasedSampler.setDimensionsWithRanges(this.currentRanges);
-            this.biasedSampler.setDimensionOrdering(newAnalyzer.getInputDimensionsOrder());
-            this.biasedSampler.setPointsToPick(this.samplesPerPhase);
-            this.biasedSampler.configureSampler();
-            sample = this.biasedSampler.next();
-        }
-        return sample;
-    }
+		if (this.biasedSampler instanceof TotalOrderingSampler) {
+			((TotalOrderingSampler) this.biasedSampler).setDimensionOrdering(analyzer.getInputDimensionsOrder());
+		} else if (this.biasedSampler instanceof GridSampler) {
+			HashMap<String, Double> coefficients = new HashMap<>();
+			for (int i = 0; i < analyzer.getDimensionLabels().length - 1; i++) {
+				double distance = (analyzer.getAngle(i) <= 90 ? analyzer.getDistance(i)
+						: analyzer.getDistanceSymmetric(i));
+				String label = analyzer.getDimensionLabels()[i];
+				if (distance == 0.0) {
+					System.err.println("Distance for " + label + " is zero!");
+					distance = 1.0;
+				}
+				coefficients.put(label, 1.0 / distance);
+			}
+			((GridSampler) this.biasedSampler).setWeights(coefficients);
+		}
+		this.biasedSampler.setPointsToPick(this.budgetStrategy.estimateBudget(this.regionTree.getCurrent()));
+		this.biasedSampler.configureSampler();
 
-    private LoadingsAnalyzer performPCA(Map<String, List<Double>> currentRange) {
-        PrincipalComponentsAnalyzer analyzer = new PrincipalComponentsAnalyzer();
-        List<OutputSpacePoint> data = RangeBisectionPartitioner.filterPoints(outputSpacePoints, currentRange);
-        analyzer.setInputData(data);
-        try {
-            analyzer.calculateVarianceMatrix();
-            analyzer.calculateCorrelationMatrix();
-            analyzer.calculateBaseWithVarianceMatrix();
-        } catch (Exception ex) {
-            Logger.getLogger(BiasedPCASampler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        int numberOfPC = 2;
-        LoadingsAnalyzer loadingsAnalyzer = analyzer.getLoadingsAnalyzer(numberOfPC);
-        loadingsAnalyzer.setPcWeights(analyzer.getPCWeights());
-        return loadingsAnalyzer;
-    }
+	}
+
+	private void configureBudgetStrategy(String budgetStrategyName) {
+		try {
+			this.budgetStrategy = (AbstractBudgetStrategy) Class.forName(budgetStrategyName).newInstance();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		this.budgetStrategy.setRegionTree(this.regionTree);
+		this.budgetStrategy.setDeploymentBudget(this.pointsToPick);
+
+		if (this.budgetStrategy instanceof ConstantTreeLevelMultiplierBudgetStrategy) {
+			Integer treeLength = 0;
+			if (this.configuration.containsKey("tree.length")) {
+				treeLength = new Integer(this.configuration.get("tree.length"));
+			} else {
+				System.err.println("tree.length must be set!!");
+				System.exit(1);
+			}
+			Double treeCoefficient = 0.0;
+			if (this.configuration.containsKey("tree.coefficient")) {
+				treeCoefficient = new Double(this.configuration.get("tree.coefficient"));
+			} else {
+				System.err.println("tree.coefficient to be set!!");
+				System.exit(1);
+			}
+			((ConstantTreeLevelMultiplierBudgetStrategy) this.budgetStrategy).setTreeCoefficient(treeCoefficient);
+			((ConstantTreeLevelMultiplierBudgetStrategy) this.budgetStrategy).setTreeLength(treeLength);
+		} else if (this.budgetStrategy instanceof ConstantBudgetStrategy) {
+			Integer constantBudget = 0;
+			if (this.configuration.containsKey("budget.constant")) {
+				constantBudget = new Integer(this.configuration.get("budget.constant"));
+			} else {
+				System.err.println("budget.constant must be set!!");
+				System.exit(1);
+			}
+			((ConstantBudgetStrategy) this.budgetStrategy).setConstantBudget(constantBudget);
+		}
+		
+		this.budgetStrategy.configure();
+	}
+
+	private void splitRegion() {
+		LoadingsAnalyzer analyzer = this.performPCA(this.regionTree.getCurrent().getRegion());
+		String[] ordering = analyzer.getInputDimensionsOrder();
+
+		RangeBisectionPartitioner partitioner = new RangeBisectionPartitioner();
+		partitioner.setRanges(this.regionTree.getCurrent().getRegion());
+		partitioner.setDimensionKey(ordering[0]);
+		partitioner.configure();
+
+		if (partitioner.getHigherRegionRanges() != null
+				&& RangeBisectionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegionRanges())
+						.size() >= this.ranges.size()) {
+			this.regionTree.addChild(partitioner.getHigherRegionRanges());
+		}
+
+		if (partitioner.getLowerRegionRanges() != null
+				&& RangeBisectionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegionRanges())
+						.size() >= this.ranges.size()) {
+			this.regionTree.addChild(partitioner.getLowerRegionRanges());
+		}
+	}
+
+	private LoadingsAnalyzer performPCA(Map<String, List<Double>> currentRange) {
+		PrincipalComponentsAnalyzer analyzer = new PrincipalComponentsAnalyzer();
+		List<OutputSpacePoint> data = RangeBisectionPartitioner.filterPoints(outputSpacePoints, currentRange);
+		analyzer.setInputData(data);
+		try {
+			analyzer.calculateVarianceMatrix();
+			analyzer.calculateCorrelationMatrix();
+			// analyzer.calculateBaseWithVarianceMatrix();
+			analyzer.calculateBaseWithDataMatrix();
+		} catch (Exception ex) {
+			Logger.getLogger(BiasedPCASampler.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		int numberOfPC = 2;
+		LoadingsAnalyzer loadingsAnalyzer = analyzer.getLoadingsAnalyzer(numberOfPC);
+		loadingsAnalyzer.setPcWeights(analyzer.getPCWeights());
+		return loadingsAnalyzer;
+	}
 }

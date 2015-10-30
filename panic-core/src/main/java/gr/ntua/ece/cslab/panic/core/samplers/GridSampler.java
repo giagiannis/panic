@@ -55,6 +55,7 @@ public class GridSampler extends  AbstractSampler {
      */
     public void setWeights(HashMap<String, Double> coefficients) {
         this.coefficients = coefficients;
+        this.normalizeCoefficients();
     }
     
     /**
@@ -66,6 +67,7 @@ public class GridSampler extends  AbstractSampler {
     public void setWeights(String[] labels, double[] coefficients) {
         for(int i=0;i<coefficients.length;i++)
             this.coefficients.put(labels[i], coefficients[i]);
+        this.normalizeCoefficients();
     }
 
     public Set<InputSpacePoint> getForbiddenPoints() {
@@ -87,7 +89,9 @@ public class GridSampler extends  AbstractSampler {
         }
         HashMap<String, Double> cardinalities=this.calculateCardinalitiesPerDimension();
         HashMap<String, List<Double>> values = this.calculateValuesPerDimension(cardinalities);
+//        System.out.println(values);
         List<InputSpacePoint> gridPoints = this.powerset(values);
+//	System.out.println(gridPoints);
         gridPoints = this.removeForbiddenPoints(gridPoints);
         this.samples = this.removePoints(gridPoints);
     }
@@ -116,7 +120,7 @@ public class GridSampler extends  AbstractSampler {
         
         
         for(String s:cardinalities.keySet()) {
-            double pivot=1.0/(cardinalities.get(s)/this.ranges.get(s).size());
+            double pivot=1.0/((1.0*cardinalities.get(s))/this.ranges.get(s).size());
             double start = pivot/2.0;
             for(double i=0;i<this.ranges.get(s).size();i+=pivot){
                 if (!valuesPerDimension.containsKey(s)) {
@@ -135,23 +139,34 @@ public class GridSampler extends  AbstractSampler {
      */
     private HashMap<String, Double> calculateCardinalitiesPerDimension() {
         HashMap<String, Double> cardinalitiesPerDimension = new HashMap<>();
-        int pointsTotal = (int) Math.ceil(this.maxChoices*this.samplingRate);
-        double product = 1.0;
-        for(Map.Entry<String, Double> e : this.coefficients.entrySet()) {
-            Double value = e.getValue();
-            product *= value;
-        }
-        for(Map.Entry<String, List<Double>> e: this.ranges.entrySet()) {
-            int dimensionCardinality = e.getValue().size();
-            product *= dimensionCardinality;
-        }
+//        double product = 1.0;
+//        for(Map.Entry<String, Double> e : this.coefficients.entrySet()) {
+//            Double value = e.getValue();
+//            product *= value;
+//        }
+//        
+//        System.out.format("Points to pick: %d, points total: %.0f\n", pointsToPick, maxChoices*product);
+//        for(Map.Entry<String, List<Double>> e: this.ranges.entrySet()) {
+//            int dimensionCardinality = e.getValue().size();
+//            product *= dimensionCardinality;
+//        }
+//        System.out.format("Points to pick: %d, points total: %.0f\n", pointsTotal, product);
+//        double globalCoefficient = Math.pow(pointsTotal/product, 1.0/this.coefficients.size());
+//        double globalCoefficient = Math.pow((double)this.pointsToPick/(double)this.maxChoices, 1.0/this.coefficients.size());
+//        for(Map.Entry<String, Double> e : this.coefficients.entrySet()) {
+//            String key = e.getKey();
+//            Double value = e.getValue();
+//            if(this.ranges.get(key)==null){
+//            	System.exit(1);
+//            }
+//            Double points = value*globalCoefficient;//*this.ranges.get(key).size();
+//            System.out.println(e.getKey()+": "+points+ " points to pick");
+//            cardinalitiesPerDimension.put(key, points);
+//        }
         
-        double globalCoefficient = Math.pow(pointsTotal/product, 1.0/this.coefficients.size());
-        for(Map.Entry<String, Double> e : this.coefficients.entrySet()) {
-            String key = e.getKey();
-            Double value = e.getValue();
-            Double points = value*globalCoefficient*this.ranges.get(key).size();
-            cardinalitiesPerDimension.put(key, points);
+        double valuePerDimension = Math.pow(this.pointsToPick, 1.0/this.ranges.size());
+        for(String k : this.coefficients.keySet()) {
+        	cardinalitiesPerDimension.put(k, this.coefficients.get(k)*valuePerDimension);
         }
         return cardinalitiesPerDimension;
     }
@@ -264,5 +279,17 @@ public class GridSampler extends  AbstractSampler {
         }
         
     }
+    
+    private void normalizeCoefficients() {
+//    	System.out.print("Initial coefficients were: "+this.coefficients);
+    	double product = 1.0;
+    	for(Double v:this.coefficients.values()) {
+    			product*=v;
+    	}
+    	product=Math.pow(product, 1.0/this.coefficients.size());
+    	for(Map.Entry<String, Double> kv : this.coefficients.entrySet()) {
+    			this.coefficients.put(kv.getKey(), kv.getValue()/product);
+    	}
+//    	System.out.println("and became: "+this.coefficients);
+    }
 }
-

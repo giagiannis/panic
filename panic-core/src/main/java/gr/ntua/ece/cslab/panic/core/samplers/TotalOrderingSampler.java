@@ -19,6 +19,7 @@ public class TotalOrderingSampler extends AbstractAdaptiveSampler {
 
     public TotalOrderingSampler() {
         super();
+        Distributions.getGaussIndex(0,0);
     }
     
     public void setDimensionOrdering(String[] dimensions) {
@@ -47,7 +48,8 @@ public class TotalOrderingSampler extends AbstractAdaptiveSampler {
         double pivot = ((double) this.maxChoices) / numberOfSamplesToPick;
         for (double i = 0.0; i <= this.maxChoices - 1; i += pivot) {
             int fromIndex = (int) Math.round(i), toIndex = (int) Math.round(i + pivot);
-            InputSpacePoint point = this.getPointById(Distributions.getRandomIndex(fromIndex, toIndex));
+//            InputSpacePoint point = this.getPointById(Distributions.getUniformIndex(fromIndex, toIndex));
+            InputSpacePoint point = this.getPointById(Distributions.getGaussIndex(fromIndex, toIndex));
             this.futureSamples.add(point);
         }
         Collections.shuffle(this.futureSamples);
