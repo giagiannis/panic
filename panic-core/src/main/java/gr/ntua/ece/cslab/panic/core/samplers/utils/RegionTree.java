@@ -1,7 +1,7 @@
 package gr.ntua.ece.cslab.panic.core.samplers.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 /** 
@@ -14,7 +14,7 @@ public class RegionTree {
 	private int listIndex=-1;
 	
 	public RegionTree() {
-		this.list = new LinkedList<>();
+		this.list = new ArrayList<>();
 	}
 	
 	/**
