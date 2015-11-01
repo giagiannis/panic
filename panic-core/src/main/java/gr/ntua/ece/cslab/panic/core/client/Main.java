@@ -93,7 +93,9 @@ public class Main extends Benchmark {
             System.out.format("\tFlushing results to database... ");
             int index = s.getClass().getCanonicalName().lastIndexOf('.');
             String samplerShortName = s.getClass().getCanonicalName().substring(index+1);
-            dbClient.insertSampledPoints(experimentId, samplerShortName, picked);
+            if(saveSamples){
+            	dbClient.insertSampledPoints(experimentId, samplerShortName, picked);
+            }
             
             
             for(Model m : models) {

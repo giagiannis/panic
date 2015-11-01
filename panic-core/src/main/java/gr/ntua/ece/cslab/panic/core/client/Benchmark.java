@@ -50,7 +50,7 @@ public class Benchmark {
     protected static CommandLine cmd;
     protected static DatabaseClient dbClient;
     protected static HashMap<String, String> configurations = new HashMap<>();
-	protected static boolean savePredictions=true;
+	protected static boolean savePredictions=true, saveSamples=true;
 
     /**
      * Method used to setup the commons-cli argument parsing. Each implemented
@@ -265,6 +265,10 @@ public class Benchmark {
         
         if(cmd.hasOption("skip-predictions")) {
         	savePredictions = false;
+        }
+        
+        if(cmd.hasOption("skip-samples")) {
+        	saveSamples = false;
         }
         
         
