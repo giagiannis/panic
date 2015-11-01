@@ -88,6 +88,10 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 
 	private void configureBiasedSampler() {
 		LoadingsAnalyzer analyzer = this.performPCA(this.regionTree.getCurrent().getRegion());
+		Integer pointsToPick=this.budgetStrategy.estimateBudget(this.regionTree.getCurrent());
+		this.regionTree.getCurrent().setLoadingsAnalyzer(analyzer);
+		this.regionTree.getCurrent().setBudget(pointsToPick);
+		
 		try {
 			this.biasedSampler = (AbstractSampler) Class.forName(biasedSamplerClassName).newInstance();
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
@@ -111,7 +115,7 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 			}
 			((GridSampler) this.biasedSampler).setWeights(coefficients);
 		}
-		this.biasedSampler.setPointsToPick(this.budgetStrategy.estimateBudget(this.regionTree.getCurrent()));
+		this.biasedSampler.setPointsToPick(pointsToPick);
 		this.biasedSampler.configureSampler();
 
 	}
@@ -159,6 +163,7 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 
 	private void splitRegion() {
 		LoadingsAnalyzer analyzer = this.performPCA(this.regionTree.getCurrent().getRegion());
+		this.regionTree.getCurrent().setLoadingsAnalyzer(analyzer);	// setting analyzer for father
 		String[] ordering = analyzer.getInputDimensionsOrder();
 
 		RangeBisectionPartitioner partitioner = new RangeBisectionPartitioner();

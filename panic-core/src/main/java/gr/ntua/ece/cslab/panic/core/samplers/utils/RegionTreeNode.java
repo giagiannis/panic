@@ -5,10 +5,15 @@ import java.util.List;
 
 public class RegionTreeNode {
 	
-	private HashMap<String, List<Double>> region;
+	// tree navigation fields
 	private RegionTreeNode leftChild=null, rightChild=null;
 	private RegionTreeNode father=null;
+	
+	// node properties
 	private int level; 
+	private HashMap<String, List<Double>> region;
+	private LoadingsAnalyzer loadingsAnalyzer;
+	private Integer budget;
 	
 	public RegionTreeNode() {
 	}
@@ -51,6 +56,22 @@ public class RegionTreeNode {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+	
+	public LoadingsAnalyzer getLoadingsAnalyzer() {
+		return loadingsAnalyzer;
+	}
+	
+	public void setLoadingsAnalyzer(LoadingsAnalyzer loadingsAnalyzer) {
+		this.loadingsAnalyzer = loadingsAnalyzer;
+	}
+	
+	public void setBudget(Integer budget) {
+		this.budget = budget;
+	}
+	
+	public Integer getBudget() {
+		return budget;
 	}
 	
 	public boolean isLeaf() {

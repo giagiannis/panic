@@ -100,7 +100,7 @@ public class LoadingsAnalyzer {
      *
      * @return
      */
-    public double[][] getDistanceMatric() {
+    public double[][] getDistanceMatrix() {
         return this.getDistanceMatrix(null);
     }
 
