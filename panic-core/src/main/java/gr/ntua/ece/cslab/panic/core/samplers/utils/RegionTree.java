@@ -2,6 +2,7 @@ package gr.ntua.ece.cslab.panic.core.samplers.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 /** 
@@ -9,12 +10,16 @@ import java.util.List;
  */
 public class RegionTree {
 	
-	private RegionTreeNode root=null, currentNode=null;
-	private List<RegionTreeNode> list;
-	private int listIndex=-1;
+	private RegionTreeNode root, currentNode;
+	private final List<RegionTreeNode> list, leaves;
+	private int listIndex;
 	
 	public RegionTree() {
 		this.list = new ArrayList<>();
+		this.leaves = new LinkedList<>();
+		this.root=null;
+		this.currentNode=null;
+		this.listIndex=-1;
 	}
 	
 	/**
@@ -42,8 +47,10 @@ public class RegionTree {
 				System.err.println("Cannot append third child into a binary tree!!");
 				System.exit(1);
 			}
+			this.leaves.remove(currentNode);
 		}
 		this.list.add(newNode);
+		this.leaves.add(newNode);
 	}
 	
 	/**
@@ -68,6 +75,15 @@ public class RegionTree {
 	public void next() {
 		this.listIndex+=1;
 		this.currentNode = this.list.get(this.listIndex);
+	}
+	
+	
+	/**
+	 * Returns the leaves of the tree
+	 * @return
+	 */
+	public List<RegionTreeNode> getLeaves() {
+		return this.leaves;
 	}
 	
 }
