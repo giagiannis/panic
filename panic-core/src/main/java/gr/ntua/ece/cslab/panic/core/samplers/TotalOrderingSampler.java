@@ -68,6 +68,7 @@ public class TotalOrderingSampler extends AbstractAdaptiveSampler {
         for (int index = this.dimensionOrdering.length - 1; index >= 0; index--) {
             String key = this.dimensionOrdering[index];
             int modulo = id % this.ranges.get(key).size();
+            modulo=(modulo<0?0:modulo);
             point.addDimension(key, this.ranges.get(key).get(modulo));
             id = id / this.ranges.get(key).size();
         }

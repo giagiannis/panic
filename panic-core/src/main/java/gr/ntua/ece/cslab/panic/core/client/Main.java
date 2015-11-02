@@ -18,11 +18,14 @@ package gr.ntua.ece.cslab.panic.core.client;
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.metrics.GlobalMetrics;
+import gr.ntua.ece.cslab.panic.core.models.EnsembleMetaModel;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
+import gr.ntua.ece.cslab.panic.core.samplers.special.BiasedPCASampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.io.File;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,6 +50,7 @@ public class Main extends Benchmark {
         
         System.out.format("Experiment id: %d\n", experimentId);
 //        List<ExecutionThread> threads = new LinkedList<>();
+        List<HashMap<String, List<Double>>> leafRegions=null;
         for (Sampler s : samplers) {
             instantiateModels();
 //            Model[] localModels = new Model[models.length];
@@ -84,8 +88,17 @@ public class Main extends Benchmark {
                     ((AbstractAdaptiveSampler)s).addOutputSpacePoint(out);
                 }
             }
-            
+        	
             for (Model m : models) {
+				if( m instanceof EnsembleMetaModel && s instanceof BiasedPCASampler) {
+            		leafRegions = ((BiasedPCASampler)s).getRegionTree().getLeafRegions();
+            		((EnsembleMetaModel)m).setRegions(leafRegions);
+            	}
+            	if(leafRegions!=null){
+            		((EnsembleMetaModel)m).setRegions(leafRegions);
+            	} else {
+            		System.err.println("Leaf regions is null!!!");
+            	}
                 m.train();
             }
             
@@ -112,6 +125,9 @@ public class Main extends Benchmark {
             }
             System.out.println("Done!");
         }
+//        for(HashMap h: leafRegions) {
+//        	System.err.println(h);
+//        }
     }
 
 }

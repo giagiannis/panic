@@ -78,12 +78,17 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 		}
 		return sample;
 	}
+	
+	public RegionTree getRegionTree() {
+		return regionTree;
+	}
 
 	private void configureUnbiasedSampler() {
 		this.unbiasedSampler = new LatinHypercubeSampler();
 		this.unbiasedSampler.setDimensionsWithRanges(this.ranges);
 		this.unbiasedSampler.setPointsToPick(this.budgetStrategy.estimateBudget(this.regionTree.getCurrent()));
 		this.unbiasedSampler.configureSampler();
+//		System.out.println("Budget to spent to unbiased: "+this.budgetStrategy.estimateBudget(this.regionTree.getCurrent()));
 	}
 
 	private void configureBiasedSampler() {
@@ -117,6 +122,7 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 		}
 		this.biasedSampler.setPointsToPick(pointsToPick);
 		this.biasedSampler.configureSampler();
+//		System.out.println("Budget to spent to biased: "+this.budgetStrategy.estimateBudget(this.regionTree.getCurrent()));
 
 	}
 

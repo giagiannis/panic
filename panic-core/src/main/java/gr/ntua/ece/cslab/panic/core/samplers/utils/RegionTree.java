@@ -11,12 +11,11 @@ import java.util.List;
 public class RegionTree {
 	
 	private RegionTreeNode root, currentNode;
-	private final List<RegionTreeNode> list, leaves;
+	private final List<RegionTreeNode> nodesToVisit;
 	private int listIndex;
 	
 	public RegionTree() {
-		this.list = new ArrayList<>();
-		this.leaves = new LinkedList<>();
+		this.nodesToVisit = new ArrayList<>();
 		this.root=null;
 		this.currentNode=null;
 		this.listIndex=-1;
@@ -30,6 +29,7 @@ public class RegionTree {
 	public void addChild(RegionTreeNode currentNode, HashMap<String, List<Double>> region) {
 		RegionTreeNode newNode = new RegionTreeNode();
 		newNode.setRegion(region);
+		newNode.setFather(currentNode);
 		if(currentNode==null) {
 			if(this.root!=null) {
 				System.err.println("Overwriting the root!");
@@ -47,10 +47,9 @@ public class RegionTree {
 				System.err.println("Cannot append third child into a binary tree!!");
 				System.exit(1);
 			}
-			this.leaves.remove(currentNode);
 		}
-		this.list.add(newNode);
-		this.leaves.add(newNode);
+		this.nodesToVisit.add(newNode);
+//		System.err.format("%50s added child %50s\n",currentNode,newNode);
 	}
 	
 	/**
@@ -74,7 +73,7 @@ public class RegionTree {
 	 */
 	public void next() {
 		this.listIndex+=1;
-		this.currentNode = this.list.get(this.listIndex);
+		this.currentNode = this.nodesToVisit.get(this.listIndex);
 	}
 	
 	
@@ -83,7 +82,42 @@ public class RegionTree {
 	 * @return
 	 */
 	public List<RegionTreeNode> getLeaves() {
-		return this.leaves;
+		this.clearNotVisited();
+		
+		List<RegionTreeNode> toVisit = new LinkedList<>();
+		List<RegionTreeNode> leaves = new LinkedList<>();
+		toVisit.add(root);
+		while(!toVisit.isEmpty()){
+			RegionTreeNode current = toVisit.remove(0);
+			if(current.isLeaf()) {
+				leaves.add(current);
+			} 
+			if(current.getLeftChild()!=null) {
+				toVisit.add(current.getLeftChild());
+			}
+			if(current.getRightChild()!=null) {
+				toVisit.add(current.getRightChild());
+			}
+		}
+//		System.out.println(leaves);
+		return leaves;
+	}
+	
+	public List<HashMap<String, List<Double>>> getLeafRegions() {
+		this.clearNotVisited();
+		List<HashMap<String, List<Double>>> leaves = new LinkedList<>();
+		for(RegionTreeNode n:this.getLeaves())
+			leaves.add(n.getRegion());
+		return leaves;
+	}
+	
+	private void clearNotVisited() {
+		for(int i=this.listIndex+1;i<this.nodesToVisit.size();i++) {
+			RegionTreeNode father=this.nodesToVisit.get(i).getFather();
+			father.setLeftChild(null);
+			father.setRightChild(null);
+		}
+		
 	}
 	
 }

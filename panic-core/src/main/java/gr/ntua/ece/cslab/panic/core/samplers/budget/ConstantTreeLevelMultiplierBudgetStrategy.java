@@ -50,7 +50,7 @@ public class ConstantTreeLevelMultiplierBudgetStrategy extends AbstractBudgetStr
 	@Override
 	public Integer estimateBudget(RegionTreeNode currentTreeNode) {
 		int order = currentTreeNode.getLevel();
-		return (int)Math.round(Math.pow(this.treeCoefficient, order)*this.treeRootBudget/ Math.pow(2, order));
+		return (int)(Math.round(Math.pow(this.treeCoefficient, order)*this.treeRootBudget/Math.pow(2, order)));
 	}
 	
 }

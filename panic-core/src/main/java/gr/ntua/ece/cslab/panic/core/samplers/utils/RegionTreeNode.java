@@ -2,6 +2,8 @@ package gr.ntua.ece.cslab.panic.core.samplers.utils;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class RegionTreeNode {
 	
@@ -80,5 +82,23 @@ public class RegionTreeNode {
 	
 	public boolean isRoot() {
 		return this.father==null;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.hashCode());
+		builder.append(' ');
+		for(Entry<String, List<Double>> kv:this.region.entrySet()) {
+			builder.append(kv.getKey());
+			builder.append(":");
+			builder.append(kv.getValue().size());
+			builder.append(" ");
+		}
+//		builder.append(' ');
+		builder.append('(');
+		builder.append(this.level);
+		builder.append(')');
+		return builder.toString();
 	}
 }
