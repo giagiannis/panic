@@ -26,7 +26,7 @@ public class RegionTree {
 	 * @param currentNode
 	 * @param region
 	 */
-	public void addChild(RegionTreeNode currentNode, HashMap<String, List<Double>> region) {
+	public RegionTreeNode addChild(RegionTreeNode currentNode, HashMap<String, List<Double>> region) {
 		RegionTreeNode newNode = new RegionTreeNode();
 		newNode.setRegion(region);
 		newNode.setFather(currentNode);
@@ -49,6 +49,7 @@ public class RegionTree {
 			}
 		}
 		this.nodesToVisit.add(newNode);
+		return newNode;
 //		System.err.format("%50s added child %50s\n",currentNode,newNode);
 	}
 	
@@ -56,8 +57,8 @@ public class RegionTree {
 	 * Adds a child under the currentNode of the struct 
 	 * @param region
 	 */
-	public void addChild(HashMap<String, List<Double>> region) {
-		this.addChild(this.currentNode, region);
+	public RegionTreeNode addChild(HashMap<String, List<Double>> region) {
+		return this.addChild(this.currentNode, region);
 	}
 	
 	/**
@@ -113,11 +114,23 @@ public class RegionTree {
 	
 	private void clearNotVisited() {
 		for(int i=this.listIndex+1;i<this.nodesToVisit.size();i++) {
-			RegionTreeNode father=this.nodesToVisit.get(i).getFather();
-			father.setLeftChild(null);
-			father.setRightChild(null);
+			RegionTreeNode current = this.nodesToVisit.get(i);
+			if(current.getLoadingsAnalyzer()==null) {
+				RegionTreeNode father = current.getFather();
+				father.setLeftChild(null);
+				father.setRightChild(null);
+			}
 		}
 		
+	}
+	
+	public List<RegionTreeNode> getNodesByLevel(int level) {
+		List<RegionTreeNode> result = new LinkedList<>();
+		for(RegionTreeNode n:this.nodesToVisit) {
+			if(n.getLevel()==level)
+				result.add(n);
+		}
+		return result;
 	}
 	
 }

@@ -10,10 +10,12 @@ import gr.ntua.ece.cslab.panic.core.samplers.TotalOrderingSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.budget.AbstractBudgetStrategy;
 import gr.ntua.ece.cslab.panic.core.samplers.budget.ConstantBudgetStrategy;
 import gr.ntua.ece.cslab.panic.core.samplers.budget.ConstantTreeLevelMultiplierBudgetStrategy;
+import gr.ntua.ece.cslab.panic.core.samplers.budget.GreedyBudgetStrategy;
 import gr.ntua.ece.cslab.panic.core.samplers.partitioners.RangeBisectionPartitioner;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTree;
+import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
 
 import java.util.HashMap;
 import java.util.List;
@@ -92,10 +94,9 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 	}
 
 	private void configureBiasedSampler() {
-		LoadingsAnalyzer analyzer = this.performPCA(this.regionTree.getCurrent().getRegion());
-		Integer pointsToPick=this.budgetStrategy.estimateBudget(this.regionTree.getCurrent());
-		this.regionTree.getCurrent().setLoadingsAnalyzer(analyzer);
+		LoadingsAnalyzer analyzer = this.regionTree.getCurrent().getLoadingsAnalyzer();
 		this.regionTree.getCurrent().setBudget(pointsToPick);
+		Integer pointsToPick=this.budgetStrategy.estimateBudget(this.regionTree.getCurrent());
 		
 		try {
 			this.biasedSampler = (AbstractSampler) Class.forName(biasedSamplerClassName).newInstance();
@@ -136,7 +137,7 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 		this.budgetStrategy.setRegionTree(this.regionTree);
 		this.budgetStrategy.setDeploymentBudget(this.pointsToPick);
 
-		if (this.budgetStrategy instanceof ConstantTreeLevelMultiplierBudgetStrategy) {
+		if (this.budgetStrategy instanceof ConstantTreeLevelMultiplierBudgetStrategy || this.budgetStrategy instanceof GreedyBudgetStrategy) {
 			Integer treeLength = 0;
 			if (this.configuration.containsKey("tree.length")) {
 				treeLength = new Integer(this.configuration.get("tree.length"));
@@ -162,7 +163,25 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 				System.exit(1);
 			}
 			((ConstantBudgetStrategy) this.budgetStrategy).setConstantBudget(constantBudget);
-		}
+		} 
+//		else if (this.budgetStrategy instanceof GreedyBudgetStrategy) {
+//			Integer rootBudget=null;
+//			Double coefficient=null;
+//			if(this.configuration.containsKey("root.budget")) {
+//				rootBudget = new Integer(this.configuration.get("root.budget"));
+//			} else {
+//				System.err.println("I need root.budget to be set!");
+//				System.exit(1);
+//			}
+//			if(this.configuration.containsKey("tree.coefficient")) {
+//				coefficient = new Double(this.configuration.get("tree.coefficient"));
+//			} else {
+//				System.err.println("I need root.budget to be set!");
+//				System.exit(1);
+//			}
+////			((GreedyBudgetStrategy)this.budgetStrategy).setCoefficient(coefficient);
+////			((GreedyBudgetStrategy)this.budgetStrategy).setRootBudget(rootBudget);
+//		}
 		
 		this.budgetStrategy.configure();
 	}
@@ -180,13 +199,15 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 		if (partitioner.getHigherRegionRanges() != null
 				&& RangeBisectionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegionRanges())
 						.size() >= this.ranges.size()) {
-			this.regionTree.addChild(partitioner.getHigherRegionRanges());
+			RegionTreeNode n = this.regionTree.addChild(partitioner.getHigherRegionRanges());
+			n.setLoadingsAnalyzer(this.performPCA(n.getRegion()));
 		}
 
 		if (partitioner.getLowerRegionRanges() != null
 				&& RangeBisectionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegionRanges())
 						.size() >= this.ranges.size()) {
-			this.regionTree.addChild(partitioner.getLowerRegionRanges());
+			RegionTreeNode n = this.regionTree.addChild(partitioner.getLowerRegionRanges());
+			n.setLoadingsAnalyzer(this.performPCA(n.getRegion()));
 		}
 	}
 

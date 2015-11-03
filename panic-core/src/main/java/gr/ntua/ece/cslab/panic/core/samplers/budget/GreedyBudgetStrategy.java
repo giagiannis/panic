@@ -1,5 +1,8 @@
 package gr.ntua.ece.cslab.panic.core.samplers.budget;
 
+import java.util.HashMap;
+import java.util.List;
+
 import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
 
@@ -9,53 +12,53 @@ import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
  * @author Giannis Giannakopoulos
  *
  */
-public class GreedyBudgetStrategy extends AbstractBudgetStrategy {
+public class GreedyBudgetStrategy extends ConstantTreeLevelMultiplierBudgetStrategy {
+	private final HashMap<Integer, Double> distanceCache, sumCache;
 
-	private Double coefficient;
-	private Integer rootBudget;
-	
 	public GreedyBudgetStrategy() {
-		
-	}
-	
-	public void setCoefficient(Double coefficient) {
-		this.coefficient = coefficient;
-	}
-	
-	public Double getCoefficient() {
-		return coefficient;
-	}
-	
-	public void setRootBudget(Integer rootBudget) {
-		this.rootBudget = rootBudget;
-	}
-	
-	public Integer getRootBudget() {
-		return rootBudget;
+		this.distanceCache = new HashMap<>();
+		this.sumCache = new HashMap<>();
 	}
 	
 	@Override
 	public void configure() {
-		// no need to do anything here, right?
+		super.configure();
 	}
 
 	@Override
 	public Integer estimateBudget(RegionTreeNode currentTreeNode) {
-		if(currentTreeNode.isRoot()) {
-			return this.rootBudget;
+		Integer levelBudget = (int) Math.round(super.estimateBudget(currentTreeNode)*Math.pow(2, currentTreeNode.getLevel()));
+		if(!distanceCache.containsKey(currentTreeNode.hashCode())){ //cache not populated
+			List<RegionTreeNode> nodes = this.regionTree.getNodesByLevel(currentTreeNode.getLevel());
+			double sum=0.0;
+			for(RegionTreeNode n: nodes) {
+				double delta = this.deltaState(n);
+				this.distanceCache.put(n.hashCode(), delta);
+				sum+=delta;
+			}
+			this.sumCache.put(currentTreeNode.getLevel(), sum);
 		}
-		this.compareAnalyzer(currentTreeNode.getFather().getLoadingsAnalyzer(), currentTreeNode.getLoadingsAnalyzer());
-		return null;
+		double ratio = this.distanceCache.get(currentTreeNode.hashCode())/this.sumCache.get(currentTreeNode.getLevel());
+		int points = (int)Math.round(levelBudget*ratio);
+		points=(points>0?points:1);
+		System.out.format("Ratio: %.5f (%d), (%d) --> points: %d\n", ratio, currentTreeNode.getLevel(), currentTreeNode.hashCode(), points);
+		return points;
 	}
 	
 	/**
-	 * Method used to compare the {@link LoadingsAnalyzer} objects of the 
-	 * father and the current region. This implements the greedy criterion of 
-	 * the budget strategy.
+	 * Method used to quantify the delta between the current sub-region and its father
+	 * @param node
 	 * @return
 	 */
-	private boolean compareAnalyzer(LoadingsAnalyzer fatherAnalyzer, LoadingsAnalyzer currentAnalyzer) {
-		return true;
+	private double deltaState(RegionTreeNode node) {
+		if(node.isRoot()) {
+			return Double.MAX_VALUE;
+		}
+		LoadingsAnalyzer fatherAnalyzer = node.getFather().getLoadingsAnalyzer(), currentAnalyzer=node.getLoadingsAnalyzer();
+		double sum=0.0;
+		for(int i=0;i<fatherAnalyzer.getDimensionLabels().length-1;i++) {
+			sum+=Math.abs(fatherAnalyzer.getDistance(i)-currentAnalyzer.getDistance(i));
+		}
+		return sum;
 	}
-
 }

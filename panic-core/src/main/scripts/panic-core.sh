@@ -9,7 +9,7 @@
 
 # classpath extraction
 export CLASSPATH="$(echo ${PWD}/target/lib/* | tr ' ' ':')"
-#export JAR=$(echo target/*.jar)
+export CLASSPATH="$CLASSPATH:$(echo ${PWD}/target/conf)"
 export JAR="target/classes"
 #[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.samplers.special.DimensionWeightSampler"
 #[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.samplers.WeightedGridSampler"
