@@ -18,6 +18,7 @@ package gr.ntua.ece.cslab.panic.core.client;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.samplers.budget.AbstractBudgetStrategy;
+import gr.ntua.ece.cslab.panic.core.samplers.partitioners.AbstractPartitioner;
 import gr.ntua.ece.cslab.panic.core.utils.DatabaseClient;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -80,6 +81,7 @@ public class Benchmark {
         options.addOption("lm", "list-models", false, "lists the available models");
         options.addOption("ls", "list-samplers", false, "lists the available samplers");
         options.addOption("lb", "list-budget", false, "lists the available budget strategies");
+        options.addOption("lp", "list-partitioner", false, "lists the available partitioning strategies");
         
         options.addOption("mo", "metrics-output", true, "<deprecated> if specifed, redirects the metrics to an SQLite database (must be created)");
         options.addOption("o", "output", true, "<deprecated> define the output file\ndefault: stdout");
@@ -166,6 +168,24 @@ public class Benchmark {
         }
         return budgetStrategiesDiscovered;
     }
+    
+    public static Class<? extends AbstractPartitioner>[] discoverPartitioners() {
+        List<Class<? extends AbstractPartitioner>> list = new ArrayList<>();
+        Reflections reflections = new Reflections("gr.ntua.ece.cslab");
+        for (Class<? extends AbstractPartitioner> c : reflections.getSubTypesOf(AbstractPartitioner.class)) {
+            if (!c.getName().toLowerCase().contains("abstract")) {
+                list.add(c);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        Class<? extends AbstractPartitioner>[] budgetStrategiesDiscovered = new Class[list.size()];
+        int i = 0;
+        for (Class<? extends AbstractPartitioner> c : list) {
+            budgetStrategiesDiscovered[i++] = c;
+        }
+        return budgetStrategiesDiscovered;
+    }
 
     /**
      * Method used to configure the benchmarking tool in order to set the
@@ -207,6 +227,14 @@ public class Benchmark {
         }
         if(cmd.hasOption("list-budget")) {
         	for(Class<? extends AbstractBudgetStrategy> c:  discoverBudgetStrategies()) {
+                String className = c.getCanonicalName();
+                System.out.format("%s\n", className);
+        	}
+        	System.exit(1);
+        }
+        
+        if(cmd.hasOption("list-partitioner")) {
+        	for(Class<? extends AbstractPartitioner> c:  discoverPartitioners()) {
                 String className = c.getCanonicalName();
                 System.out.format("%s\n", className);
         	}

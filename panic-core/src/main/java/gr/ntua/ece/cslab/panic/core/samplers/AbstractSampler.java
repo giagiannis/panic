@@ -37,6 +37,8 @@ public class AbstractSampler implements Sampler {
     
     protected int pointsToPick;
     
+    protected final HashMap<String, String> configurationsParameters;
+    
     
     protected HashMap<String, String> configuration;
 
@@ -46,6 +48,7 @@ public class AbstractSampler implements Sampler {
         this.pointsPicked = 0;
         this.pointsToPick = 0;
         this.configuration =  new HashMap<>();
+        this.configurationsParameters = new HashMap<>();
 
     }
 
@@ -137,5 +140,9 @@ public class AbstractSampler implements Sampler {
         }
         return point;
     }
+    
+    public HashMap<String, String> getConfigurationsParameters() {
+		return configurationsParameters;
+	}
 
 }
