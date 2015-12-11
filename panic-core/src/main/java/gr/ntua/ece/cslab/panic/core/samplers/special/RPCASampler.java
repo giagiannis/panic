@@ -7,7 +7,7 @@ import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.LatinHypercubeSampler;
-import gr.ntua.ece.cslab.panic.core.samplers.partitioners.SplitByDimensionPartitioner;
+import gr.ntua.ece.cslab.panic.core.partitioners.SplitByDimensionPartitioner;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;
 import java.util.HashMap;
@@ -82,7 +82,7 @@ public class RPCASampler extends AbstractAdaptiveSampler {
             SplitByDimensionPartitioner partitioner = new SplitByDimensionPartitioner();
             partitioner.setRanges(this.currentRanges);
             partitioner.setDimensionKey(ordering[0]);
-            partitioner.configure();
+            partitioner.configurePartitioner();
             
             if(partitioner.getHigherRegion()!=null && !SplitByDimensionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegion()).isEmpty()) {
                 this.rangesToExamine.add(partitioner.getHigherRegion());

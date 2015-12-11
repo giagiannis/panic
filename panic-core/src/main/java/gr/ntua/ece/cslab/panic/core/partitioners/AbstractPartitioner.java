@@ -1,4 +1,4 @@
-package gr.ntua.ece.cslab.panic.core.samplers.partitioners;
+package gr.ntua.ece.cslab.panic.core.partitioners;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,7 +36,7 @@ public abstract class AbstractPartitioner {
 		this.ranges = ranges;
 	}
 	
-	public abstract void configure();
+	public abstract void configurePartitioner();
 	
     // public static methods
     public static boolean pointIsInRange(Map<String, List<Double>> range, InputSpacePoint point) {

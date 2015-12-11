@@ -6,7 +6,7 @@ import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.LatinHypercubeSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.TotalOrderingSampler;
-import gr.ntua.ece.cslab.panic.core.samplers.partitioners.SplitByDimensionPartitioner;
+import gr.ntua.ece.cslab.panic.core.partitioners.SplitByDimensionPartitioner;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public class LHSPCASampler extends AbstractAdaptiveSampler {
             SplitByDimensionPartitioner partitioner = new SplitByDimensionPartitioner();
             partitioner.setRanges(this.currentRanges);
             partitioner.setDimensionKey(ordering[0]);
-            partitioner.configure();
+            partitioner.configurePartitioner();
             if (SplitByDimensionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegion()).isEmpty()) {
                 System.err.println("higher: No need to add the range");
             } else {

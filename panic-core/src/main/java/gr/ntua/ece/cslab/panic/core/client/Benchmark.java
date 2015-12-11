@@ -18,7 +18,7 @@ package gr.ntua.ece.cslab.panic.core.client;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.samplers.budget.AbstractBudgetStrategy;
-import gr.ntua.ece.cslab.panic.core.samplers.partitioners.AbstractPartitioner;
+import gr.ntua.ece.cslab.panic.core.partitioners.AbstractPartitioner;
 import gr.ntua.ece.cslab.panic.core.utils.DatabaseClient;
 import java.io.PrintStream;
 import java.util.ArrayList;

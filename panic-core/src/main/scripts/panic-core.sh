@@ -18,6 +18,7 @@ export JAR="target/classes"
 #[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.utils.DatabaseClient"
 #[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.utils.SQLiteClient"
 #[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.containers.beans.lists.OutputSpacePointList"
+#[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTree"
 
 
 

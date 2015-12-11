@@ -1,4 +1,4 @@
-package gr.ntua.ece.cslab.panic.core.samplers.partitioners;
+package gr.ntua.ece.cslab.panic.core.partitioners;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -15,14 +15,13 @@ public class RandomPartitioner extends SplitByDimensionPartitioner {
 	}
 	
 	@Override
-	public void configure() {
+	public void configurePartitioner() {
 		LinkedList<String> keys = new LinkedList<>();
 		keys.addAll(this.ranges.keySet());
 		Random random = new Random();
 		int index=random.nextInt(keys.size());
 		
 		this.setDimensionKey(keys.get(index));
-		super.configure();
+		super.configurePartitioner();
 	}
-
 }

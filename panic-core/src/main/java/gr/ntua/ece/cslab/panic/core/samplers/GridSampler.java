@@ -39,7 +39,7 @@ public class GridSampler extends  AbstractSampler {
     public GridSampler() {
         this.coefficients = new HashMap<>();
     }
-    
+
     
     /**
      * Returns the coefficient HashMap

@@ -1,4 +1,4 @@
-package gr.ntua.ece.cslab.panic.core.samplers.partitioners;
+package gr.ntua.ece.cslab.panic.core.partitioners;
 
 //import java.util.Collections;
 import java.util.LinkedList;
@@ -31,7 +31,7 @@ public class SplitByDimensionPartitioner  extends AbstractPartitioner{
     /**
      * Configures and estimates the new ranges
      */
-    public void configure() {
+    public void configurePartitioner() {
         for (String key : this.ranges.keySet()) {
             this.higherRegion.put(key, this.ranges.get(key));
             this.lowerRegion.put(key, this.ranges.get(key));

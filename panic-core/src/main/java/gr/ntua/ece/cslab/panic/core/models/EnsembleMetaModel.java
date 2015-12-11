@@ -6,7 +6,7 @@ import java.util.List;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.samplers.partitioners.SplitByDimensionPartitioner;
+import gr.ntua.ece.cslab.panic.core.partitioners.SplitByDimensionPartitioner;
 
 public class EnsembleMetaModel implements Model {
 

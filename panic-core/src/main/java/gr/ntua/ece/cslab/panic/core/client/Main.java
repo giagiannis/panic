@@ -23,12 +23,12 @@ import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.samplers.special.BiasedPCASampler;
+import gr.ntua.ece.cslab.panic.core.samplers.special.RandomPartitioningSampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 
 /**
  * This class is used as a benchmarking class, in order to compare different
@@ -44,36 +44,33 @@ public class Main extends Benchmark {
 
         CSVFileManager file = new CSVFileManager();
         file.setFilename(inputFile);
-        
-        String fullPath = new File(inputFile).getCanonicalFile().getAbsolutePath() ;
+
+        String fullPath = new File(inputFile).getCanonicalFile().getAbsolutePath();
         int experimentId = dbClient.insertExperiment(samplingRate, fullPath, configurations.toString());
-        
+
         System.out.format("Experiment id: %d\n", experimentId);
 //        List<ExecutionThread> threads = new LinkedList<>();
-        List<HashMap<String, List<Double>>> leafRegions=null;
+        List<HashMap<String, List<Double>>> leafRegions = null;
         for (Sampler s : samplers) {
             instantiateModels();
 //            Model[] localModels = new Model[models.length];
 //            System.arraycopy(models, 0, localModels, 0, models.length);
 //            ExecutionThread t = new ExecutionThread(s, experimentId, samplingRate, file, dbClient, localModels);
 //            threads.add(t);
-            
-            
+
             System.out.format("Sampler: %s\n", s.getClass().getSimpleName());
             instantiateModels();
 //            instantiateSamplers();
-            
-            
+
             // model initialization
-            for (Model m : models)
+            for (Model m : models) {
                 m.configureClassifier();
+            }
 
             // samplers initialization
             s.setSamplingRate(samplingRate);
             s.setDimensionsWithRanges(file.getDimensionRanges());
             s.configureSampler();
-            
-            
 
             // models training
             List<InputSpacePoint> picked = new LinkedList<>();
@@ -84,41 +81,47 @@ public class Main extends Benchmark {
                 for (Model m : models) {
                     m.feed(out, false);
                 }
-                if( s instanceof AbstractAdaptiveSampler) {
-                    ((AbstractAdaptiveSampler)s).addOutputSpacePoint(out);
+                if (s instanceof AbstractAdaptiveSampler) {
+                    ((AbstractAdaptiveSampler) s).addOutputSpacePoint(out);
                 }
             }
-        	
+
             for (Model m : models) {
-				if( m instanceof EnsembleMetaModel && s instanceof BiasedPCASampler) {
-            		leafRegions = ((BiasedPCASampler)s).getRegionTree().getLeafRegions();
-            		((EnsembleMetaModel)m).setRegions(leafRegions);
-            	}
-            	if(leafRegions!=null){
-            		((EnsembleMetaModel)m).setRegions(leafRegions);
-            	} else {
-            		System.err.println("Leaf regions is null!!!");
-            	}
+                if (m instanceof EnsembleMetaModel ) {
+                    if(s instanceof BiasedPCASampler) {
+                        leafRegions = ((BiasedPCASampler) s).getRegionTree().getLeafRegions();
+                    } else if (s instanceof RandomPartitioningSampler) {
+                        leafRegions = ((RandomPartitioningSampler) s).getRegionTree().getLeafRegions();
+                    } else {
+                        leafRegions = null;
+                    }
+//                    System.out.println("Leaf regions: "+leafRegions.size());
+//                    ((EnsembleMetaModel) m).setRegions(leafRegions);
+                }
+                if (leafRegions != null && m instanceof EnsembleMetaModel) {
+                    ((EnsembleMetaModel) m).setRegions(leafRegions);
+                } else {
+                    System.err.println("Leaf regions is null or model not EnsembleModel");
+                }
                 m.train();
             }
-            
+
             // write results to DB
             System.out.format("\tFlushing results to database... ");
             int index = s.getClass().getCanonicalName().lastIndexOf('.');
-            String samplerShortName = s.getClass().getCanonicalName().substring(index+1);
-            if(saveSamples){
-            	dbClient.insertSampledPoints(experimentId, samplerShortName, picked);
+            String samplerShortName = s.getClass().getCanonicalName().substring(index + 1);
+            if (saveSamples) {
+                dbClient.insertSampledPoints(experimentId, samplerShortName, picked);
             }
-            
-            
-            for(Model m : models) {
+
+            for (Model m : models) {
                 index = m.getClass().getCanonicalName().lastIndexOf('.');
-                String modelShortName = m.getClass().getCanonicalName().substring(index+1);
-                
-                if(savePredictions) {
-                	dbClient.insertModelPredictions(experimentId, modelShortName, samplerShortName, m.getPoints(file.getInputSpacePoints()));
+                String modelShortName = m.getClass().getCanonicalName().substring(index + 1);
+
+                if (savePredictions) {
+                    dbClient.insertModelPredictions(experimentId, modelShortName, samplerShortName, m.getPoints(file.getInputSpacePoints()));
                 }
-                
+
                 GlobalMetrics metrics = new GlobalMetrics(file.getOutputSpacePoints(), m, picked);
                 dbClient.insertExperimentMetrics(experimentId, modelShortName, samplerShortName,
                         metrics.getMSE(), metrics.getAverageError(), metrics.getDeviation(), metrics.getR());
