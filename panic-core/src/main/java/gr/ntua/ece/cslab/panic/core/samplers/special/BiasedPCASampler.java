@@ -14,8 +14,8 @@ import gr.ntua.ece.cslab.panic.core.samplers.budget.GreedyBudgetStrategy;
 import gr.ntua.ece.cslab.panic.core.partitioners.AbstractPartitioner;
 import gr.ntua.ece.cslab.panic.core.partitioners.RandomPartitioner;
 import gr.ntua.ece.cslab.panic.core.partitioners.SplitByDimensionPartitioner;
-import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
-import gr.ntua.ece.cslab.panic.core.samplers.utils.PrincipalComponentsAnalyzer;
+import gr.ntua.ece.cslab.panic.core.analyzers.deprec.LoadingsAnalyzer;
+import gr.ntua.ece.cslab.panic.core.analyzers.deprec.PrincipalComponentsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTree;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
 

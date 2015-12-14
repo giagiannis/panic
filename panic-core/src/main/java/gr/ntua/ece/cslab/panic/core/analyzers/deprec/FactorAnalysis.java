@@ -1,4 +1,4 @@
-package gr.ntua.ece.cslab.panic.core.samplers.utils;
+package gr.ntua.ece.cslab.panic.core.analyzers.deprec;
 
 import com.itemanalysis.psychometrics.factoranalysis.EstimationMethod;
 import com.itemanalysis.psychometrics.factoranalysis.ExploratoryFactorAnalysis;

@@ -3,7 +3,7 @@ package gr.ntua.ece.cslab.panic.core.samplers.budget;
 import java.util.HashMap;
 import java.util.List;
 
-import gr.ntua.ece.cslab.panic.core.samplers.utils.LoadingsAnalyzer;
+import gr.ntua.ece.cslab.panic.core.analyzers.deprec.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
 
 /**

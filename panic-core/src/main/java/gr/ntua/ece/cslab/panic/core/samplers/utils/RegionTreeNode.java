@@ -1,5 +1,7 @@
 package gr.ntua.ece.cslab.panic.core.samplers.utils;
 
+import gr.ntua.ece.cslab.panic.core.analyzers.deprec.LoadingsAnalyzer;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;

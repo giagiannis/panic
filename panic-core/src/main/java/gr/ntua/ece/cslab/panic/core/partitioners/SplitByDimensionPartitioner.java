@@ -32,19 +32,23 @@ public class SplitByDimensionPartitioner  extends AbstractPartitioner{
      * Configures and estimates the new ranges
      */
     public void configurePartitioner() {
+        System.out.print("partitioning: (");
         for (String key : this.ranges.keySet()) {
             this.higherRegion.put(key, this.ranges.get(key));
             this.lowerRegion.put(key, this.ranges.get(key));
+            System.out.format("%s:%d ",key,this.ranges.get(key).size());
         }
+        System.out.println(")");
+
         List<Double> examinedList = this.ranges.get(dimensionKey);
         if(this.getLeftSublist(examinedList).size()>0)
             this.lowerRegion.put(dimensionKey, this.getLeftSublist(examinedList));
-        else 
-            this.lowerRegion = null;
+//        else
+//            this.lowerRegion = null;
         if(this.getRightSublist(examinedList).size()>0)
             this.higherRegion.put(dimensionKey, this.getRightSublist(examinedList));
-        else
-            this.higherRegion = null;
+//        else
+//            this.higherRegion = null;
     }
 
     // private methods
@@ -69,5 +73,4 @@ public class SplitByDimensionPartitioner  extends AbstractPartitioner{
             result.add(list.get(i));
         return result;
     }
-
 }

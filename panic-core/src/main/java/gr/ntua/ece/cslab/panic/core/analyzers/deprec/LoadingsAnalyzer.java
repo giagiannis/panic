@@ -1,4 +1,4 @@
-package gr.ntua.ece.cslab.panic.core.samplers.utils;
+package gr.ntua.ece.cslab.panic.core.analyzers.deprec;
 
 import java.util.LinkedList;
 import java.util.List;

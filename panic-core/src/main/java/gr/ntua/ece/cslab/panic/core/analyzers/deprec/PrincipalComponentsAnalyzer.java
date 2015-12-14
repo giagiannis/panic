@@ -1,4 +1,4 @@
-package gr.ntua.ece.cslab.panic.core.samplers.utils;
+package gr.ntua.ece.cslab.panic.core.analyzers.deprec;
 
 import gr.ntua.ece.cslab.panic.beans.containers.EigenSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
