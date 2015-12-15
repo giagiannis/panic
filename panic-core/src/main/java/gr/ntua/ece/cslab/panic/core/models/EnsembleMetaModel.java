@@ -51,7 +51,13 @@ public class EnsembleMetaModel implements Model {
 		Model m = this.findModelByPoint(point.getInputSpacePoint());
 		if(retrain && m!=null)
 			m.train();
+	}
 
+	@Override
+	public void feed(List<OutputSpacePoint> points) throws Exception {
+		for(OutputSpacePoint p:points) {
+			this.feed(p, false);
+		}
 	}
 
 	@Override

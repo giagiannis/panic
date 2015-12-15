@@ -51,6 +51,13 @@ public abstract class AbstractWekaModel implements Model {
     }
 
     @Override
+    public void feed(List<OutputSpacePoint> points) throws Exception {
+        for(OutputSpacePoint p:points) {
+            this.feed(p, false);
+        }
+    }
+
+    @Override
     public void train() throws Exception {
         this.classifier.buildClassifier(getInstances(pointsSampled));
     }
@@ -144,5 +151,11 @@ public abstract class AbstractWekaModel implements Model {
             instances.add(convertPointToInstance(p));
         instances.setClassIndex(instances.numAttributes()-1);
         return instances;
+    }
+
+
+    // temp methods
+    public Classifier getClassifier() {
+        return classifier;
     }
 }

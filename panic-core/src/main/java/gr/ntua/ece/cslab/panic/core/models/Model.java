@@ -43,7 +43,14 @@ public interface Model {
      * @throws java.lang.Exception
      */
     public void feed(OutputSpacePoint point, boolean retrain)  throws Exception;
-    
+
+    /**
+     * Provide a list of output space points into the model. The model is not retrained.
+     * @param points
+     * @throws Exception
+     */
+    public void feed(List<OutputSpacePoint> points) throws Exception;
+
     /**
      * Method used to train the model object. The model is built according 
      * to the point that were previously provided.

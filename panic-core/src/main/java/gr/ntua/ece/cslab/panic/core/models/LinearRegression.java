@@ -25,7 +25,7 @@ import weka.classifiers.functions.SimpleLinearRegression;
 public class LinearRegression extends AbstractWekaModel {
 
     public LinearRegression() {
-        this.classifier = new SimpleLinearRegression();
+        this.classifier = new weka.classifiers.functions.LinearRegression();
     }
 
     @Override
