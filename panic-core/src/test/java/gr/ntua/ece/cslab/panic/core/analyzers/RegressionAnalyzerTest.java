@@ -2,6 +2,7 @@ package gr.ntua.ece.cslab.panic.core.analyzers;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.DatasetCreator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,16 +25,25 @@ public class RegressionAnalyzerTest {
 
     @Before
     public void setUp() throws Exception {
-        this.trainPoints = new ArrayList<>();
         this.random = new Random();
+
+        DatasetCreator datasetCreator = new DatasetCreator();
+        datasetCreator.setNumberOfDimensions(this.random.nextInt(4)+1);
+        datasetCreator.createDataset();
+
+        this.dataCoefficients = datasetCreator.getDataCoefficients();
+        this.trainPoints = datasetCreator.getDataPoints();
+
         this.analyzer = new RegressionAnalyzer();
-        this.createTestDataset(this.random.nextInt(80)+20, this.random.nextInt(9)+1);
         this.analyzer.setPointsToAnalyze(this.trainPoints);
     }
 
     @After
     public void tearDown() throws Exception {
-        // no need to destruct anything
+        this.dataCoefficients = null;
+        this.trainPoints = null;
+        this.random = null;
+        this.analyzer = null;
     }
 
     // test that the points are normalized correctly
@@ -90,35 +100,5 @@ public class RegressionAnalyzerTest {
         OutputSpacePoint o2 = this.analyzer.getNormalizedPoint(p);
         assertTrue(o1.getInputSpacePoint().equals(o2.getInputSpacePoint()));
         assertTrue(o1.getValue() == o2.getValue());
-    }
-
-    // aux methods
-    private void createTestDataset(int numberOfPoints, int numberOfDimensions) {
-        this.dataCoefficients = new TreeMap<>();
-        double[] coefficients = new double[numberOfDimensions];
-        coefficients[0] = 1.0;
-        String id=String.format("x%05d",0);
-        this.dataCoefficients.put(id, 1.0);
-        for(int j=1;j<numberOfDimensions;j++) {
-            id=String.format("x%05d",j);
-            coefficients[j] = 2*coefficients[j-1]/3.0;
-            this.dataCoefficients.put(id, coefficients[j]);
-        }
-
-        for(int i=0;i<numberOfPoints;i++) {
-            InputSpacePoint point = new InputSpacePoint();
-            Double sum = 0.0;
-            for(int j=0;j<numberOfDimensions;j++) {
-                id=String.format("x%05d",j);
-                point.addDimension(id ,this.random.nextGaussian()*(this.random.nextInt(10)+1));
-                sum += this.dataCoefficients.get(id) * point.getValue(id);
-            }
-            OutputSpacePoint outPoint = new OutputSpacePoint();
-            outPoint.setInputSpacePoint(point);
-            outPoint.setKey("y");
-            outPoint.setValue(sum);
-            this.trainPoints.add(outPoint);
-        }
-
     }
 }

@@ -88,17 +88,17 @@ public class RegionTree {
             this.currentNode = null;
     }
     
-    private void clearNotVisited() {
-        for (int i = this.listIndex + 1; i < this.nodesToVisit.size(); i++) {
-            RegionTreeNode current = this.nodesToVisit.get(i);
-            if (current.getLoadingsAnalyzer() == null) {
-                RegionTreeNode father = current.getFather();
-                father.setLeftChild(null);
-                father.setRightChild(null);
-            }
-        }
-
-    }
+//    private void clearNotVisited() {
+//        for (int i = this.listIndex + 1; i < this.nodesToVisit.size(); i++) {
+//            RegionTreeNode current = this.nodesToVisit.get(i);
+//            if (current.getLoadingsAnalyzer() == null) {
+//                RegionTreeNode father = current.getFather();
+//                father.setLeftChild(null);
+//                father.setRightChild(null);
+//            }
+//        }
+//
+//    }
 
     public List<RegionTreeNode> getNodesByLevel(int level) {
         List<RegionTreeNode> result = new LinkedList<>();
