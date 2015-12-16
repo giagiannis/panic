@@ -1,4 +1,4 @@
-package gr.ntua.ece.cslab.panic.core.samplers.budget;
+package gr.ntua.ece.cslab.panic.core.budget;
 
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTree;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;

@@ -3,6 +3,8 @@ package gr.ntua.ece.cslab.panic.core.samplers.special;
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.DatasetCreator;
+import gr.ntua.ece.cslab.panic.core.analyzers.RegressionAnalyzer;
+import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTree;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,5 +49,18 @@ public class TreePartitioningSamplerTest {
             count++;
         }
         assertTrue(count>0);
+    }
+
+    @Test
+    public void testTreeParsing() {
+        TreePartitioningSampler.SpecificRegionTreeNode node = new TreePartitioningSampler.SpecificRegionTreeNode();
+        node.setRegion(this.ranges);
+        node.setAnalyzer(new RegressionAnalyzer());
+        RegionTree tree = new RegionTree();
+        tree.addChild(node);
+
+        tree.next();
+        TreePartitioningSampler.SpecificRegionTreeNode f = (TreePartitioningSampler.SpecificRegionTreeNode) tree.getCurrent();
+        assertTrue(f.getAnalyzer()!=null);
     }
 }

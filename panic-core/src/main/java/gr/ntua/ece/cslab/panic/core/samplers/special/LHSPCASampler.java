@@ -2,11 +2,11 @@ package gr.ntua.ece.cslab.panic.core.samplers.special;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.partitioners.SingleDimensionPartitioner;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.LatinHypercubeSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.TotalOrderingSampler;
-import gr.ntua.ece.cslab.panic.core.partitioners.SplitByDimensionPartitioner;
 import gr.ntua.ece.cslab.panic.core.analyzers.deprec.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.analyzers.deprec.PrincipalComponentsAnalyzer;
 import java.util.HashMap;
@@ -81,17 +81,17 @@ public class LHSPCASampler extends AbstractAdaptiveSampler {
 //            for(String s:ordering)
 //                System.err.format("%s \t", s);
 //            System.err.println("");
-            SplitByDimensionPartitioner partitioner = new SplitByDimensionPartitioner();
+            SingleDimensionPartitioner partitioner = new SingleDimensionPartitioner();
             partitioner.setRanges(this.currentRanges);
             partitioner.setDimensionKey(ordering[0]);
             partitioner.configurePartitioner();
-            if (SplitByDimensionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegion()).isEmpty()) {
+            if (SingleDimensionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegion()).isEmpty()) {
                 System.err.println("higher: No need to add the range");
             } else {
                 this.rangesToExamine.add(partitioner.getHigherRegion());
             }
 
-            if (SplitByDimensionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegion()).isEmpty()) {
+            if (SingleDimensionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegion()).isEmpty()) {
                 System.err.println("lower: No need to add the range");
             } else {
                 this.rangesToExamine.add(partitioner.getLowerRegion());
@@ -113,7 +113,7 @@ public class LHSPCASampler extends AbstractAdaptiveSampler {
 
     private LoadingsAnalyzer performPCA(Map<String, List<Double>> currentRange) {
         PrincipalComponentsAnalyzer analyzer = new PrincipalComponentsAnalyzer();
-        List<OutputSpacePoint> data = SplitByDimensionPartitioner.filterPoints(outputSpacePoints, currentRange);
+        List<OutputSpacePoint> data = SingleDimensionPartitioner.filterPoints(outputSpacePoints, currentRange);
         analyzer.setInputData(data);
         try {
             analyzer.calculateVarianceMatrix();

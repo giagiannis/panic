@@ -15,7 +15,6 @@ public class RegionTreeNode {
 	// node properties
 	private int level; 
 	private HashMap<String, List<Double>> region;
-	private LoadingsAnalyzer loadingsAnalyzer;
 	private Integer budget;
 	
 	public RegionTreeNode() {
@@ -59,14 +58,6 @@ public class RegionTreeNode {
 
 	public void setLevel(int level) {
 		this.level = level;
-	}
-	
-	public LoadingsAnalyzer getLoadingsAnalyzer() {
-		return loadingsAnalyzer;
-	}
-	
-	public void setLoadingsAnalyzer(LoadingsAnalyzer loadingsAnalyzer) {
-		this.loadingsAnalyzer = loadingsAnalyzer;
 	}
 	
 	public void setBudget(Integer budget) {

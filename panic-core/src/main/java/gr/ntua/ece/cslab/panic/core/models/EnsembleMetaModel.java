@@ -6,7 +6,7 @@ import java.util.List;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.partitioners.SplitByDimensionPartitioner;
+import gr.ntua.ece.cslab.panic.core.partitioners.SingleDimensionPartitioner;
 
 public class EnsembleMetaModel implements Model {
 
@@ -97,7 +97,7 @@ public class EnsembleMetaModel implements Model {
 	private Model findModelByPoint(InputSpacePoint point) {
 		int modelIndex = 0;
 		for (int i = 0; i < this.regions.size(); i++) {
-			if (SplitByDimensionPartitioner.pointIsInRange(this.regions.get(i), point)) {
+			if (SingleDimensionPartitioner.pointIsInRange(this.regions.get(i), point)) {
 				modelIndex = this.regionToModelMapping[i];
 			}
 		}

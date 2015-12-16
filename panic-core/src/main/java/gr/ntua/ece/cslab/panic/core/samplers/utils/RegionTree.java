@@ -14,14 +14,35 @@ import java.util.Random;
 public class RegionTree {
 
     private RegionTreeNode root, currentNode;
-    private final List<RegionTreeNode> nodesToVisit;
+    private List<RegionTreeNode> nodesToVisit=null;
     private int listIndex;
 
     public RegionTree() {
-        this.nodesToVisit = new ArrayList<>();
+        this.nodesToVisit = new ArrayList<RegionTreeNode>();
         this.root = null;
         this.currentNode = null;
         this.listIndex = -1;
+    }
+
+    public RegionTreeNode addChild(RegionTreeNode newNode) {
+        return this.addChild(this.currentNode, newNode);
+    }
+    public RegionTreeNode addChild(RegionTreeNode currentNode, RegionTreeNode newNode) {
+        if(currentNode==null) {
+            this.root = newNode;
+            this.root.setLevel(0);
+        } else {
+            newNode.setLevel(currentNode.getLevel()+1);
+            if (currentNode.getLeftChild() == null) {
+                currentNode.setLeftChild(newNode);
+            } else if (currentNode.getRightChild() == null) {
+                currentNode.setRightChild(newNode);
+            } else {
+                System.err.println("Cannot append third child into a binary tree!!");
+            }
+        }
+        this.nodesToVisit.add(newNode);
+        return newNode;
     }
 
     /**
@@ -39,9 +60,8 @@ public class RegionTree {
             if (this.root != null) {
                 System.err.println("Overwriting the root!");
             }
-            this.root = newNode;
+            this.root = (RegionTreeNode)newNode;
             this.root.setLevel(0);
-            this.currentNode = this.root;
         } else {
             newNode.setLevel(currentNode.getLevel() + 1);
             if (currentNode.getLeftChild() == null) {

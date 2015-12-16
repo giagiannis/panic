@@ -2,18 +2,18 @@ package gr.ntua.ece.cslab.panic.core.samplers.special;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.budget.StandardTreeBudgetStrategy;
+import gr.ntua.ece.cslab.panic.core.partitioners.SingleDimensionPartitioner;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.GridSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.LatinHypercubeSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.TotalOrderingSampler;
-import gr.ntua.ece.cslab.panic.core.samplers.budget.AbstractBudgetStrategy;
-import gr.ntua.ece.cslab.panic.core.samplers.budget.ConstantBudgetStrategy;
-import gr.ntua.ece.cslab.panic.core.samplers.budget.ConstantTreeLevelMultiplierBudgetStrategy;
-import gr.ntua.ece.cslab.panic.core.samplers.budget.GreedyBudgetStrategy;
+import gr.ntua.ece.cslab.panic.core.budget.AbstractBudgetStrategy;
+import gr.ntua.ece.cslab.panic.core.budget.ConstantBudgetStrategy;
+import gr.ntua.ece.cslab.panic.core.budget.GreedyBudgetStrategy;
 import gr.ntua.ece.cslab.panic.core.partitioners.AbstractPartitioner;
 import gr.ntua.ece.cslab.panic.core.partitioners.RandomPartitioner;
-import gr.ntua.ece.cslab.panic.core.partitioners.SplitByDimensionPartitioner;
 import gr.ntua.ece.cslab.panic.core.analyzers.deprec.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.analyzers.deprec.PrincipalComponentsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTree;
@@ -54,11 +54,12 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
     @Override
     public void configureSampler() {
         super.configureSampler();
-
-        this.regionTree.addChild(this.ranges);
+        SpecificRegionTreeNode node = new SpecificRegionTreeNode();
+        node.setRegion(this.ranges);
+        this.regionTree.addChild(node);
         this.regionTree.next();
 
-        String budgetStrategyName = "gr.ntua.ece.cslab.panic.core.samplers.budget.ConstantTreeLevelMultiplierBudgetStrategy";
+        String budgetStrategyName = "gr.ntua.ece.cslab.panic.core.budget.StandardTreeBudgetStrategy";
         if (this.configuration.containsKey("budget.strategy")) {
             budgetStrategyName = this.configuration.get("budget.strategy");
         }
@@ -107,7 +108,7 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
     }
 
     private void configureBiasedSampler() {
-        LoadingsAnalyzer analyzer = this.regionTree.getCurrent().getLoadingsAnalyzer();
+        LoadingsAnalyzer analyzer = ((SpecificRegionTreeNode)this.regionTree.getCurrent()).getLoadingsAnalyzer();
         this.regionTree.getCurrent().setBudget(pointsToPick);
         Integer pointsToPick = this.budgetStrategy.estimateBudget(this.regionTree.getCurrent());
 
@@ -150,7 +151,7 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
         this.budgetStrategy.setRegionTree(this.regionTree);
         this.budgetStrategy.setDeploymentBudget(this.pointsToPick);
 
-        if (this.budgetStrategy instanceof ConstantTreeLevelMultiplierBudgetStrategy || this.budgetStrategy instanceof GreedyBudgetStrategy) {
+        if (this.budgetStrategy instanceof StandardTreeBudgetStrategy || this.budgetStrategy instanceof GreedyBudgetStrategy) {
             treeLength = 0;
             if (this.configuration.containsKey("tree.length")) {
                 treeLength = new Integer(this.configuration.get("tree.length"));
@@ -165,8 +166,8 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
                 System.err.println("tree.coefficient to be set!!");
                 System.exit(1);
             }
-            ((ConstantTreeLevelMultiplierBudgetStrategy) this.budgetStrategy).setTreeCoefficient(treeCoefficient);
-            ((ConstantTreeLevelMultiplierBudgetStrategy) this.budgetStrategy).setTreeLength(treeLength);
+            ((StandardTreeBudgetStrategy) this.budgetStrategy).setTreeCoefficient(treeCoefficient);
+            ((StandardTreeBudgetStrategy) this.budgetStrategy).setTreeLength(treeLength);
         } else if (this.budgetStrategy instanceof ConstantBudgetStrategy) {
             // FIXME: define treeLength
             Integer constantBudget = 0;
@@ -183,13 +184,13 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 
     private void splitRegion() {
         LoadingsAnalyzer analyzer = this.performPCA(this.regionTree.getCurrent().getRegion());
-        this.regionTree.getCurrent().setLoadingsAnalyzer(analyzer);	// setting analyzer for father
+        ((SpecificRegionTreeNode)this.regionTree.getCurrent()).setLoadingsAnalyzer(analyzer);	// setting loadingsAnalyzer for father
         String[] ordering = analyzer.getInputDimensionsOrder();
         
         if(this.regionTree.getCurrent().getLevel()>=this.treeLength-1) {
             return;
         }
-        String partitionerClassName = "gr.ntua.ece.cslab.panic.core.partitioners.SplitByDimensionPartitioner";
+        String partitionerClassName = "gr.ntua.ece.cslab.panic.core.partitioners.SingleDimensionPartitioner";
         if (this.configuration.containsKey("partitioner")) {
             partitionerClassName = this.configuration.get("partitioner");
         }
@@ -204,8 +205,8 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
         }
 
         partitioner.setRanges(this.regionTree.getCurrent().getRegion());
-        if (partitioner instanceof SplitByDimensionPartitioner) {
-            ((SplitByDimensionPartitioner) partitioner).setDimensionKey(ordering[0]);
+        if (partitioner instanceof SingleDimensionPartitioner) {
+            ((SingleDimensionPartitioner) partitioner).setDimensionKey(ordering[0]);
         } else if (partitioner instanceof RandomPartitioner) {
             // nothing is needed
         }
@@ -214,14 +215,19 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
         if (partitioner.getHigherRegion() != null
                 && AbstractPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegion())
                 .size() >= this.ranges.size()) {
-            RegionTreeNode n = this.regionTree.addChild(partitioner.getHigherRegion());
+            SpecificRegionTreeNode node = new SpecificRegionTreeNode();
+            node.setRegion(partitioner.getHigherRegion());
+            SpecificRegionTreeNode n = (SpecificRegionTreeNode)this.regionTree.addChild(node);
             n.setLoadingsAnalyzer(this.performPCA(n.getRegion()));
         }
 
         if (partitioner.getLowerRegion() != null
                 && AbstractPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegion())
                 .size() >= this.ranges.size()) {
-            RegionTreeNode n = this.regionTree.addChild(partitioner.getLowerRegion());
+
+            SpecificRegionTreeNode node = new SpecificRegionTreeNode();
+            node.setRegion(partitioner.getLowerRegion());
+            SpecificRegionTreeNode n = (SpecificRegionTreeNode)this.regionTree.addChild(node);
             n.setLoadingsAnalyzer(this.performPCA(n.getRegion()));
         }
     }
@@ -241,5 +247,17 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
         LoadingsAnalyzer loadingsAnalyzer = analyzer.getLoadingsAnalyzer(numberOfPC);
         loadingsAnalyzer.setPcWeights(analyzer.getPCWeights());
         return loadingsAnalyzer;
+    }
+
+    public static class SpecificRegionTreeNode extends RegionTreeNode {
+        private LoadingsAnalyzer loadingsAnalyzer;
+
+        public LoadingsAnalyzer getLoadingsAnalyzer() {
+            return loadingsAnalyzer;
+        }
+
+        public void setLoadingsAnalyzer(LoadingsAnalyzer loadingsAnalyzer) {
+            this.loadingsAnalyzer = loadingsAnalyzer;
+        }
     }
 }

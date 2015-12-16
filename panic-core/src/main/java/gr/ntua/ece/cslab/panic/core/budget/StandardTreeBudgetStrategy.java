@@ -1,4 +1,4 @@
-package gr.ntua.ece.cslab.panic.core.samplers.budget;
+package gr.ntua.ece.cslab.panic.core.budget;
 
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
 
@@ -9,14 +9,14 @@ import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
  * @author Giannis Giannakopoulos
  *
  */
-public class ConstantTreeLevelMultiplierBudgetStrategy extends AbstractBudgetStrategy{
+public class StandardTreeBudgetStrategy extends AbstractBudgetStrategy{
 
 	private Double treeCoefficient;
 	private Integer treeLength;
 	
 	// aux variables
 	private Integer treeRootBudget;
-	public ConstantTreeLevelMultiplierBudgetStrategy() {
+	public StandardTreeBudgetStrategy() {
 		super();
 	}
 	

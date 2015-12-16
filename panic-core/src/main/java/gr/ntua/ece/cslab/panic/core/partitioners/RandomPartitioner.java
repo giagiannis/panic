@@ -8,7 +8,7 @@ import java.util.Random;
  * @author Giannis Giannakopoulos
  *
  */
-public class RandomPartitioner extends SplitByDimensionPartitioner {
+public class RandomPartitioner extends SingleDimensionPartitioner {
 
 	public RandomPartitioner() {
 		super();

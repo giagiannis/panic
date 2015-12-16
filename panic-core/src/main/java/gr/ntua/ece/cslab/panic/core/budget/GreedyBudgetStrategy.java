@@ -1,9 +1,10 @@
-package gr.ntua.ece.cslab.panic.core.samplers.budget;
+package gr.ntua.ece.cslab.panic.core.budget;
 
 import java.util.HashMap;
 import java.util.List;
 
 import gr.ntua.ece.cslab.panic.core.analyzers.deprec.LoadingsAnalyzer;
+import gr.ntua.ece.cslab.panic.core.samplers.special.BiasedPCASampler;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
 
 /**
@@ -12,7 +13,7 @@ import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
  * @author Giannis Giannakopoulos
  *
  */
-public class GreedyBudgetStrategy extends ConstantTreeLevelMultiplierBudgetStrategy {
+public class GreedyBudgetStrategy extends StandardTreeBudgetStrategy {
 	private final HashMap<Integer, Double> distanceCache, sumCache;
 
 	public GreedyBudgetStrategy() {
@@ -54,11 +55,16 @@ public class GreedyBudgetStrategy extends ConstantTreeLevelMultiplierBudgetStrat
 		if(node.isRoot()) {
 			return Double.MAX_VALUE;
 		}
-		LoadingsAnalyzer fatherAnalyzer = node.getFather().getLoadingsAnalyzer(), currentAnalyzer=node.getLoadingsAnalyzer();
 		double sum=0.0;
-		for(int i=0;i<fatherAnalyzer.getDimensionLabels().length-1;i++) {
-			sum+=Math.abs(fatherAnalyzer.getDistance(i)-currentAnalyzer.getDistance(i));
+		if(node instanceof BiasedPCASampler.SpecificRegionTreeNode) {
+			LoadingsAnalyzer
+					fatherAnalyzer = ((BiasedPCASampler.SpecificRegionTreeNode)node.getFather()).getLoadingsAnalyzer(),
+					currentAnalyzer=((BiasedPCASampler.SpecificRegionTreeNode)node).getLoadingsAnalyzer();
+			for(int i=0;i<fatherAnalyzer.getDimensionLabels().length-1;i++) {
+				sum+=Math.abs(fatherAnalyzer.getDistance(i)-currentAnalyzer.getDistance(i));
+			}
 		}
+
 		return sum;
 	}
 }

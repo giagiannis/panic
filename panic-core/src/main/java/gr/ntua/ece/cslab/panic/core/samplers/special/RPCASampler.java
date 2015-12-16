@@ -4,10 +4,10 @@ package gr.ntua.ece.cslab.panic.core.samplers.special;
 //import gr.ntua.ece.cslab.panic.core.containers.beans.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.partitioners.SingleDimensionPartitioner;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.LatinHypercubeSampler;
-import gr.ntua.ece.cslab.panic.core.partitioners.SplitByDimensionPartitioner;
 import gr.ntua.ece.cslab.panic.core.analyzers.deprec.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.analyzers.deprec.PrincipalComponentsAnalyzer;
 import java.util.HashMap;
@@ -79,16 +79,16 @@ public class RPCASampler extends AbstractAdaptiveSampler {
             LoadingsAnalyzer analyzer = this.performPCA(this.currentRanges);
             String[] ordering = analyzer.getInputDimensionsOrder();
             
-            SplitByDimensionPartitioner partitioner = new SplitByDimensionPartitioner();
+            SingleDimensionPartitioner partitioner = new SingleDimensionPartitioner();
             partitioner.setRanges(this.currentRanges);
             partitioner.setDimensionKey(ordering[0]);
             partitioner.configurePartitioner();
             
-            if(partitioner.getHigherRegion()!=null && !SplitByDimensionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegion()).isEmpty()) {
+            if(partitioner.getHigherRegion()!=null && !SingleDimensionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegion()).isEmpty()) {
                 this.rangesToExamine.add(partitioner.getHigherRegion());
             }
             
-            if(partitioner.getLowerRegion()!=null && !SplitByDimensionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegion()).isEmpty()) {
+            if(partitioner.getLowerRegion()!=null && !SingleDimensionPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegion()).isEmpty()) {
                 this.rangesToExamine.add(partitioner.getLowerRegion());
             }
 
@@ -107,7 +107,7 @@ public class RPCASampler extends AbstractAdaptiveSampler {
 
     private LoadingsAnalyzer performPCA(Map<String, List<Double>> currentRange) {
         PrincipalComponentsAnalyzer analyzer = new PrincipalComponentsAnalyzer();
-        List<OutputSpacePoint> data = SplitByDimensionPartitioner.filterPoints(outputSpacePoints, currentRange);
+        List<OutputSpacePoint> data = SingleDimensionPartitioner.filterPoints(outputSpacePoints, currentRange);
         analyzer.setInputData(data);
         try {
             analyzer.calculateVarianceMatrix();

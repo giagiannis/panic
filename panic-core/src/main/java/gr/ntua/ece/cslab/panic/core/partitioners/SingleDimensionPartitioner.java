@@ -10,11 +10,11 @@ import java.util.List;
  *
  * @author Giannis Giannakopoulos
  */
-public class SplitByDimensionPartitioner  extends AbstractPartitioner{
+public class SingleDimensionPartitioner extends AbstractPartitioner{
     private String dimensionKey;
 
     // constructors, getters and setters
-    public SplitByDimensionPartitioner() {
+    public SingleDimensionPartitioner() {
     	
     }
     
