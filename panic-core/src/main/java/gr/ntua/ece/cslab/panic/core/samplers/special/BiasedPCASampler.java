@@ -54,8 +54,7 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
     @Override
     public void configureSampler() {
         super.configureSampler();
-        SpecificRegionTreeNode node = new SpecificRegionTreeNode();
-        node.setRegion(this.ranges);
+        SpecificRegionTreeNode node = new SpecificRegionTreeNode(this.ranges);
         this.regionTree.addChild(node);
         this.regionTree.next();
 
@@ -215,8 +214,7 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
         if (partitioner.getHigherRegion() != null
                 && AbstractPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegion())
                 .size() >= this.ranges.size()) {
-            SpecificRegionTreeNode node = new SpecificRegionTreeNode();
-            node.setRegion(partitioner.getHigherRegion());
+            SpecificRegionTreeNode node = new SpecificRegionTreeNode(partitioner.getHigherRegion());
             SpecificRegionTreeNode n = (SpecificRegionTreeNode)this.regionTree.addChild(node);
             n.setLoadingsAnalyzer(this.performPCA(n.getRegion()));
         }
@@ -225,8 +223,7 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
                 && AbstractPartitioner.filterPoints(this.outputSpacePoints, partitioner.getLowerRegion())
                 .size() >= this.ranges.size()) {
 
-            SpecificRegionTreeNode node = new SpecificRegionTreeNode();
-            node.setRegion(partitioner.getLowerRegion());
+            SpecificRegionTreeNode node = new SpecificRegionTreeNode(partitioner.getLowerRegion());
             SpecificRegionTreeNode n = (SpecificRegionTreeNode)this.regionTree.addChild(node);
             n.setLoadingsAnalyzer(this.performPCA(n.getRegion()));
         }
@@ -251,6 +248,13 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
 
     public static class SpecificRegionTreeNode extends RegionTreeNode {
         private LoadingsAnalyzer loadingsAnalyzer;
+
+        public SpecificRegionTreeNode() {
+        }
+
+        public SpecificRegionTreeNode(HashMap<String, List<Double>> region) {
+            super(region);
+        }
 
         public LoadingsAnalyzer getLoadingsAnalyzer() {
             return loadingsAnalyzer;

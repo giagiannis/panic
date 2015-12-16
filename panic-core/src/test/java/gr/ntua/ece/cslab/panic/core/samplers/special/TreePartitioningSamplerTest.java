@@ -53,14 +53,14 @@ public class TreePartitioningSamplerTest {
 
     @Test
     public void testTreeParsing() {
-        TreePartitioningSampler.SpecificRegionTreeNode node = new TreePartitioningSampler.SpecificRegionTreeNode();
-        node.setRegion(this.ranges);
+        TreePartitioningSampler.SpecificRegionTreeNode node = new TreePartitioningSampler.SpecificRegionTreeNode(this.ranges);
         node.setAnalyzer(new RegressionAnalyzer());
+
         RegionTree tree = new RegionTree();
         tree.addChild(node);
-
         tree.next();
         TreePartitioningSampler.SpecificRegionTreeNode f = (TreePartitioningSampler.SpecificRegionTreeNode) tree.getCurrent();
         assertTrue(f.getAnalyzer()!=null);
     }
+
 }

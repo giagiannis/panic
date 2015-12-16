@@ -20,6 +20,10 @@ public class RegionTreeNode {
 	public RegionTreeNode() {
 	}
 
+	public RegionTreeNode(HashMap<String, List<Double>> region) {
+		this.region = region;
+	}
+
 	public HashMap<String, List<Double>> getRegion() {
 		return region;
 	}
