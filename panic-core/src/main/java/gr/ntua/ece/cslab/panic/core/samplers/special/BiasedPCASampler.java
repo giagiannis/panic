@@ -215,8 +215,8 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
                 && AbstractPartitioner.filterPoints(this.outputSpacePoints, partitioner.getHigherRegion())
                 .size() >= this.ranges.size()) {
             SpecificRegionTreeNode node = new SpecificRegionTreeNode(partitioner.getHigherRegion());
-            SpecificRegionTreeNode n = (SpecificRegionTreeNode)this.regionTree.addChild(node);
-            n.setLoadingsAnalyzer(this.performPCA(n.getRegion()));
+            node.setLoadingsAnalyzer(this.performPCA(node.getRegion()));
+            this.regionTree.addChild(node);
         }
 
         if (partitioner.getLowerRegion() != null
@@ -224,8 +224,10 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
                 .size() >= this.ranges.size()) {
 
             SpecificRegionTreeNode node = new SpecificRegionTreeNode(partitioner.getLowerRegion());
-            SpecificRegionTreeNode n = (SpecificRegionTreeNode)this.regionTree.addChild(node);
-            n.setLoadingsAnalyzer(this.performPCA(n.getRegion()));
+            node.setLoadingsAnalyzer(this.performPCA(node.getRegion()));
+            this.regionTree.addChild(node);
+//            SpecificRegionTreeNode n = (SpecificRegionTreeNode)this.regionTree.addChild(node);
+//            n.setLoadingsAnalyzer(this.performPCA(n.getRegion()));
         }
     }
 

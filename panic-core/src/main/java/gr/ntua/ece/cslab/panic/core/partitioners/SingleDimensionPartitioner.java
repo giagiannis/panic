@@ -32,13 +32,13 @@ public class SingleDimensionPartitioner extends AbstractPartitioner{
      * Configures and estimates the new ranges
      */
     public void configurePartitioner() {
-        System.out.print("partitioning: (");
+//        System.out.print("partitioning: (");
         for (String key : this.ranges.keySet()) {
             this.higherRegion.put(key, this.ranges.get(key));
             this.lowerRegion.put(key, this.ranges.get(key));
-            System.out.format("%s:%d ",key,this.ranges.get(key).size());
+//            System.out.format("%s:%d ",key,this.ranges.get(key).size());
         }
-        System.out.println(")");
+//        System.out.println(")");
 
         List<Double> examinedList = this.ranges.get(dimensionKey);
         if(this.getLeftSublist(examinedList).size()>0)

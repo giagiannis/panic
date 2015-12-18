@@ -24,7 +24,10 @@ import gr.ntua.ece.cslab.panic.core.samplers.AbstractAdaptiveSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.samplers.special.BiasedPCASampler;
 import gr.ntua.ece.cslab.panic.core.samplers.special.RandomPartitioningSampler;
+import gr.ntua.ece.cslab.panic.core.samplers.special.TreePartitioningSampler;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
+import sun.reflect.generics.tree.Tree;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -92,6 +95,8 @@ public class Main extends Benchmark {
                         leafRegions = ((BiasedPCASampler) s).getRegionTree().getLeafRegions();
                     } else if (s instanceof RandomPartitioningSampler) {
                         leafRegions = ((RandomPartitioningSampler) s).getRegionTree().getLeafRegions();
+                    } else if (s instanceof TreePartitioningSampler) {
+                        leafRegions = ((TreePartitioningSampler) s).getRegionTree().getLeafRegions();
                     } else {
                         leafRegions = null;
                     }

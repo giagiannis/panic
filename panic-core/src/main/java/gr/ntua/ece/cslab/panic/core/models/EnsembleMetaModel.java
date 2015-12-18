@@ -97,7 +97,7 @@ public class EnsembleMetaModel implements Model {
 	private Model findModelByPoint(InputSpacePoint point) {
 		int modelIndex = 0;
 		for (int i = 0; i < this.regions.size(); i++) {
-			if (SingleDimensionPartitioner.pointIsInRange(this.regions.get(i), point)) {
+			if (SingleDimensionPartitioner.pointInRange(this.regions.get(i), point)) {
 				modelIndex = this.regionToModelMapping[i];
 			}
 		}

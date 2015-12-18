@@ -26,7 +26,6 @@ public class TreePartitioningSamplerTest {
         DatasetCreator datasetCreator = new DatasetCreator();
         datasetCreator.setNumberOfDimensions(3);
         datasetCreator.createDataset();
-
         dataPoints = datasetCreator.getDataPoints();
         ranges = datasetCreator.getDimensionsWithRanges();
     }
@@ -43,11 +42,21 @@ public class TreePartitioningSamplerTest {
         sampler.setSamplingRate(0.1);
         sampler.configureSampler();
         InputSpacePoint in = sampler.next();
-        int count = 0;
+        int count = 1;
         while(sampler.hasMore() && in!=null) {
             in = sampler.next();
             count++;
+            OutputSpacePoint pointToFeed = null;
+            for(OutputSpacePoint p :dataPoints) {
+//                System.out.println("Comparing "+p.getInputSpacePoint()+" to "+in);
+                if(p.getInputSpacePoint().equals(in)){
+                    pointToFeed = p;
+                    break;
+                }
+            }
+            sampler.addOutputSpacePoint(pointToFeed);
         }
+
         assertTrue(count>0);
     }
 

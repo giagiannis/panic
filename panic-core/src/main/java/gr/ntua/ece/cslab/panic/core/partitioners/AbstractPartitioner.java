@@ -39,7 +39,8 @@ public abstract class AbstractPartitioner {
 	public abstract void configurePartitioner();
 	
     // public static methods
-    public static boolean pointIsInRange(Map<String, List<Double>> range, InputSpacePoint point) {
+    public static boolean pointInRange(Map<String, List<Double>> range, InputSpacePoint point) {
+//        System.out.format("Received value (%s, %s)\n", (range == null), (point == null));
         if(range==null)
             return false;
         for (String s : point.getKeysAsCollection()) {
@@ -65,7 +66,10 @@ public abstract class AbstractPartitioner {
             if(points == null) {
                 System.err.println("Null points???");
             }
-            if (pointIsInRange(range, p.getInputSpacePoint())) {
+//            System.out.format("%s, %s\n",(range==null), (p==null));
+//            System.out.format("%s, %s\n",(range==null), (p.getInputSpacePoint()==null));
+            boolean valu = pointInRange(range, p.getInputSpacePoint());
+            if (pointInRange(range, p.getInputSpacePoint())) {
                 result.add(p);
             }
         }
