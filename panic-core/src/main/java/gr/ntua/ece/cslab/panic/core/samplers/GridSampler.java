@@ -20,7 +20,7 @@ public class GridSampler extends  AbstractSampler {
     /**
      * the raw coefficients as inserted by the user
      */
-    private HashMap<String, Double> coefficients;
+    private Map<String, Double> coefficients;
     /**
      * List of samples into the grid
      */
@@ -45,7 +45,7 @@ public class GridSampler extends  AbstractSampler {
      * Returns the coefficient HashMap
      * @return 
      */
-    public HashMap<String, Double> getCoefficients() {
+    public Map<String, Double> getCoefficients() {
         return coefficients;
     }
 
@@ -53,7 +53,7 @@ public class GridSampler extends  AbstractSampler {
      * Set the weights of choice for each dimension.
      * @param coefficients 
      */
-    public void setWeights(HashMap<String, Double> coefficients) {
+    public void setWeights(Map<String, Double> coefficients) {
         this.coefficients = coefficients;
         this.normalizeCoefficients();
     }
@@ -120,6 +120,8 @@ public class GridSampler extends  AbstractSampler {
         
         
         for(String s:cardinalities.keySet()) {
+            System.out.format("key: %s, cardinality: %s, ranges: %s\n", s, cardinalities, this.ranges.get(s));
+
             double pivot=1.0/((1.0*cardinalities.get(s))/this.ranges.get(s).size());
             double start = pivot/2.0;
             for(double i=0;i<this.ranges.get(s).size();i+=pivot){
@@ -250,7 +252,7 @@ public class GridSampler extends  AbstractSampler {
     private class InputSpacePointsComparator implements Comparator<InputSpacePoint> {
         
         private final String[] orderedLabels;
-        public InputSpacePointsComparator(HashMap<String, Double> coefficients) {
+        public InputSpacePointsComparator(Map<String, Double> coefficients) {
             this.orderedLabels = new String[coefficients.size()];
             TreeMap<Double, List<String>> tree = new TreeMap<>();
             for(Double val : coefficients.values()) 
@@ -263,7 +265,7 @@ public class GridSampler extends  AbstractSampler {
                 for(String s:dimensions)
                     this.orderedLabels[index++] = s;
             }
-            
+
         }
 
         @Override

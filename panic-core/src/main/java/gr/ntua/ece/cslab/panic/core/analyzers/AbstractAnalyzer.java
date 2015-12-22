@@ -3,10 +3,7 @@ package gr.ntua.ece.cslab.panic.core.analyzers;
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by Giannis Giannakopoulos on 12/14/15.
@@ -86,6 +83,16 @@ public abstract class AbstractAnalyzer {
             this.normalizedPoints.add(this.getNormalizedPoint(p));
         }
     }
+//
+//    /**
+//     * This method receives coefficients c0,..,cn and returns C1,..,Cn where:
+//     * C1 = |c1|/(|c0|+..+|cn|)
+//     * @param coefficients
+//     * @return
+//     */
+//    public Map<String, Double> asPortion(Map<String, Double> coefficients) {
+//
+//    }
 
     public abstract void analyze() throws Exception;
 

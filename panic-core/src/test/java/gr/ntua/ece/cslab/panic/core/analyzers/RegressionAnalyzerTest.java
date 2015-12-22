@@ -2,7 +2,7 @@ package gr.ntua.ece.cslab.panic.core.analyzers;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.DatasetCreator;
+import gr.ntua.ece.cslab.panic.core.LinearDatasetCreator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class RegressionAnalyzerTest {
     public void setUp() throws Exception {
         this.random = new Random();
 
-        DatasetCreator datasetCreator = new DatasetCreator();
+        LinearDatasetCreator datasetCreator = new LinearDatasetCreator();
         datasetCreator.setNumberOfDimensions(this.random.nextInt(4)+1);
         datasetCreator.createDataset();
 
@@ -48,7 +48,7 @@ public class RegressionAnalyzerTest {
 
     // test that the points are normalized correctly
     @Test
-    public void testnormalizePoints() throws Exception {
+    public void testNormalizePoints() throws Exception {
         this.analyzer.normalizePoints();
         List<OutputSpacePoint> normalizedPoints = this.analyzer.getNormalizedPoints();
         assertNotNull(normalizedPoints);
@@ -100,5 +100,10 @@ public class RegressionAnalyzerTest {
         OutputSpacePoint o2 = this.analyzer.getNormalizedPoint(p);
         assertTrue(o1.getInputSpacePoint().equals(o2.getInputSpacePoint()));
         assertTrue(o1.getValue() == o2.getValue());
+    }
+
+    @Test
+    public void testAnalyzeWithConstantFunction() {
+
     }
 }

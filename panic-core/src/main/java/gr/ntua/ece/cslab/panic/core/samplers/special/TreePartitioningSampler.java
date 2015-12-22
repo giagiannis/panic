@@ -17,6 +17,7 @@ import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Giannis Giannakopoulos on 12/15/15.
@@ -43,8 +44,8 @@ public class TreePartitioningSampler extends AbstractAdaptiveSampler {
         this.regionTree = new RegionTree();
 
         this.configurationsParameters.put("budget.class", "define the budget class to be used");
-        this.configurationsParameters.put("budget.regionTree.coefficient", "define the coefficient of the regionTree budget strategies");
-        this.configurationsParameters.put("budget.regionTree.length", "define the length of the regionTree budget strategies");
+        this.configurationsParameters.put("budget.tree.coefficient", "define the coefficient of the regionTree budget strategies");
+        this.configurationsParameters.put("budget.tree.length", "define the length of the regionTree budget strategies");
         this.configurationsParameters.put("budget.constant.coefficient", "define the coefficient of the constant budget strategy");
         this.configurationsParameters.put("partitioner.class", "define the partitioner class");
         this.configurationsParameters.put("sampler.biased.class", "define the class of the biased sampler");
@@ -69,7 +70,6 @@ public class TreePartitioningSampler extends AbstractAdaptiveSampler {
     public InputSpacePoint next() {
         super.next();
         if (!this.sampler.hasMore()) {  // reconfiguration is needed
-            System.out.format("Reconfiguration at step %d (Level: %d)\n", this.pointsPicked, this.regionTree.getCurrent().getLevel());
             this.partitionSpace();
             this.regionTree.next();
             this.configureBiasedSampler();
@@ -122,8 +122,37 @@ public class TreePartitioningSampler extends AbstractAdaptiveSampler {
         }
         this.sampler.setDimensionsWithRanges(this.regionTree.getCurrent().getRegion());
         this.sampler.setPointsToPick(this.budgetStrategy.estimateBudget(this.regionTree.getCurrent()));
-        if(this.sampler instanceof GridSampler || this.sampler instanceof TotalOrderingSampler) {
-            System.out.println("Do not use biased sampler here!");
+
+        if(this.sampler instanceof GridSampler) {
+            if(((SpecificRegionTreeNode)this.regionTree.getCurrent()).getAnalyzer()==null) {
+                RegressionAnalyzer analyzer = new RegressionAnalyzer();
+                analyzer.setPointsToAnalyze(AbstractPartitioner.filterPoints(this.outputSpacePoints, this.regionTree.getCurrent().getRegion()));
+                analyzer.analyze();
+                ((SpecificRegionTreeNode) this.regionTree.getCurrent()).setAnalyzer(analyzer);
+            }
+            Map<String, Double> coefficients = ((SpecificRegionTreeNode)this.regionTree.getCurrent()).getAnalyzer().getCoefficients();
+
+
+            double sum = 0.0;
+            Map<String, Double> res = new HashMap<>();
+            for(String s:coefficients.keySet()) {
+                if(!s.equals("c"))
+                    sum+=Math.abs(coefficients.get(s));
+            }
+            for(String s:coefficients.keySet()) {
+                if(!s.equals("c"))
+                    res.put(s,Math.abs(coefficients.get(s))/sum);
+            }
+            ((GridSampler) this.sampler).setWeights(res);
+//            ((GridSampler) this.sampler).setForbiddenPoints;
+        } else if(this.sampler instanceof TotalOrderingSampler) {
+            if(((SpecificRegionTreeNode)this.regionTree.getCurrent()).getAnalyzer()==null) {
+                RegressionAnalyzer analyzer  = new RegressionAnalyzer();
+                analyzer.setPointsToAnalyze(AbstractPartitioner.filterPoints(this.outputSpacePoints, this.regionTree.getCurrent().getRegion()));
+                analyzer.analyze();
+                ((SpecificRegionTreeNode) this.regionTree.getCurrent()).setAnalyzer(analyzer);
+            }
+            ((TotalOrderingSampler) this.sampler).setDimensionOrdering(((SpecificRegionTreeNode) this.regionTree.getCurrent()).getAnalyzer().getDimensionOrdering());
         }
         this.sampler.configureSampler();
     }
@@ -144,11 +173,11 @@ public class TreePartitioningSampler extends AbstractAdaptiveSampler {
                     new Integer(this.configuration.get("budget.constant.coefficient")):DEFAULT_BUDGET_CONSTANT_COEFFICIENT));
         } else if(this.budgetStrategy instanceof StandardTreeBudgetStrategy) {      // this also implies GreedyBudgetStrategy
             ((StandardTreeBudgetStrategy) this.budgetStrategy).setTreeCoefficient(
-                    this.configuration.containsKey("budget.regionTree.coefficient")?
-                            new Double(this.configuration.get("budget.regionTree.coefficient")):DEFAULT_BUDGET_TREE_COEFFICIENT);
+                    this.configuration.containsKey("budget.tree.coefficient")?
+                            new Double(this.configuration.get("budget.tree.coefficient")):DEFAULT_BUDGET_TREE_COEFFICIENT);
             ((StandardTreeBudgetStrategy) this.budgetStrategy).setTreeLength(
-                    this.configuration.containsKey("budget.regionTree.length")?
-                            new Integer(this.configuration.get("budget.regionTree.length")):DEFAULT_BUDGET_TREE_LENGTH);
+                    this.configuration.containsKey("budget.tree.length")?
+                            new Integer(this.configuration.get("budget.tree.length")):DEFAULT_BUDGET_TREE_LENGTH);
         }
 
         this.budgetStrategy.configure();
@@ -158,7 +187,7 @@ public class TreePartitioningSampler extends AbstractAdaptiveSampler {
     private void partitionSpace() {
         RegressionAnalyzer analyzer = new RegressionAnalyzer();
         List<OutputSpacePoint> pointsToAnalyze = AbstractPartitioner.filterPoints(this.outputSpacePoints, this.regionTree.getCurrent().getRegion());
-        System.out.println("Points to analyze: "+pointsToAnalyze.size()+" out of "+this.outputSpacePoints.size());
+//        System.out.println("Points to analyze: "+pointsToAnalyze.size()+" out of "+this.outputSpacePoints.size());
         analyzer.setPointsToAnalyze(pointsToAnalyze);
         analyzer.analyze();
         String dimensionsToSplit = analyzer.getDimensionOrdering()[0];

@@ -25,8 +25,9 @@ import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.samplers.special.BiasedPCASampler;
 import gr.ntua.ece.cslab.panic.core.samplers.special.RandomPartitioningSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.special.TreePartitioningSampler;
+import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTree;
+import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
-import sun.reflect.generics.tree.Tree;
 
 import java.io.File;
 import java.util.HashMap;
@@ -90,21 +91,26 @@ public class Main extends Benchmark {
             }
 
             for (Model m : models) {
+                RegionTree tree = null;
                 if (m instanceof EnsembleMetaModel ) {
                     if(s instanceof BiasedPCASampler) {
-                        leafRegions = ((BiasedPCASampler) s).getRegionTree().getLeafRegions();
+                        tree = ((BiasedPCASampler) s).getRegionTree();
                     } else if (s instanceof RandomPartitioningSampler) {
-                        leafRegions = ((RandomPartitioningSampler) s).getRegionTree().getLeafRegions();
+                        tree = ((RandomPartitioningSampler) s).getRegionTree();
                     } else if (s instanceof TreePartitioningSampler) {
-                        leafRegions = ((TreePartitioningSampler) s).getRegionTree().getLeafRegions();
+                        tree = ((TreePartitioningSampler) s).getRegionTree();
                     } else {
-                        leafRegions = null;
+                        tree = null;
                     }
-//                    System.out.println("Leaf regions: "+leafRegions.size());
-//                    ((EnsembleMetaModel) m).setRegions(leafRegions);
                 }
-                if (leafRegions != null && m instanceof EnsembleMetaModel) {
-                    ((EnsembleMetaModel) m).setRegions(leafRegions);
+                if (tree != null && m instanceof EnsembleMetaModel) {
+                    ((EnsembleMetaModel) m).setRegions(tree.getLeafRegions());
+//                    System.out.println("Leaf regions: "+tree.getLeafRegions().size());
+                    for(RegionTreeNode n :tree.getDFSOrdering()) {
+                        for(int i=0;i<n.getLevel();i++)
+                            System.out.print("\t");
+                        System.out.println(n);
+                    }
                 } else {
                     System.err.println("Leaf regions is null or model not EnsembleModel");
                 }

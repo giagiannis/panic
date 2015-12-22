@@ -37,7 +37,7 @@ public class AbstractSampler implements Sampler {
     
     protected int pointsToPick;
     
-    protected final HashMap<String, String> configurationsParameters;
+    protected static HashMap<String, String> configurationsParameters;
     
     
     protected HashMap<String, String> configuration;

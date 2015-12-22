@@ -44,6 +44,7 @@ public class RegressionAnalyzer extends AbstractAnalyzer {
 
     /**
      * Return an array of the dimensions ordered in descending order of significance.
+     *
      * @return
      */
     public String[] getDimensionOrdering() {
@@ -52,27 +53,28 @@ public class RegressionAnalyzer extends AbstractAnalyzer {
 
     /**
      * Return an array of the dimensions, ordered by their significance with configurable order (asc vs desc).
+     *
      * @return
      */
     public String[] getDimensionOrdering(boolean descendingOrder) {
-        String[] keys = new String[this.coefficients.size()-1];
+        String[] keys = new String[this.coefficients.size() - 1];
         LinkedList<Map.Entry<String, Double>> entries = new LinkedList<>(this.coefficients.entrySet());
         Collections.sort(entries, new Comparator<Map.Entry<String, Double>>() {
             @Override
             public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) {
-                if(o1.getValue()>o2.getValue())
+                if (Math.abs(o1.getValue()) > Math.abs(o2.getValue()))
                     return 1;
-                else if (o1.getValue()<o2.getValue())
+                else if (Math.abs(o1.getValue()) < Math.abs(o2.getValue()))
                     return -1;
                 else
-                    return 0;
+                    return (new Random().nextBoolean()?-1:1);
             }
         });
-        Iterator<Map.Entry<String, Double>> it = (descendingOrder?entries.descendingIterator():entries.iterator());
+        Iterator<Map.Entry<String, Double>> it = (descendingOrder ? entries.descendingIterator() : entries.iterator());
         Integer index = 0;
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Map.Entry<String, Double> en = it.next();
-            if(!en.getKey().equals("c")) {
+            if (!en.getKey().equals("c")) {
                 keys[index++] = en.getKey();
             }
         }
@@ -82,25 +84,25 @@ public class RegressionAnalyzer extends AbstractAnalyzer {
     // trains a linear classifier and returns the params of its model
     private Map<String, Double> trainLinearRegressionClassifier(List<OutputSpacePoint> points) throws Exception {
         this.coefficients = new TreeMap<>();
+        for (String s : points.get(0).getInputSpacePoint().getKeysAsCollection()) {
+            this.coefficients.put(s, 0.0);
+        }
         LinearRegression regression = new LinearRegression();
         regression.configureClassifier();
         regression.feed(points);
         regression.train();
         String output = regression.getClassifier().toString();
-        System.out.println(output);
         output = output.replace('\n', ' ');
         String array[] = output.split("=")[1].split("\\+");
-        /*
-        FIXME
-        When the model is not trained appropriately, some input variables are hidden...
-        Pad with zeroes
-         */
         for (String c : array) {
             String temp[] = c.split("\\*");
             if (temp.length > 1)
-                coefficients.put(temp[1].trim(), new Double(temp[0]));
-            else
-                coefficients.put("c", new Double(temp[0]));
+                coefficients.put(temp[1].trim(), new Double(temp[0].trim()));
+            else {
+                if (!temp[0].trim().equals("")) {
+                    coefficients.put("c", new Double(temp[0].trim()));
+                }
+            }
         }
         return coefficients;
     }

@@ -2,7 +2,7 @@ package gr.ntua.ece.cslab.panic.core.samplers.special;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.DatasetCreator;
+import gr.ntua.ece.cslab.panic.core.LinearDatasetCreator;
 import gr.ntua.ece.cslab.panic.core.analyzers.RegressionAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTree;
 import org.junit.After;
@@ -23,7 +23,7 @@ public class TreePartitioningSamplerTest {
 
     @Before
     public void setUp() throws Exception {
-        DatasetCreator datasetCreator = new DatasetCreator();
+        LinearDatasetCreator datasetCreator = new LinearDatasetCreator();
         datasetCreator.setNumberOfDimensions(3);
         datasetCreator.createDataset();
         dataPoints = datasetCreator.getDataPoints();
@@ -48,7 +48,6 @@ public class TreePartitioningSamplerTest {
             count++;
             OutputSpacePoint pointToFeed = null;
             for(OutputSpacePoint p :dataPoints) {
-//                System.out.println("Comparing "+p.getInputSpacePoint()+" to "+in);
                 if(p.getInputSpacePoint().equals(in)){
                     pointToFeed = p;
                     break;

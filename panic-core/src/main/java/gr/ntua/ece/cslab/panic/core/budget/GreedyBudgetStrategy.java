@@ -6,7 +6,6 @@ import java.util.List;
 import gr.ntua.ece.cslab.panic.core.analyzers.deprec.LoadingsAnalyzer;
 import gr.ntua.ece.cslab.panic.core.samplers.special.BiasedPCASampler;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * This class implement the Greedy Budget Strategy, which focuses on increasing or decreasing 
@@ -65,7 +64,7 @@ public class GreedyBudgetStrategy extends StandardTreeBudgetStrategy {
 				sum+=Math.abs(fatherAnalyzer.getDistance(i)-currentAnalyzer.getDistance(i));
 			}
 		} else {
-			throw  new NotImplementedException();
+
 		}
 
 		return sum;

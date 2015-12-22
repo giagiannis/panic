@@ -199,7 +199,6 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
         try {
             partitioner = (AbstractPartitioner) Class.forName(partitionerClassName).newInstance();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

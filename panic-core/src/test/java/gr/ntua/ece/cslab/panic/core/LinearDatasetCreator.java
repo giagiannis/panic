@@ -8,14 +8,14 @@ import java.util.*;
 /**
  * Created by Giannis Giannakopoulos on 12/15/15.
  */
-public class DatasetCreator {
+public class LinearDatasetCreator {
     private Random random;
     private List<OutputSpacePoint> dataPoints;
     private Map<String, Double> dataCoefficients;
 
     private Integer numberOfDimensions;
 
-    public DatasetCreator() {
+    public LinearDatasetCreator() {
         this.random = new Random();
     }
 
