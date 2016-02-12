@@ -168,7 +168,7 @@ public class BiasedPCASampler extends AbstractAdaptiveSampler {
             ((StandardTreeBudgetStrategy) this.budgetStrategy).setTreeCoefficient(treeCoefficient);
             ((StandardTreeBudgetStrategy) this.budgetStrategy).setTreeLength(treeLength);
         } else if (this.budgetStrategy instanceof ConstantBudgetStrategy) {
-            // FIXME: define treeLength
+
             Integer constantBudget = 0;
             if (this.configuration.containsKey("budget.constant")) {
                 constantBudget = new Integer(this.configuration.get("budget.constant"));
