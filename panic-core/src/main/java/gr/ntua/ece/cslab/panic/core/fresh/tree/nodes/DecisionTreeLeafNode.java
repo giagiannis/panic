@@ -22,6 +22,7 @@ import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import java.util.List;
 
 /**
+ * Class  representing a terminal - leaf node of the decision tree
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
 public class DecisionTreeLeafNode extends DecisionTreeNode {
@@ -33,5 +34,10 @@ public class DecisionTreeLeafNode extends DecisionTreeNode {
 
     public List<OutputSpacePoint> getPoints() {
         return points;
+    }
+
+    @Override
+    protected String toString(String pad) {
+        return String.format("%s[%d]",pad,this.points.size());
     }
 }

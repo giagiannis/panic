@@ -20,6 +20,7 @@ package gr.ntua.ece.cslab.panic.core.fresh.tree.nodes;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 
 /**
+ * Class representing and intermediate - test node.
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
 public class DecisionTreeTestNode extends DecisionTreeNode {
@@ -28,12 +29,23 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
     private DecisionTreeNode leftChild, rightChild;
 
     /**
-     * Constructor of the test node
-     * @param attribute
-     * @param value
-     * @param leftChild
-     * @param rightChild
+     * Default construction
+     * @param attribute the split dimension name
+     * @param value the split dimension value
      */
+    public DecisionTreeTestNode(String attribute, double value) {
+        this.attribute = attribute;
+        this.value = value;
+    }
+
+    /**
+     * Constructor of the test node
+     * @param attribute the split dimension name
+     * @param value the split dimension value
+     * @param leftChild the left child of the test node
+     * @param rightChild the right child of the test node
+     */
+
     public DecisionTreeTestNode(String attribute, double value, DecisionTreeNode leftChild, DecisionTreeNode rightChild) {
         this.attribute = attribute;
         this.value = value;
@@ -59,21 +71,37 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
 
     public void setLeftChild(DecisionTreeNode leftChild) {
         this.leftChild = leftChild;
+        this.leftChild.father = this;
     }
 
     public void setRightChild(DecisionTreeNode rightChild) {
         this.rightChild = rightChild;
+        this.rightChild.father = this;
     }
 
     /**
      * Test the point and return left or right child
-     * @param p
-     * @return
+     * @param p the OutputSpacePoint to test
+     * @return returns the correct child that p belongs into (may be an intermediate node)
      */
     public DecisionTreeNode test(OutputSpacePoint p) {
         if(p.getInputSpacePoint().getValue(this.attribute) <= this.value)
             return leftChild;
         else
             return rightChild;
+    }
+
+    @Override
+    public String toString() {
+        return this.toString("");
+    }
+
+    protected String toString(String pad) {
+        return String.format("%s(%s, %.2f)\n%s\n%s",
+                pad,
+                this.attribute,
+                this.value,
+                this.leftChild.toString(pad+"\t"),
+                this.rightChild.toString(pad+"\t"));
     }
 }

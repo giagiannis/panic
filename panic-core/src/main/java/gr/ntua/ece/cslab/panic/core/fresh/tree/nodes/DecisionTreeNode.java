@@ -18,6 +18,7 @@
 package gr.ntua.ece.cslab.panic.core.fresh.tree.nodes;
 
 /**
+ * The base class, used for all the decision tree nodes.
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
 public abstract class DecisionTreeNode {
@@ -42,4 +43,6 @@ public abstract class DecisionTreeNode {
     public DecisionTreeTestNode castToTest() {
         return (DecisionTreeTestNode) this;
     }
+
+    protected abstract String toString(String pad);
 }
