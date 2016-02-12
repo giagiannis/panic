@@ -31,12 +31,9 @@ import java.util.List;
 public class DecisionTree {
     private DecisionTreeNode root;
 
-    private List<DecisionTreeNode> leaves;
+    private List<DecisionTreeLeafNode> leaves;
     private boolean leavesChanged = false;
 
-    public static class Configuration {
-        public static String SEPARATOR_TYPE;
-    }
 
     public DecisionTree() {
         this.root = new DecisionTreeLeafNode(new LinkedList<OutputSpacePoint>());
@@ -66,7 +63,7 @@ public class DecisionTree {
      * the leaves are returned from the cache, else the leaves are re-calculated and returned.
      * @return the leaves of the tree
      */
-    public List<DecisionTreeNode> getLeaves() {
+    public List<DecisionTreeLeafNode> getLeaves() {
         if(leavesChanged) {
             this.leaves.clear();
             List<DecisionTreeNode> toVisit = new LinkedList<>();
@@ -77,7 +74,7 @@ public class DecisionTree {
                     toVisit.add(n.castToTest().getLeftChild());
                     toVisit.add(n.castToTest().getRightChild());
                 } else {
-                    this.leaves.add(n);
+                    this.leaves.add(n.castToLeaf());
                 }
             }
             leavesChanged = false;
@@ -99,8 +96,13 @@ public class DecisionTree {
         return current.castToLeaf();
     }
 
-    // aux functions
-    private void replaceNode(DecisionTreeNode oldNode, DecisionTreeNode newNode) {
+    /**
+     * Function used to replace an old tree node with a new tree node. Use this function to build the tree and convert
+     * leaves into test nodes.
+     * @param oldNode the old node
+     * @param newNode the new node, to replace the former one
+     */
+    public final void replaceNode(DecisionTreeNode oldNode, DecisionTreeNode newNode) {
         DecisionTreeNode father = oldNode.getFather();
         if(father.castToTest().getLeftChild() == oldNode) {
             father.castToTest().setLeftChild(newNode);
