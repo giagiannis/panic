@@ -17,11 +17,13 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.tree.separators;
 
+import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 
-import java.util.List;
+import java.util.*;
 
 /**
+ * Separators that targets to separate the original leaf node wrt minimizing the variance of the output variable.
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
 public class VarianceSeparator extends Separator {
@@ -30,8 +32,36 @@ public class VarianceSeparator extends Separator {
         super(original);
     }
 
-    @Override
-    public void separate() {
+    protected double estimate(CandidatePair solution) {
+        double eval = 0.0;
+        eval += solution.getOriginal().size() * this.variance(solution.getOriginal());
+        eval -= solution.getLeftList().size() * this.variance(solution.getLeftList());
+        eval -= solution.getRightList().size() * this.variance(solution.getRightList());
+        return eval;
+    }
 
+
+    private double variance(List<OutputSpacePoint> list) {
+        double variance = 0.0;
+        double mean = this.mean(list);
+        for(OutputSpacePoint p :list) {
+            double diff = p.getValue() - mean;
+            variance = diff*diff;
+        }
+        if(list.size()>0) {
+            variance/=list.size();
+        }
+        return variance;
+    }
+
+    private double mean(List<OutputSpacePoint> list) {
+        double mean = 0.0;
+        for(OutputSpacePoint p: list) {
+            mean += p.getValue();
+        }
+        if(list.size()>0) {
+            mean/=list.size();
+        }
+        return  mean;
     }
 }
