@@ -1,6 +1,23 @@
+/*
+ * Copyright 2016 Giannis Giannakopoulos
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package gr.ntua.ece.cslab.panic.core.fresh.tree.separators;
 
-import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 
 import java.util.List;
 
@@ -8,47 +25,13 @@ import java.util.List;
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
 public class VarianceSeparator extends Separator {
-    private String dimension;
-    private double value;
 
-    public VarianceSeparator() {
-    }
-
-    public VarianceSeparator(List<OutputSpacePoint> points) {
-        super(points);
+    public VarianceSeparator(DecisionTreeLeafNode original) {
+        super(original);
     }
 
     @Override
-    public void configure() {
-        // TODO: calculate the most suitable dimension/value
-        // this.dimension, this.value must be defined here
-    }
+    public void separate() {
 
-    @Override
-    public Groups compute(OutputSpacePoint point) {
-        return (point.getInputSpacePoint().getValue(this.dimension)<= this.value?Groups.LEFT:Groups.RIGHT);
-    }
-
-    private double getVariance(List<OutputSpacePoint> points) {
-        double mean = this.getMean(points);
-        double variance = 0.0;
-        for(OutputSpacePoint p : points) {
-            variance+= (p.getValue() - mean)*(p.getValue() - mean);
-        }
-        if(points.size()>0) {
-            variance /= points.size();
-        }
-        return variance;
-    }
-
-    private double getMean(List<OutputSpacePoint> points) {
-        double mean = 0.0;
-        for(OutputSpacePoint p : points) {
-            mean += p.getValue();
-        }
-        if(this.points.size()>0) {
-            mean /= this.points.size();
-        }
-        return mean;
     }
 }
