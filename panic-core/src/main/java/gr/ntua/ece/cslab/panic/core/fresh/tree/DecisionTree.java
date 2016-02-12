@@ -44,7 +44,7 @@ public class DecisionTree {
 
     /**
      * Calls the DecisionTree.addPoint method many times.
-     * @param points
+     * @param points the points to add
      */
     public void addPoint(List<OutputSpacePoint> points) {
         for(OutputSpacePoint p : points) {
@@ -54,7 +54,7 @@ public class DecisionTree {
 
     /**
      * Adds a new point into the leaf that the specified point should belong into.
-     * @param point
+     * @param point the point to add
      */
     public void addPoint(OutputSpacePoint point) {
 
@@ -64,7 +64,7 @@ public class DecisionTree {
     /**
      * Returns the leaves of the DecisionTree. This methods retains a cache: if no new nodes have been created, then
      * the leaves are returned from the cache, else the leaves are re-calculated and returned.
-     * @return
+     * @return the leaves of the tree
      */
     public List<DecisionTreeNode> getLeaves() {
         if(leavesChanged) {
@@ -88,8 +88,8 @@ public class DecisionTree {
 
     /**
      * Returns the leaf in which the specified point belongs.
-     * @param point
-     * @return
+     * @param point the output space point to search
+     * @return the leaf that this point belongs into
      */
     public DecisionTreeLeafNode getLeaf(OutputSpacePoint point) {
         DecisionTreeNode current = this.root;
@@ -98,14 +98,6 @@ public class DecisionTree {
         }
         return current.castToLeaf();
     }
-
-    /**
-     * Function used to evaluate the leaves and
-     */
-    public void breakLeaves() {
-        // FIXME: write the DecisionTree.breakLeaves method
-    }
-
 
     // aux functions
     private void replaceNode(DecisionTreeNode oldNode, DecisionTreeNode newNode) {
