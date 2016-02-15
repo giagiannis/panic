@@ -39,13 +39,13 @@ public class CandidatePairTest {
 
     @Before
     public void setUp() throws Exception {
-        points = TestUtils.getOutputSpacePoints();
+        points = new TestUtils.FileReader().getOutputSpacePoints();
         Random random = new Random();
         OutputSpacePoint o = points.get(random.nextInt(points.size()));
         List<String> dimensions = new LinkedList<>(o.getInputSpacePoint().getKeysAsCollection());
         String randomDimension = dimensions.get(random.nextInt(dimensions.size()));
         Double randomValue = o.getInputSpacePoint().getValue(randomDimension);
-        pair = new Separator.CandidatePair(points, randomDimension, randomValue);
+        pair = new Separator.CandidatePair(points, randomDimension, randomValue, new TestUtils.FileReader().getDeploymentSpace());
     }
 
     @Test

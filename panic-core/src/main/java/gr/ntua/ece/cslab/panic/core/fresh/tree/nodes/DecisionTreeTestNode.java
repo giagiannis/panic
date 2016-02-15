@@ -18,6 +18,7 @@
 package gr.ntua.ece.cslab.panic.core.fresh.tree.nodes;
 
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
 /**
  * Class representing and intermediate - test node.
@@ -33,9 +34,10 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
      * @param attribute the split dimension name
      * @param value the split dimension value
      */
-    public DecisionTreeTestNode(String attribute, double value) {
+    public DecisionTreeTestNode(String attribute, double value, DeploymentSpace space) {
         this.attribute = attribute;
         this.value = value;
+        this.deploymentSpace = space;
     }
 
     /**
@@ -46,11 +48,12 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
      * @param rightChild the right child of the test node
      */
 
-    public DecisionTreeTestNode(String attribute, double value, DecisionTreeNode leftChild, DecisionTreeNode rightChild) {
+    public DecisionTreeTestNode(String attribute, double value, DeploymentSpace space, DecisionTreeNode leftChild, DecisionTreeNode rightChild) {
         this.attribute = attribute;
         this.value = value;
         this.leftChild = leftChild;
         this.rightChild = rightChild;
+        this.deploymentSpace = space;
     }
 
     public String getAttribute() {

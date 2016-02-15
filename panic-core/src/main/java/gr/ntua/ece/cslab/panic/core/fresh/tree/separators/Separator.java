@@ -18,6 +18,7 @@
 package gr.ntua.ece.cslab.panic.core.fresh.tree.separators;
 
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeTestNode;
 
@@ -56,38 +57,19 @@ public abstract class Separator {
      */
     public void separate() {
         // get possible values of separation
-        HashMap<String, Set<Double>> possibleValues = new HashMap<>();
-        for (OutputSpacePoint o : this.original.getPoints()) {
-            for (String dimension : o.getInputSpacePoint().getKeysAsCollection()) {
-                if (!possibleValues.containsKey(dimension)) {
-                    possibleValues.put(dimension, new HashSet<Double>());
-                }
-                possibleValues.get(dimension).add(o.getInputSpacePoint().getValue(dimension));
-            }
-        }
+        HashMap<String,Set<Double>> possibleValues = this.possibleValues(this.original.getPoints());
 
         // try all the possible values
-        double minEstimation = Double.MAX_VALUE;
-        CandidatePair best = null;
-        for (String candidateDimension : possibleValues.keySet()) {
-            Iterator<Double> it = possibleValues.get(candidateDimension).iterator();
-            for (Double candidateValue : possibleValues.get(candidateDimension)) {
-                CandidatePair candidatePair;
-                candidatePair = new CandidatePair(this.original.getPoints(), candidateDimension, candidateValue);
-                double estimation = estimate(candidatePair);
-                if (estimation < minEstimation) {
-                    minEstimation = estimation;
-                    best = candidatePair;
-                }
-            }
-        }
+        CandidatePair best = this.findBestCandidatePair(possibleValues);
 
         // setting result
         if (best != null) {
-            this.result = new DecisionTreeTestNode(best.getSeparationDimension(),
+            this.result = new DecisionTreeTestNode(
+                    best.getSeparationDimension(),
                     best.getSeparationValue(),
-                    new DecisionTreeLeafNode(best.getLeftList()),
-                    new DecisionTreeLeafNode(best.getRightList()));
+                    best.getOriginalDS(),
+                    new DecisionTreeLeafNode(best.getLeftList(),best.getLeftDS()),
+                    new DecisionTreeLeafNode(best.getRightList(), best.getRightDS()));
         }
     }
 
@@ -95,15 +77,18 @@ public abstract class Separator {
 
     protected static class CandidatePair {
         private final List<OutputSpacePoint> original, leftList, rightList;
+        private final DeploymentSpace originalDS;
+        private final DeploymentSpace leftDS, rightDS;
         private final String separationDimension;
         private final double separationValue;
 
-        public CandidatePair(List<OutputSpacePoint> original, String separationDimension, double separationValue) {
+        public CandidatePair(List<OutputSpacePoint> original, String separationDimension, double separationValue, DeploymentSpace space) {
             this.original = original;
             this.leftList = new LinkedList<>();
             this.rightList = new LinkedList<>();
             this.separationDimension = separationDimension;
             this.separationValue = separationValue;
+            this.originalDS = space;
 
             for (OutputSpacePoint o : original) {
                 if (o.getInputSpacePoint().getValue(separationDimension) <= separationValue) {
@@ -112,6 +97,20 @@ public abstract class Separator {
                     this.rightList.add(o);
                 }
             }
+
+            // separate deployment spaces as well
+            LinkedList<Double> leftL = new LinkedList<>(), rightL = new LinkedList<>();
+            for(Double d:this.originalDS.getRange().get(this.separationDimension)) {
+                if(d <= separationValue)
+                    leftL.add(d);
+                else
+                    rightL.add(d);
+            }
+            this.leftDS = this.originalDS.clone();
+            this.leftDS.getRange().put(this.separationDimension, leftL);
+            this.rightDS = this.originalDS.clone();
+            this.rightDS.getRange().put(this.separationDimension, rightL);
+
         }
 
         public List<OutputSpacePoint> getLeftList() {
@@ -133,5 +132,48 @@ public abstract class Separator {
         public double getSeparationValue() {
             return separationValue;
         }
+
+        public DeploymentSpace getOriginalDS() {
+            return originalDS;
+        }
+
+        public DeploymentSpace getLeftDS() {
+            return leftDS;
+        }
+
+        public DeploymentSpace getRightDS() {
+            return rightDS;
+        }
+    }
+
+    protected HashMap<String, Set<Double>> possibleValues(List<OutputSpacePoint> points) {
+        HashMap<String, Set<Double>> possibleValues = new HashMap<>();
+        for (OutputSpacePoint o : points) {
+            for (String dimension : o.getInputSpacePoint().getKeysAsCollection()) {
+                if (!possibleValues.containsKey(dimension)) {
+                    possibleValues.put(dimension, new HashSet<>());
+                }
+                possibleValues.get(dimension).add(o.getInputSpacePoint().getValue(dimension));
+            }
+        }
+        return possibleValues;
+    }
+
+    protected CandidatePair findBestCandidatePair(HashMap<String,Set<Double>> possibleValues) {
+        double minEstimation = Double.MAX_VALUE;
+        CandidatePair best = null;
+        for (String candidateDimension : possibleValues.keySet()) {
+            Iterator<Double> it = possibleValues.get(candidateDimension).iterator();
+            for (Double candidateValue : possibleValues.get(candidateDimension)) {
+                CandidatePair candidatePair;
+                candidatePair = new CandidatePair(this.original.getPoints(), candidateDimension, candidateValue, this.original.getDeploymentSpace());
+                double estimation = estimate(candidatePair);
+                if (estimation < minEstimation) {
+                    minEstimation = estimation;
+                    best = candidatePair;
+                }
+            }
+        }
+        return best;
     }
 }

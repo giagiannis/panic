@@ -17,15 +17,26 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.tree.nodes;
 
+import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
+
 /**
  * The base class, used for all the decision tree nodes.
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
 public abstract class DecisionTreeNode {
     protected DecisionTreeNode father;
+    protected DeploymentSpace deploymentSpace;
 
     public DecisionTreeNode() {
 
+    }
+
+    public DeploymentSpace getDeploymentSpace() {
+        return deploymentSpace;
+    }
+
+    public void setDeploymentSpace(DeploymentSpace deploymentSpace) {
+        this.deploymentSpace = deploymentSpace;
     }
 
     public DecisionTreeNode getFather() {

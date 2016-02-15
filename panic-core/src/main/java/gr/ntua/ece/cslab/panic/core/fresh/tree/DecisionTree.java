@@ -18,6 +18,7 @@
 package gr.ntua.ece.cslab.panic.core.fresh.tree;
 
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 
@@ -35,8 +36,8 @@ public class DecisionTree {
     private boolean leavesChanged = false;
 
 
-    public DecisionTree() {
-        this.root = new DecisionTreeLeafNode(new LinkedList<OutputSpacePoint>());
+    public DecisionTree(DeploymentSpace space) {
+        this.root = new DecisionTreeLeafNode(new LinkedList<>(), space);
     }
 
     /**

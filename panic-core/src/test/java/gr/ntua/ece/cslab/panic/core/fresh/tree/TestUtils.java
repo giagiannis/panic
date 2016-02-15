@@ -18,6 +18,7 @@
 package gr.ntua.ece.cslab.panic.core.fresh.tree;
 
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 
 import java.net.URL;
@@ -30,23 +31,45 @@ import java.util.List;
  */
 public class TestUtils {
 
-    public static List<OutputSpacePoint> getOutputSpacePoints() {
-        return getOutputSpacePoints("sample-input.dat");
-    }
+    public static class FileReader {
+        private CSVFileManager manager;
+        private List<OutputSpacePoint> outputSpacePoints;
+        private DeploymentSpace space;
 
-    public static List<OutputSpacePoint> getOutputSpacePoints(String resourceName) {
-        List<OutputSpacePoint> points = null;
-        CSVFileManager manager = new CSVFileManager();
-        URL url  = TestUtils.class.getClassLoader().getResource(resourceName);
-        if(url!=null) {
-            String file = url.getFile();
-            manager.setFilename(file);
-            points = manager.getOutputSpacePoints();
-            Collections.shuffle(points);
-            points = points.subList(0,100);
+        public FileReader() {
+            this.readFile("sample-input.dat");
         }
-        return points;
-    }
 
+        public FileReader(String resourceName) {
+            this.readFile(resourceName);
+        }
+
+        public  List<OutputSpacePoint> getOutputSpacePoints() {
+            if(this.outputSpacePoints == null) {
+                this.outputSpacePoints = this.manager.getOutputSpacePoints();
+            }
+            return this.outputSpacePoints;
+        }
+
+        public DeploymentSpace getDeploymentSpace() {
+            if(this.space == null) {
+                this.space = new DeploymentSpace();
+                this.space.setRange(manager.getDimensionRanges());
+            }
+            return this.space;
+        }
+
+        private void readFile(String resourceName) {
+            List<OutputSpacePoint> points;
+            manager = new CSVFileManager();
+            URL url = TestUtils.class.getClassLoader().getResource(resourceName);
+            if (url != null) {
+                String file = url.getFile();
+                manager.setFilename(file);
+                points = manager.getOutputSpacePoints();
+                Collections.shuffle(points);
+            }
+        }
+    }
 
 }

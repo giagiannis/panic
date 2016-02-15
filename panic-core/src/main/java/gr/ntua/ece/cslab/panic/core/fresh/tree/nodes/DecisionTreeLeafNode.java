@@ -18,6 +18,7 @@
 package gr.ntua.ece.cslab.panic.core.fresh.tree.nodes;
 
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
 import java.util.List;
 
@@ -28,8 +29,9 @@ import java.util.List;
 public class DecisionTreeLeafNode extends DecisionTreeNode {
     private final List<OutputSpacePoint> points;
 
-    public DecisionTreeLeafNode(List<OutputSpacePoint> points) {
+    public DecisionTreeLeafNode(List<OutputSpacePoint> points, DeploymentSpace space) {
         this.points = points;
+        this.deploymentSpace = space;
     }
 
     public List<OutputSpacePoint> getPoints() {

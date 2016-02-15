@@ -43,9 +43,9 @@ public class SeparatorTest {
 
     @Before
     public void setUp() throws Exception {
-        points = TestUtils.getOutputSpacePoints();
+        points = new TestUtils.FileReader().getOutputSpacePoints();
         SeparatorFactory factory = new SeparatorFactory();
-        DecisionTreeLeafNode node = new DecisionTreeLeafNode(points);
+        DecisionTreeLeafNode node = new DecisionTreeLeafNode(points, new TestUtils.FileReader().getDeploymentSpace());
         separator = new Separator(node) {
             @Override
             protected double estimate(CandidatePair pair) {
