@@ -65,6 +65,5 @@ public class FileMetricSourceTest {
     @Test
     public void testDeploymentSpace() throws Exception {
         assertNotNull(this.deployer.getDeploymentSpace());
-        System.out.println(deployer.getDeploymentSpace());
     }
 }

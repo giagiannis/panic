@@ -17,6 +17,9 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.client;
 
+import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAdaptive;
+import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
+import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSourceFactory;
 import org.apache.commons.cli.*;
 
 import java.io.FileInputStream;
@@ -31,8 +34,17 @@ import java.util.Properties;
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
 public class EntryPoint {
-
     public static boolean DEBUG=false;
+    public static String
+            CONF_METRICSOURCE_PREFIX_KEY = "metricsource",
+            CONF_METRICSOURCE_TYPE_KEY = "metricsource.type",
+            CONF_SAMPLER_PREFIX = "sampler",
+            CONF_SAMPLER_TYPE_KEY = "sampler.type",
+            CONF_SEPARATOR_PREFIX = "separator",
+            CONF_SEPARATOR_TYPE_KEY = "separator.type",
+            CONF_BUDGET_PREFIX = "budget",
+            CONF_BUDGET_POINTS_KEY = "budget.points",
+            CONF_BUDGET_TYPE_KEY= "budget.type";
 
 
     protected static void debugPrint(String message) {
@@ -93,8 +105,37 @@ public class EntryPoint {
         return prop;
     }
 
+    protected static Properties isolateProperties(Properties original, String prefix) {
+        Properties finalProperties = new Properties();
+        for(String key:original.stringPropertyNames()) {
+            if(key.contains(prefix)) {
+                int index = key.indexOf(prefix) + prefix.length()+1;
+                finalProperties.setProperty(key.substring(index), original.getProperty(key));
+            }
+        }
+        return finalProperties;
+
+    }
     public static void main(String[] args) throws ParseException, IOException {
         Map<String,String> cliOptions= parseCLIOptions(args);
-        Properties p = loadConfigurationFile(cliOptions);
+        Properties properties = loadConfigurationFile(cliOptions);
+
+        // MetricSource
+        Properties msProps = isolateProperties(properties, CONF_METRICSOURCE_PREFIX_KEY +"."+properties.getProperty(CONF_METRICSOURCE_TYPE_KEY));
+        MetricSourceFactory factory  = new MetricSourceFactory();
+        MetricSource source = factory.create(properties.getProperty(CONF_METRICSOURCE_TYPE_KEY), msProps);
+        source.configure();
+
+        // deploymentBudget count
+        int budget = new Integer(properties.getProperty(CONF_BUDGET_POINTS_KEY));
+        Properties budgetProperties = isolateProperties(properties, CONF_BUDGET_PREFIX+"."+properties.getProperty(CONF_BUDGET_TYPE_KEY));
+        Properties samplerProperties = isolateProperties(properties, CONF_SAMPLER_PREFIX+"."+properties.getProperty(CONF_SAMPLER_TYPE_KEY));
+
+        DTAdaptive adaptive = new DTAdaptive(budget, source,
+                properties.getProperty(CONF_BUDGET_TYPE_KEY), budgetProperties,
+                properties.getProperty(CONF_SAMPLER_TYPE_KEY),
+                properties.getProperty(CONF_SEPARATOR_TYPE_KEY));
+
+        adaptive.run();
     }
 }

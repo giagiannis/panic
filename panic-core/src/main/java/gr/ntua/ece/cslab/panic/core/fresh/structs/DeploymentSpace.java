@@ -42,11 +42,6 @@ public class DeploymentSpace {
     }
 
     public DeploymentSpace clone() {
-        try {
-            super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
         HashMap<String, List<Double>> newRegion = new HashMap<>();
         for(String s: this.range.keySet()) {
             newRegion.put(s, new LinkedList<>());

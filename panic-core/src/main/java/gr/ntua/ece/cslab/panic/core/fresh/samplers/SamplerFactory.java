@@ -26,7 +26,7 @@ import java.util.Properties;
  */
 public class SamplerFactory {
 
-    public AbstractSampler create(String type, Properties properties) {
+    public AbstractSampler create(String type) {
         if(type.equals("lhs")) {
             return new LatinHypercubeSampler();
         }

@@ -40,6 +40,7 @@ public class ConstantBudget extends Budget {
 
     @Override
     public int estimate(DecisionTreeNode node) {
+        // FIXME: we may exceed the budget here
         return this.coefficient;
     }
 }

@@ -49,10 +49,11 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
      */
 
     public DecisionTreeTestNode(String attribute, double value, DeploymentSpace space, DecisionTreeNode leftChild, DecisionTreeNode rightChild) {
+        super();
         this.attribute = attribute;
         this.value = value;
-        this.leftChild = leftChild;
-        this.rightChild = rightChild;
+        this.setLeftChild(leftChild);
+        this.setRightChild(rightChild);;
         this.deploymentSpace = space;
     }
 

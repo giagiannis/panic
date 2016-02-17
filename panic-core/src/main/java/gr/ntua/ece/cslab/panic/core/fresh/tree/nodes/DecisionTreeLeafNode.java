@@ -30,6 +30,7 @@ public class DecisionTreeLeafNode extends DecisionTreeNode {
     private final List<OutputSpacePoint> points;
 
     public DecisionTreeLeafNode(List<OutputSpacePoint> points, DeploymentSpace space) {
+        super();
         this.points = points;
         this.deploymentSpace = space;
     }

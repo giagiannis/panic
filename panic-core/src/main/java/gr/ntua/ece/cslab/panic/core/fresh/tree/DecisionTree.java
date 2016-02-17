@@ -33,11 +33,12 @@ public class DecisionTree {
     private DecisionTreeNode root;
 
     private List<DecisionTreeLeafNode> leaves;
-    private boolean leavesChanged = false;
+    private boolean leavesChanged = true;
 
 
     public DecisionTree(DeploymentSpace space) {
         this.root = new DecisionTreeLeafNode(new LinkedList<>(), space);
+        this.leaves = new LinkedList<>();
     }
 
     /**
@@ -55,7 +56,7 @@ public class DecisionTree {
      * @param point the point to add
      */
     public void addPoint(OutputSpacePoint point) {
-
+        this.getLeaf(point).getPoints().add(point);
     }
 
 
@@ -104,8 +105,11 @@ public class DecisionTree {
      * @param newNode the new node, to replace the former one
      */
     public final void replaceNode(DecisionTreeNode oldNode, DecisionTreeNode newNode) {
+        this.leavesChanged = true;
         DecisionTreeNode father = oldNode.getFather();
-        if(father.castToTest().getLeftChild() == oldNode) {
+        if(father == null) { // we need to change the root here
+            this.root = newNode;
+        } else if(father.castToTest().getLeftChild().getId() == oldNode.getId()) {
             father.castToTest().setLeftChild(newNode);
         } else if(father.castToTest().getRightChild() == oldNode) {
             father.castToTest().setRightChild(newNode);
@@ -113,5 +117,36 @@ public class DecisionTree {
             System.err.println("oldnode says: my father does not recognize me :(");
             System.exit(1);
         }
+    }
+
+
+    public final List<OutputSpacePoint> getSamples() {
+        List<OutputSpacePoint> points = new LinkedList<>();
+        for(DecisionTreeLeafNode leaf : this.getLeaves()) {
+            points.addAll(leaf.getPoints());
+        }
+        return points;
+    }
+
+    @Override
+    public String toString() {
+        String buffer = "";
+        List<DecisionTreeNode> toVisit = new LinkedList<>();
+        toVisit.add(this.root);
+        while (!toVisit.isEmpty()) {
+            DecisionTreeNode n = toVisit.remove(0);
+            if(!n.isLeaf()) {
+                toVisit.add(0,n.castToTest().getLeftChild());
+                toVisit.add(0,n.castToTest().getRightChild());
+            }
+//            int count = 0;
+            DecisionTreeNode t = n;
+            while(t!=root && t!=null) {
+                t = t.getFather();
+                buffer+="\t";
+            }
+            buffer+=n.getId()+"\n";
+        }
+        return buffer;
     }
 }

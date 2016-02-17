@@ -19,6 +19,8 @@ package gr.ntua.ece.cslab.panic.core.fresh.tree.nodes;
 
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
+import java.util.UUID;
+
 /**
  * The base class, used for all the decision tree nodes.
  * Created by Giannis Giannakopoulos on 2/11/16.
@@ -26,9 +28,10 @@ import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 public abstract class DecisionTreeNode {
     protected DecisionTreeNode father;
     protected DeploymentSpace deploymentSpace;
+    private final String id;
 
     public DecisionTreeNode() {
-
+        this.id = UUID.randomUUID().toString();
     }
 
     public DeploymentSpace getDeploymentSpace() {
@@ -55,5 +58,8 @@ public abstract class DecisionTreeNode {
         return (DecisionTreeTestNode) this;
     }
 
+    public String getId() {
+        return this.id;
+    }
     protected abstract String toString(String pad);
 }
