@@ -19,6 +19,7 @@ package gr.ntua.ece.cslab.panic.core.fresh.metricsource;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
 import java.util.Properties;
 
@@ -28,9 +29,18 @@ import java.util.Properties;
  */
 public abstract class MetricSource {
     protected Properties configuration;
+    protected DeploymentSpace deploymentSpace;
 
     public MetricSource(Properties configuration) {
         this.configuration = configuration;
+    }
+
+    public DeploymentSpace getDeploymentSpace() {
+        return deploymentSpace;
+    }
+
+    public void setDeploymentSpace(DeploymentSpace deploymentSpace) {
+        this.deploymentSpace = deploymentSpace;
     }
 
     /**

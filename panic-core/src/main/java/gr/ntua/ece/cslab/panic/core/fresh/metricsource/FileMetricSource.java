@@ -19,6 +19,7 @@ package gr.ntua.ece.cslab.panic.core.fresh.metricsource;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 
 import java.util.HashMap;
@@ -49,6 +50,8 @@ public class FileMetricSource extends MetricSource {
         for(OutputSpacePoint p : manager.getOutputSpacePoints()) {
             this.mapping.put(p.getInputSpacePoint(), p);
         }
+        this.deploymentSpace = new DeploymentSpace();
+        this.deploymentSpace.setRange(manager.getDimensionRanges());
     }
 
     @Override
