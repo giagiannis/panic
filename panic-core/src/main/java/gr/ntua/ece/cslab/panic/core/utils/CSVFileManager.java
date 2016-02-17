@@ -50,6 +50,10 @@ public class CSVFileManager {
         
     }
 
+    public CSVFileManager(String filename) {
+        this.setFilename(filename);
+    }
+
     public String getFilename() {
         return filename;
     }
@@ -58,7 +62,7 @@ public class CSVFileManager {
         this.filename = filename;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
-            String buffer=new String();
+            String buffer="";
             while(reader.ready()) {
                 buffer = reader.readLine();
                 if(!buffer.trim().startsWith("#") && buffer.trim().length()!=0)
@@ -71,9 +75,7 @@ public class CSVFileManager {
             this.outputDimensionIndex = this.dimensionNames.length - 1;
             this.hashMap = new HashMap<>();
             reader.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CSVFileManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch ( IOException  ex) {
             Logger.getLogger(CSVFileManager.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -82,7 +84,7 @@ public class CSVFileManager {
     /**
      * Default number equals to number of column to CSV -1.
      *
-     * @return
+     * @return number of input dimensions
      */
     public int getNumberOfInputDimensions() {
         return numberOfInputDimensions;
@@ -103,7 +105,7 @@ public class CSVFileManager {
     /**
      * Default number equals to number of columns to CSV -1.
      *
-     * @return
+     * @return the index of output dimension
      */
     public int getOutputDimensionIndex() {
         return outputDimensionIndex;
@@ -150,7 +152,7 @@ public class CSVFileManager {
      * Method returning the district values of each dimension. Useful for
      * samplers.
      *
-     * @return
+     * @return the dimension regions
      */
     public HashMap<String, List<Double>> getDimensionRanges() {
         HashMap<String, Set<Double>> temp = new HashMap<>();
@@ -158,7 +160,7 @@ public class CSVFileManager {
         for (InputSpacePoint p : points) {
             for (String key : p.getKeysAsCollection()) {
                 if (temp.get(key) == null) {
-                    temp.put(key, new HashSet<Double>());
+                    temp.put(key, new HashSet<>());
                 }
                 temp.get(key).add(p.getValue(key));
             }
