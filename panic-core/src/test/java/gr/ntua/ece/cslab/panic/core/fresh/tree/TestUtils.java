@@ -32,12 +32,13 @@ import java.util.List;
 public class TestUtils {
 
     public static class FileReader {
+        public static String DEFAULT_DATASET_PATH = "sample-input.dat";
         private CSVFileManager manager;
         private List<OutputSpacePoint> outputSpacePoints;
         private DeploymentSpace space;
 
         public FileReader() {
-            this.readFile("sample-input.dat");
+            this.readFile(DEFAULT_DATASET_PATH);
         }
 
         public FileReader(String resourceName) {
