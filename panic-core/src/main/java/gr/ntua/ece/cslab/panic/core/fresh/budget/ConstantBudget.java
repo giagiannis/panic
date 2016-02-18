@@ -23,13 +23,14 @@ import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 import java.util.Properties;
 
 /**
+ * Budget strategy that always returns the same
  * Created by Giannis Giannakopoulos on 2/17/16.
  */
 public class ConstantBudget extends Budget {
     protected int coefficient;
 
-    public ConstantBudget(DecisionTree tree, Properties properties) {
-        super(tree, properties);
+    public ConstantBudget(DecisionTree tree, Properties properties, Integer totalBudget) {
+        super(tree, properties, totalBudget);
         this.coefficient = new Integer(this.properties.getProperty("coefficient"));
     }
 

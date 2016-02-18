@@ -22,13 +22,16 @@ import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import java.util.Properties;
 
 /**
+ * Factor for Budget instances
  * Created by Giannis Giannakopoulos on 2/17/16.
  */
 public class BudgetFactory {
 
-    public Budget create(String type, DecisionTree tree, Properties properties) {
+    public Budget create(String type, DecisionTree tree, Properties properties, Integer totalBudget) {
         if(type.equals("constant")) {
-            return new ConstantBudget(tree, properties);
+            return new ConstantBudget(tree, properties, totalBudget);
+        } else if (type.equals("tree")) {
+            return new TreeBudget(tree, properties, totalBudget);
         }
         return null;
     }

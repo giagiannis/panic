@@ -29,10 +29,12 @@ import java.util.Properties;
 public abstract class Budget {
     protected final DecisionTree tree;
     protected final Properties properties;
+    protected final Integer totalBudget;
 
-    public Budget(DecisionTree tree, Properties properties) {
+    public Budget(DecisionTree tree, Properties properties, Integer totalBudget) {
         this.tree = tree;
         this.properties = properties;
+        this.totalBudget = totalBudget;
     }
 
     public abstract void configure();
