@@ -109,7 +109,7 @@ public class DecisionTree {
         DecisionTreeNode father = oldNode.getFather();
         if(father == null) { // we need to change the root here
             this.root = newNode;
-        } else if(father.castToTest().getLeftChild().getId() == oldNode.getId()) {
+        } else if(father.castToTest().getLeftChild() == oldNode) {
             father.castToTest().setLeftChild(newNode);
         } else if(father.castToTest().getRightChild() == oldNode) {
             father.castToTest().setRightChild(newNode);
@@ -139,14 +139,13 @@ public class DecisionTree {
                 toVisit.add(0,n.castToTest().getLeftChild());
                 toVisit.add(0,n.castToTest().getRightChild());
             }
-//            int count = 0;
             DecisionTreeNode t = n;
-            while(t!=root && t!=null) {
+            while(t!=root) {
                 t = t.getFather();
-                buffer+="\t";
+                buffer+="    ";
             }
             buffer+=n.getId()+"\n";
         }
-        return buffer;
+        return buffer.substring(0,buffer.length()-1);
     }
 }
