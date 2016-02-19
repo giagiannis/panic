@@ -17,7 +17,9 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.client;
 
-import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAdaptive;
+import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithm;
+import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithmFactory;
+import gr.ntua.ece.cslab.panic.core.fresh.algo.DTOnline;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSourceFactory;
 import org.apache.commons.cli.*;
@@ -35,17 +37,6 @@ import java.util.Properties;
  */
 public class EntryPoint {
     public static boolean DEBUG=false;
-    public static String
-            CONF_METRICSOURCE_PREFIX_KEY = "metricsource",
-            CONF_METRICSOURCE_TYPE_KEY = "metricsource.type",
-            CONF_SAMPLER_PREFIX = "sampler",
-            CONF_SAMPLER_TYPE_KEY = "sampler.type",
-            CONF_SEPARATOR_PREFIX = "separator",
-            CONF_SEPARATOR_TYPE_KEY = "separator.type",
-            CONF_BUDGET_PREFIX = "budget",
-            CONF_BUDGET_POINTS_KEY = "budget.points",
-            CONF_BUDGET_TYPE_KEY= "budget.type";
-
 
     protected static void debugPrint(String message) {
         if(DEBUG) {
@@ -121,32 +112,20 @@ public class EntryPoint {
         return finalProperties;
 
     }
+
     public static void main(String[] args) throws ParseException, IOException {
         Map<String,String> cliOptions= parseCLIOptions(args);
         Properties properties = loadConfigurationFile(cliOptions);
 
-        // MetricSource
-        Properties msProps = isolateProperties(properties, CONF_METRICSOURCE_PREFIX_KEY +"."+properties.getProperty(CONF_METRICSOURCE_TYPE_KEY));
-        MetricSourceFactory factory  = new MetricSourceFactory();
-        MetricSource source = factory.create(properties.getProperty(CONF_METRICSOURCE_TYPE_KEY), msProps);
-        source.configure();
-
-        // deploymentBudget count
-        int budget = new Integer(properties.getProperty(CONF_BUDGET_POINTS_KEY));
-        Properties budgetProperties = isolateProperties(properties, CONF_BUDGET_PREFIX+"."+properties.getProperty(CONF_BUDGET_TYPE_KEY));
-        Properties samplerProperties = isolateProperties(properties, CONF_SAMPLER_PREFIX+"."+properties.getProperty(CONF_SAMPLER_TYPE_KEY));
-
         int repetitions = new Integer(properties.getProperty("entrypoint.repetitions"));
         double mse = 0.0, leafNodes = 0.0;
         for(int i=0;i<repetitions;i++) {
-            DTAdaptive adaptive = new DTAdaptive(budget, source,
-                    properties.getProperty(CONF_BUDGET_TYPE_KEY), budgetProperties,
-                    properties.getProperty(CONF_SAMPLER_TYPE_KEY),
-                    properties.getProperty(CONF_SEPARATOR_TYPE_KEY));
-
-            adaptive.run();
-            mse+=adaptive.getMSE();
-            leafNodes+=adaptive.getTree().getLeaves().size();
+            DTAlgorithm algorithm;
+            DTAlgorithmFactory factory1 = new DTAlgorithmFactory();
+            algorithm = factory1.create(properties.getProperty("entrypoint.algorithm"), properties);
+            algorithm.run();
+            mse+=algorithm.meanSquareError();
+            leafNodes+=algorithm.getTree().getLeaves().size();
         }
         System.out.format("%.5f\t%.5f\n", mse/repetitions, leafNodes/repetitions);
     }
