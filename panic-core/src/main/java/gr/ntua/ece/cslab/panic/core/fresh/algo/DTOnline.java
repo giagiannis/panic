@@ -24,8 +24,6 @@ import gr.ntua.ece.cslab.panic.core.fresh.budget.BudgetFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
-import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
-import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.Separator;
