@@ -153,6 +153,11 @@ public abstract class Separator {
         public void setValue(double value) {
             this.value = value;
         }
+
+        @Override
+        public String toString() {
+            return String.format("(%s, %.5f)", this.separationDimension, this.separationValue);
+        }
     }
 
     protected HashMap<String, Set<Double>> possibleValues(List<OutputSpacePoint> points) {
@@ -169,10 +174,9 @@ public abstract class Separator {
     }
 
     protected CandidateSolution findBestCandidatePair(HashMap<String,Set<Double>> possibleValues) {
-        double maxEstimation = Double.MIN_VALUE;
+        double maxEstimation = Double.NEGATIVE_INFINITY;
         CandidateSolution best = null;
         for (String candidateDimension : possibleValues.keySet()) {
-            Iterator<Double> it = possibleValues.get(candidateDimension).iterator();
             for (Double candidateValue : possibleValues.get(candidateDimension)) {
                 CandidateSolution candidatePair;
                 candidatePair = new CandidateSolution(this.original.getPoints(), candidateDimension, candidateValue, this.original.getDeploymentSpace());
@@ -189,10 +193,8 @@ public abstract class Separator {
 
     protected boolean solutionIsAccepted(CandidateSolution solution) {
 //        System.out.format("\t%s: %.5f, %d, %d\n",this.getClass().toString(), solution.getValue(), solution.getRightList().size(), solution.getLeftList().size());
-        // FIXME: any sanity check?
         boolean accepted= solution.getLeftList().size()>solution.getOriginalDS().getRange().size();
         accepted &= solution.getRightList().size()>solution.getOriginalDS().getRange().size();
-//        System.out.println();
         return accepted;
     }
 }
