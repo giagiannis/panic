@@ -42,13 +42,15 @@ public abstract class DTAlgorithm {
     protected final String samplerType;
     protected final DeploymentSpace space;
     protected final MetricSource source;
+    protected final String separatorType;
 
-    public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source) {
+    public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source, String separatorType) {
         this.deploymentBudget = deploymentBudget;
         this.samplerType = samplerType;
         this.source = source;
         this.space = source.getDeploymentSpace();
         this.tree = new DecisionTree(this.space);
+        this.separatorType = separatorType;
     }
 
     // getters and setters

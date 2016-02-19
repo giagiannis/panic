@@ -21,6 +21,8 @@ import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.SeparatorFactory;
 
 /**
  * DTRandom algorithm works as follows:<br/>
@@ -30,17 +32,28 @@ import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
 public class DTRandom extends DTAlgorithm {
 
 
-    public DTRandom(int deploymentBudget, String samplerType, MetricSource source) {
-        super(deploymentBudget, samplerType, source);
+    public DTRandom(int deploymentBudget, String samplerType, MetricSource source, String separatorType) {
+        super(deploymentBudget, samplerType, source, separatorType);
     }
 
     @Override
     public void run() {
         SamplerFactory factory = new SamplerFactory();
-        AbstractSampler sampler = factory.create(this.samplerType);
+        AbstractSampler sampler = factory.create(this.samplerType, this.space, this.deploymentBudget);
+        sampler.configureSampler();
         while(sampler.hasMore()) {
             InputSpacePoint in = sampler.next();
             this.tree.addPoint(this.source.getPoint(in));
         }
+
+        boolean someoneReplaced = true;
+        while(someoneReplaced) {
+            ReplacementCouples couples = new ReplacementCouples();
+            for(DecisionTreeLeafNode l : this.tree.getLeaves()) {
+                SeparatorFactory factory1 = new SeparatorFactory();
+                factory1.create(this.separatorType, l);
+            }
+        }
+
     }
 }
