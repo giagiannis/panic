@@ -101,18 +101,6 @@ public class EntryPoint {
         return prop;
     }
 
-    protected static Properties isolateProperties(Properties original, String prefix) {
-        Properties finalProperties = new Properties();
-        for(String key:original.stringPropertyNames()) {
-            if(key.contains(prefix)) {
-                int index = key.indexOf(prefix) + prefix.length()+1;
-                finalProperties.setProperty(key.substring(index), original.getProperty(key));
-            }
-        }
-        return finalProperties;
-
-    }
-
     public static void main(String[] args) throws ParseException, IOException {
         Map<String,String> cliOptions= parseCLIOptions(args);
         Properties properties = loadConfigurationFile(cliOptions);
