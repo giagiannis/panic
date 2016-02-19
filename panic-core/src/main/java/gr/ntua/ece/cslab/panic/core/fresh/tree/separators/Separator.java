@@ -60,9 +60,10 @@ public abstract class Separator {
         HashMap<String,Set<Double>> possibleValues = this.possibleValues(this.original.getPoints());
 
         // try all the possible values
-        CandidatePair best = this.findBestCandidatePair(possibleValues);
+        CandidateSolution best = this.findBestCandidatePair(possibleValues);
 
-        // setting result
+        // FIXME: sanity check of the solution is crucial here
+//         setting result
         if (best != null) {
             this.result = new DecisionTreeTestNode(
                     best.getSeparationDimension(),
@@ -73,16 +74,16 @@ public abstract class Separator {
         }
     }
 
-    protected abstract double estimate(CandidatePair pair);
+    protected abstract double estimate(CandidateSolution pair);
 
-    protected static class CandidatePair {
+    protected static class CandidateSolution {
         private final List<OutputSpacePoint> original, leftList, rightList;
         private final DeploymentSpace originalDS;
         private final DeploymentSpace leftDS, rightDS;
         private final String separationDimension;
         private final double separationValue;
-
-        public CandidatePair(List<OutputSpacePoint> original, String separationDimension, double separationValue, DeploymentSpace space) {
+        private double value;
+        public CandidateSolution(List<OutputSpacePoint> original, String separationDimension, double separationValue, DeploymentSpace space) {
             this.original = original;
             this.leftList = new LinkedList<>();
             this.rightList = new LinkedList<>();
@@ -144,6 +145,14 @@ public abstract class Separator {
         public DeploymentSpace getRightDS() {
             return rightDS;
         }
+
+        public double getValue() {
+            return value;
+        }
+
+        public void setValue(double value) {
+            this.value = value;
+        }
     }
 
     protected HashMap<String, Set<Double>> possibleValues(List<OutputSpacePoint> points) {
@@ -159,21 +168,31 @@ public abstract class Separator {
         return possibleValues;
     }
 
-    protected CandidatePair findBestCandidatePair(HashMap<String,Set<Double>> possibleValues) {
-        double minEstimation = Double.MAX_VALUE;
-        CandidatePair best = null;
+    protected CandidateSolution findBestCandidatePair(HashMap<String,Set<Double>> possibleValues) {
+        double maxEstimation = Double.MIN_VALUE;
+        CandidateSolution best = null;
         for (String candidateDimension : possibleValues.keySet()) {
             Iterator<Double> it = possibleValues.get(candidateDimension).iterator();
             for (Double candidateValue : possibleValues.get(candidateDimension)) {
-                CandidatePair candidatePair;
-                candidatePair = new CandidatePair(this.original.getPoints(), candidateDimension, candidateValue, this.original.getDeploymentSpace());
+                CandidateSolution candidatePair;
+                candidatePair = new CandidateSolution(this.original.getPoints(), candidateDimension, candidateValue, this.original.getDeploymentSpace());
                 double estimation = estimate(candidatePair);
-                if (estimation < minEstimation) {
-                    minEstimation = estimation;
+                candidatePair.setValue(estimation);
+                if (estimation > maxEstimation && this.solutionIsAccepted(candidatePair)) {
+                    maxEstimation = estimation;
                     best = candidatePair;
                 }
             }
         }
         return best;
+    }
+
+    protected boolean solutionIsAccepted(CandidateSolution solution) {
+//        System.out.format("\t%s: %.5f, %d, %d\n",this.getClass().toString(), solution.getValue(), solution.getRightList().size(), solution.getLeftList().size());
+        // FIXME: any sanity check?
+        boolean accepted= solution.getLeftList().size()>solution.getOriginalDS().getRange().size();
+        accepted &= solution.getRightList().size()>solution.getOriginalDS().getRange().size();
+//        System.out.println();
+        return accepted;
     }
 }

@@ -32,7 +32,7 @@ public class VarianceSeparator extends Separator {
         super(original);
     }
 
-    protected double estimate(CandidatePair solution) {
+    protected double estimate(CandidateSolution solution) {
         double eval = 0.0;
         eval += solution.getOriginal().size() * this.variance(solution.getOriginal());
         eval -= solution.getLeftList().size() * this.variance(solution.getLeftList());

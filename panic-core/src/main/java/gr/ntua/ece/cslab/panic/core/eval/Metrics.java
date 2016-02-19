@@ -35,8 +35,8 @@ public class Metrics {
         try {
             for (OutputSpacePoint p : testPoints) {
                 m.getPoint(p.getInputSpacePoint());
-//                double val = m.getPoint(p.getInputSpacePoint()).getValue() - p.getValue();
-//                error += val * val;
+                double val = m.getPoint(p.getInputSpacePoint()).getValue() - p.getValue();
+                error += val * val;
             }
         } catch (Exception e) {
             e.printStackTrace();

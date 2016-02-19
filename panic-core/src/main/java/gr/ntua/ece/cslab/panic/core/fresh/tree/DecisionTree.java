@@ -144,7 +144,12 @@ public class DecisionTree {
                 t = t.getFather();
                 buffer+="    ";
             }
-            buffer+=n.getId()+"\n";
+//            buffer+=n.getId()+"\n";
+            if(n.isLeaf()) {
+                buffer+=String.format("%s (%d)\n", n.getId(),n.castToLeaf().getPoints().size());
+            } else {
+                buffer += String.format("%s (%s <> %.2f)\n", n.getId(), n.castToTest().getAttribute(), n.castToTest().getValue());
+            }
         }
         return buffer.substring(0,buffer.length()-1);
     }

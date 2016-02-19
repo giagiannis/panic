@@ -50,13 +50,13 @@ public class VarianceSeparatorTest {
         // the pair returned by the separator must be the best in terms of variance
         HashMap<String, Set<Double>> possibleValues = separator.possibleValues(this.points);
 
-        Separator.CandidatePair best = new Separator.CandidatePair(points,separator.getResult().getAttribute(), separator.getResult().getValue(), space);
+        Separator.CandidateSolution best = new Separator.CandidateSolution(points,separator.getResult().getAttribute(), separator.getResult().getValue(), space);
         double minVariance = separator.estimate(best);
 
         for(String candidateDimension:possibleValues.keySet()) {
             for(Double candidateValue: possibleValues.get(candidateDimension)) {
-                Separator.CandidatePair candidatePair;
-                candidatePair = new Separator.CandidatePair(points, candidateDimension, candidateValue, space);
+                Separator.CandidateSolution candidatePair;
+                candidatePair = new Separator.CandidateSolution(points, candidateDimension, candidateValue, space);
                 double estimation = separator.estimate(candidatePair);
                 assertTrue(minVariance<=separator.estimate(candidatePair));
             }

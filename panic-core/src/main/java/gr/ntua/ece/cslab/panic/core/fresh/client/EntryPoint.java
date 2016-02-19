@@ -101,6 +101,11 @@ public class EntryPoint {
             stream = EntryPoint.class.getClassLoader().getResourceAsStream(confFileName);
         }
         prop.load(stream);
+        for(String s:System.getProperties().stringPropertyNames()) {
+            if(prop.getProperty(s)!=null) {
+                prop.setProperty(s, System.getProperty(s));
+            }
+        }
         debugPrint("Conf file loaded and parsed");
         return prop;
     }
@@ -131,11 +136,18 @@ public class EntryPoint {
         Properties budgetProperties = isolateProperties(properties, CONF_BUDGET_PREFIX+"."+properties.getProperty(CONF_BUDGET_TYPE_KEY));
         Properties samplerProperties = isolateProperties(properties, CONF_SAMPLER_PREFIX+"."+properties.getProperty(CONF_SAMPLER_TYPE_KEY));
 
-        DTAdaptive adaptive = new DTAdaptive(budget, source,
-                properties.getProperty(CONF_BUDGET_TYPE_KEY), budgetProperties,
-                properties.getProperty(CONF_SAMPLER_TYPE_KEY),
-                properties.getProperty(CONF_SEPARATOR_TYPE_KEY));
+        int repetitions = new Integer(properties.getProperty("entrypoint.repetitions"));
+        double mse = 0.0, leafNodes = 0.0;
+        for(int i=0;i<repetitions;i++) {
+            DTAdaptive adaptive = new DTAdaptive(budget, source,
+                    properties.getProperty(CONF_BUDGET_TYPE_KEY), budgetProperties,
+                    properties.getProperty(CONF_SAMPLER_TYPE_KEY),
+                    properties.getProperty(CONF_SEPARATOR_TYPE_KEY));
 
-        adaptive.run();
+            adaptive.run();
+            mse+=adaptive.getMSE();
+            leafNodes+=adaptive.getTree().getLeaves().size();
+        }
+        System.out.format("%.5f\t%.5f\n", mse/repetitions, leafNodes/repetitions);
     }
 }

@@ -29,13 +29,13 @@ import java.util.Random;
 import static org.junit.Assert.*;
 
 /**
- * Test class for CandidatePair
+ * Test class for CandidateSolution
  * Created by Giannis Giannakopoulos on 2/12/16.
  */
 public class CandidatePairTest {
 
     private List<OutputSpacePoint> points;
-    private Separator.CandidatePair pair;
+    private Separator.CandidateSolution pair;
 
     @Before
     public void setUp() throws Exception {
@@ -45,7 +45,7 @@ public class CandidatePairTest {
         List<String> dimensions = new LinkedList<>(o.getInputSpacePoint().getKeysAsCollection());
         String randomDimension = dimensions.get(random.nextInt(dimensions.size()));
         Double randomValue = o.getInputSpacePoint().getValue(randomDimension);
-        pair = new Separator.CandidatePair(points, randomDimension, randomValue, new TestUtils.FileReader().getDeploymentSpace());
+        pair = new Separator.CandidateSolution(points, randomDimension, randomValue, new TestUtils.FileReader().getDeploymentSpace());
     }
 
     @Test

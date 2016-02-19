@@ -19,17 +19,19 @@ package gr.ntua.ece.cslab.panic.core.fresh.algo;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
 import gr.ntua.ece.cslab.panic.core.fresh.budget.Budget;
 import gr.ntua.ece.cslab.panic.core.fresh.budget.BudgetFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
+import gr.ntua.ece.cslab.panic.core.fresh.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
-import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeTestNode;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.Separator;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.SeparatorFactory;
-import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
+import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 
 import java.util.*;
 
@@ -40,7 +42,6 @@ import java.util.*;
 public class DTAdaptive {
 
     // fields of the class
-    protected final List<OutputSpacePoint> samples;
     protected final int deploymentBudget;
     protected final MetricSource source;
     protected final DeploymentSpace space;
@@ -55,12 +56,10 @@ public class DTAdaptive {
         this.deploymentBudget = deploymentBudget;
         this.source = source;
         this.space = source.getDeploymentSpace();
-
-        this.samples = new LinkedList<>();
         this.tree = new DecisionTree(this.space);
 
         BudgetFactory factory = new BudgetFactory();
-        this.budgetStrategy = factory.create(budgetType, this.tree, budgetProperties);
+        this.budgetStrategy = factory.create(budgetType, this.tree, budgetProperties, deploymentBudget);
         this.budgetStrategy.configure();
 
         this.samplerType = samplerType;
@@ -69,7 +68,7 @@ public class DTAdaptive {
 
     // getters and setters
     public List<OutputSpacePoint> getSamples() {
-        return samples;
+        return this.tree.getSamples();
     }
 
     public double getDeploymentBudget() {
@@ -98,9 +97,13 @@ public class DTAdaptive {
      */
     public void run() {
         while(!this.terminationCondition()) {
+//            System.out.println(this.tree.toString());
             this.runStep();
+//            System.out.println("\n\n");
         }
-        System.out.println(this.tree.toString());
+//        System.out.println(this.tree.toString());
+//        System.out.println("\n\n");
+//        System.out.println("MSE: "+this.getMSE());;
     }
 
     // terminationCondition is true if the algorithm should terminate
@@ -109,33 +112,74 @@ public class DTAdaptive {
     }
 
     private void runStep() {
-
         for(DecisionTreeLeafNode leaf : this.tree.getLeaves()) {
-            int budget = this.budgetStrategy.estimate(leaf);
-            SamplerFactory factory = new SamplerFactory();
-            Sampler sampler = factory.create(this.samplerType);
-            sampler.setDimensionsWithRanges(leaf.getDeploymentSpace().getRange());
-            sampler.setPointsToPick(budget);
-            sampler.configureSampler();
-            while(sampler.hasMore()) {
-                InputSpacePoint point = sampler.next();
-                OutputSpacePoint out = source.getPoint(point);
-                this.tree.addPoint(out);
+            this.sampleLeaf(leaf);
+            if(this.terminationCondition()) {
+                break;
             }
         }
+        if(this.terminationCondition()) {
+            return;
+        }
 
-        Map<DecisionTreeLeafNode, DecisionTreeTestNode> separationMapping = new HashMap<>();
+        ReplacementCouples couples = new ReplacementCouples();
         for(DecisionTreeLeafNode leaf : this.tree.getLeaves()) {
             SeparatorFactory factory = new SeparatorFactory();
             Separator separator = factory.create(this.separatorType, leaf);
             separator.separate();
-            separationMapping.put(leaf, separator.getResult());
+            if(separator.getResult()!=null) {
+                couples.addCouple(leaf, separator.getResult());
+            }
         }
 
-        for(Map.Entry<DecisionTreeLeafNode, DecisionTreeTestNode> kv:separationMapping.entrySet()) {
-            this.tree.replaceNode(kv.getKey(), kv.getValue());
+        for(DecisionTreeNode t : couples.getOriginalNodes()) {
+            this.tree.replaceNode(t, couples.getNode(t));
+        }
+    }
+
+    private void sampleLeaf(DecisionTreeLeafNode leaf) {
+        int budget = this.budgetStrategy.estimate(leaf);
+        SamplerFactory factory = new SamplerFactory();
+        AbstractSampler sampler = factory.create(this.samplerType);
+        sampler.setDimensionsWithRanges(leaf.getDeploymentSpace().getRange());
+        sampler.setPointsToPick(budget);
+        sampler.configureSampler();
+        while(sampler.hasMore() && !this.terminationCondition()) {
+            InputSpacePoint point = sampler.next();
+            OutputSpacePoint out = source.getPoint(point);
+            this.tree.addPoint(out);
+        }
+    }
+
+    public double getMSE() {
+        double sum = 0.0;
+        for(DecisionTreeLeafNode l : this.tree.getLeaves()) {
+//            System.out.println(l.getPoints().size());
+            sum += CrossValidation.meanSquareError(LinearRegression.class, l.getPoints()) * l.getPoints().size();
+        }
+        return sum/this.tree.getSamples().size();
+    }
+
+    /**
+     * Class used to hold the couples of nodes that can be replaced into a Decision Tree
+     */
+    private static class ReplacementCouples {
+        private Map<DecisionTreeNode, DecisionTreeNode> mapping;
+
+        public ReplacementCouples() {
+            this.mapping = new HashMap<>();
         }
 
+        public void addCouple(DecisionTreeNode oldNode, DecisionTreeNode newNode) {
+            this.mapping.put(oldNode, newNode);
+        }
 
+        public DecisionTreeNode getNode(DecisionTreeNode oldNode) {
+            return this.mapping.get(oldNode);
+        }
+
+        public Set<DecisionTreeNode> getOriginalNodes() {
+            return this.mapping.keySet();
+        }
     }
 }

@@ -20,14 +20,9 @@ package gr.ntua.ece.cslab.panic.core.fresh.tree.separators;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.TestUtils;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
-import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
 
@@ -48,7 +43,7 @@ public class SeparatorTest {
         DecisionTreeLeafNode node = new DecisionTreeLeafNode(points, new TestUtils.FileReader().getDeploymentSpace());
         separator = new Separator(node) {
             @Override
-            protected double estimate(CandidatePair pair) {
+            protected double estimate(CandidateSolution pair) {
                 return new Random().nextDouble();
             }
         };
