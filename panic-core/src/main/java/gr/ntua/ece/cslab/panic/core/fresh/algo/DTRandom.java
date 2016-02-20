@@ -22,6 +22,8 @@ import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.AbstractSampler;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.Separator;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.SeparatorFactory;
 
 /**
@@ -31,9 +33,14 @@ import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.SeparatorFactory;
  */
 public class DTRandom extends DTAlgorithm {
 
-
+    private double minMSE = Double.MAX_VALUE;
     public DTRandom(int deploymentBudget, String samplerType, MetricSource source, String separatorType) {
         super(deploymentBudget, samplerType, source, separatorType);
+    }
+
+    @Override
+    public double meanSquareError() {
+        return (minMSE==Double.MAX_VALUE?super.meanSquareError():minMSE);
     }
 
     @Override
@@ -47,12 +54,25 @@ public class DTRandom extends DTAlgorithm {
         }
 
         boolean someoneReplaced = true;
+//        double previousMSE = this.meanSquareError();
+        double minMSE = this.meanSquareError();
         while(someoneReplaced) {
             ReplacementCouples couples = new ReplacementCouples();
+            someoneReplaced = false;
             for(DecisionTreeLeafNode l : this.tree.getLeaves()) {
                 SeparatorFactory factory1 = new SeparatorFactory();
-                factory1.create(this.separatorType, l);
+                Separator sep = factory1.create(this.separatorType, l);
+                sep.separate();
+                if(sep.getResult()!=null) {
+                    couples.addCouple(l, sep.getResult());
+                    someoneReplaced = true;
+                }
             }
+            for(DecisionTreeNode n : couples.getOriginalNodes()) {
+                this.tree.replaceNode(n, couples.getNode(n));
+            }
+            double currentMSE = this.meanSquareError();
+            this.minMSE=(minMSE>currentMSE?currentMSE:minMSE);
         }
 
     }
