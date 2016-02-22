@@ -39,11 +39,6 @@ public class DTRandom extends DTAlgorithm {
     }
 
     @Override
-    public double meanSquareError() {
-        return (minMSE==Double.MAX_VALUE?super.meanSquareError():minMSE);
-    }
-
-    @Override
     public void run() {
         SamplerFactory factory = new SamplerFactory();
         AbstractSampler sampler = factory.create(this.samplerType, this.space, this.deploymentBudget);
@@ -52,28 +47,5 @@ public class DTRandom extends DTAlgorithm {
             InputSpacePoint in = sampler.next();
             this.tree.addPoint(this.source.getPoint(in));
         }
-
-        boolean someoneReplaced = true;
-//        double previousMSE = this.meanSquareError();
-        double minMSE = this.meanSquareError();
-        while(someoneReplaced) {
-            ReplacementCouples couples = new ReplacementCouples();
-            someoneReplaced = false;
-            for(DecisionTreeLeafNode l : this.tree.getLeaves()) {
-                SeparatorFactory factory1 = new SeparatorFactory();
-                Separator sep = factory1.create(this.separatorType, l);
-                sep.separate();
-                if(sep.getResult()!=null) {
-                    couples.addCouple(l, sep.getResult());
-                    someoneReplaced = true;
-                }
-            }
-            for(DecisionTreeNode n : couples.getOriginalNodes()) {
-                this.tree.replaceNode(n, couples.getNode(n));
-            }
-            double currentMSE = this.meanSquareError();
-            this.minMSE=(minMSE>currentMSE?currentMSE:minMSE);
-        }
-
     }
 }

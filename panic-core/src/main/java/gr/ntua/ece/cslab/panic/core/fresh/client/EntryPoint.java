@@ -22,6 +22,7 @@ import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithmFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTOnline;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSourceFactory;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import org.apache.commons.cli.*;
 
 import java.io.FileInputStream;
@@ -112,8 +113,9 @@ public class EntryPoint {
             DTAlgorithmFactory factory1 = new DTAlgorithmFactory();
             algorithm = factory1.create(properties.getProperty("entrypoint.algorithm"), properties);
             algorithm.run();
-            mse+=algorithm.meanSquareError();
-            leafNodes+=algorithm.getTree().getLeaves().size();
+            DecisionTree tree = algorithm.getBestTree();
+            mse+=DTAlgorithm.meanSquareError(tree);
+            leafNodes+=tree.getLeaves().size();
         }
         System.out.format("%.5f\t%.5f\n", mse/repetitions, leafNodes/repetitions);
     }

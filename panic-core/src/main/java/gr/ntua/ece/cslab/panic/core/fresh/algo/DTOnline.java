@@ -55,7 +55,7 @@ public class DTOnline extends DTAlgorithm {
      * Start the algorithm.
      */
     public void run() {
-        while(!this.terminationCondition()) {
+        while (!this.terminationCondition()) {
             this.runStep();
         }
     }

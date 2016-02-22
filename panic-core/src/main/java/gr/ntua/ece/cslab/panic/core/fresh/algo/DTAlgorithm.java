@@ -24,6 +24,8 @@ import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.Separator;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.SeparatorFactory;
 import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 
 import java.util.HashMap;
@@ -43,6 +45,7 @@ public abstract class DTAlgorithm {
     protected final DeploymentSpace space;
     protected final MetricSource source;
     protected final String separatorType;
+    protected DecisionTree bestTree;
 
     public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source, String separatorType) {
         this.deploymentBudget = deploymentBudget;
@@ -87,9 +90,56 @@ public abstract class DTAlgorithm {
         return sum/this.tree.getSamples().size();
     }
 
+    public static double meanSquareError(DecisionTree tree) {
+        double sum = 0.0;
+        for(DecisionTreeLeafNode l : tree.getLeaves()) {
+            sum += CrossValidation.meanSquareError(LinearRegression.class, l.getPoints()) * l.getPoints().size();
+        }
+        return sum/tree.getSamples().size();
+    }
+
 
     public abstract void run();
 
+    /**
+     * This method creates new trees with different partitioning setups and gets the one that appears to be the best.
+     * This method creates new trees with different partitioning setups and gets the one that appears to be the best.
+     */
+    public DecisionTree getBestTree() {
+        if (bestTree == null) {
+            DecisionTree currentTree = this.tree.clone();
+            DecisionTree bestTree = this.tree;
+            double bestScore = DTAlgorithm.meanSquareError(currentTree);
+
+            boolean someoneReplaced = true;
+            while (someoneReplaced) {
+                ReplacementCouples couples = new ReplacementCouples();
+                someoneReplaced = false;
+                for (DecisionTreeLeafNode l : currentTree.getLeaves()) {
+                    SeparatorFactory factory1 = new SeparatorFactory();
+                    Separator sep = factory1.create(this.separatorType, l);
+                    sep.separate();
+
+                    if (sep.getResult() != null) {
+                        couples.addCouple(l, sep.getResult());
+                        someoneReplaced = true;
+                    }
+                }
+                for (DecisionTreeNode n : couples.getOriginalNodes()) {
+                    currentTree.replaceNode(n, couples.getNode(n));
+                }
+
+                double currentScore = DTAlgorithm.meanSquareError(currentTree);
+                if(currentScore<=bestScore) {
+                    bestTree = currentTree;
+                    bestScore = currentScore;
+                }
+                currentTree = currentTree.clone();
+            }
+            this.bestTree = bestTree;
+        }
+        return bestTree;
+    }
 
     /**
      * Class used to hold the couples of nodes that can be replaced into a Decision Tree
