@@ -22,8 +22,10 @@ import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Decision Tree
@@ -152,5 +154,37 @@ public class DecisionTree {
             }
         }
         return buffer.substring(0,buffer.length()-1);
+    }
+
+    public DecisionTree clone() {
+        DecisionTree tree = new DecisionTree(this.root.getDeploymentSpace());
+        Map<DecisionTreeNode, DecisionTreeNode> mapping = new HashMap<>();
+        List<DecisionTreeNode> nodes = new LinkedList<>();
+        nodes.add(root);
+
+        while(!nodes.isEmpty()) {
+            DecisionTreeNode current = nodes.remove(0);
+            mapping.put(current, current.clone());
+            if(!current.isLeaf()) {
+                nodes.add(current.castToTest().getLeftChild());
+                nodes.add(current.castToTest().getRightChild());
+            }
+        }
+        for(DecisionTreeNode original : mapping.keySet()) {
+            if(original.getFather()==null){
+                tree.root = mapping.get(original);
+            }
+            if(!original.isLeaf()) {
+                DecisionTreeNode left = original.castToTest().getLeftChild();
+                DecisionTreeNode right = original.castToTest().getRightChild();
+
+                DecisionTreeNode newNode = mapping.get(original);
+                DecisionTreeNode newNodeLeft = mapping.get(left);
+                DecisionTreeNode newNodeRight = mapping.get(right);
+                newNode.castToTest().setLeftChild(newNodeLeft);
+                newNode.castToTest().setRightChild(newNodeRight);
+            }
+        }
+        return tree;
     }
 }

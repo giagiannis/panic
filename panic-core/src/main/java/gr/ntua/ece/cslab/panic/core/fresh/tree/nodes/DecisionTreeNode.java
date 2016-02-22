@@ -62,4 +62,13 @@ public abstract class DecisionTreeNode {
         return this.id;
     }
     protected abstract String toString(String pad);
+
+    public DecisionTreeNode clone() {
+        if(this instanceof DecisionTreeLeafNode){
+            return ((DecisionTreeLeafNode)this).clone();
+        } else {
+            return ((DecisionTreeTestNode)this).clone();
+        }
+
+    }
 }

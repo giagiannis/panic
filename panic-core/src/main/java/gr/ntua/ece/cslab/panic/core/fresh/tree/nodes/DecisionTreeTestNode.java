@@ -53,7 +53,7 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
         this.attribute = attribute;
         this.value = value;
         this.setLeftChild(leftChild);
-        this.setRightChild(rightChild);;
+        this.setRightChild(rightChild);
         this.deploymentSpace = space;
     }
 
@@ -107,5 +107,9 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
                 this.value,
                 this.leftChild.toString(pad+"\t"),
                 this.rightChild.toString(pad+"\t"));
+    }
+
+    public DecisionTreeTestNode clone() {
+        return new DecisionTreeTestNode(this.attribute, this.value, this.deploymentSpace);
     }
 }
