@@ -51,7 +51,7 @@ public class EntryPoint {
     protected static Map<String, String> parseCLIOptions(String[] args) throws ParseException {
         // setting the options
         Options options = new Options();
-        options.addOption("h","help", false,"Prins this menu");
+        options.addOption("h","help", false,"Prints this menu");
         options.addOption("c", "conf", true, "overrides the configuration file that is, by default into the classpath");
         options.getOption("c").setArgName("config");
         options.addOption(null, "debug", false, "if set, prints diagnostic messages");
