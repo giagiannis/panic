@@ -32,6 +32,7 @@ import java.util.List;
 public class TestUtils {
 
     public static class FileReader {
+        public static int POINTS_COUNT=100;
         public static String DEFAULT_DATASET_PATH = "sample-input.dat";
         private CSVFileManager manager;
         private List<OutputSpacePoint> outputSpacePoints;
@@ -69,6 +70,7 @@ public class TestUtils {
                 manager.setFilename(file);
                 points = manager.getOutputSpacePoints();
                 Collections.shuffle(points);
+                points.subList(0,POINTS_COUNT);
             }
         }
     }
