@@ -123,18 +123,12 @@ public class CSVFileManager {
             results = new LinkedList<>();
             while ((line = reader.readNext()) != null) {
                 boolean sanityCheck = true;
-                for(String s: line) {
-                    if(s.isEmpty()){
-                        sanityCheck = false;
-                        break;
-                    }
-                }
-                if(sanityCheck) {
                     OutputSpacePoint point = new OutputSpacePoint();
                     point.setInputSpacePoint(new InputSpacePoint());
                     for (int i = 0; i < numberOfInputDimensions; i++) {
                         point.getInputSpacePoint().addDimension(this.dimensionNames[i], new Double(line[i]));
                     }
+                if(!line[outputDimensionIndex].equals("")) {
                     point.setValue(this.dimensionNames[this.dimensionNames.length-1], new Double(line[outputDimensionIndex]));
                     results.add(point);
                     this.hashMap.put(point.getInputSpacePoint(), point);
