@@ -122,14 +122,23 @@ public class CSVFileManager {
             String[] line;
             results = new LinkedList<>();
             while ((line = reader.readNext()) != null) {
-                OutputSpacePoint point = new OutputSpacePoint();
-                point.setInputSpacePoint(new InputSpacePoint());
-                for (int i = 0; i < numberOfInputDimensions; i++) {
-                    point.getInputSpacePoint().addDimension(this.dimensionNames[i], new Double(line[i]));
+                boolean sanityCheck = true;
+                for(String s: line) {
+                    if(s.isEmpty()){
+                        sanityCheck = false;
+                        break;
+                    }
                 }
-                point.setValue(this.dimensionNames[this.dimensionNames.length-1], new Double(line[outputDimensionIndex]));
-                results.add(point);
-                this.hashMap.put(point.getInputSpacePoint(), point);
+                if(sanityCheck) {
+                    OutputSpacePoint point = new OutputSpacePoint();
+                    point.setInputSpacePoint(new InputSpacePoint());
+                    for (int i = 0; i < numberOfInputDimensions; i++) {
+                        point.getInputSpacePoint().addDimension(this.dimensionNames[i], new Double(line[i]));
+                    }
+                    point.setValue(this.dimensionNames[this.dimensionNames.length-1], new Double(line[outputDimensionIndex]));
+                    results.add(point);
+                    this.hashMap.put(point.getInputSpacePoint(), point);
+                }
             }
             reader.close();
         } catch (IOException ex) {
@@ -173,19 +182,6 @@ public class CSVFileManager {
     }
 
     public OutputSpacePoint getActualValue(InputSpacePoint point) {
-//        for (OutputSpacePoint p : this.getOutputSpacePoints()) {
-//            if (p.getInputSpacePoint().equals(point)) {
-//                return p;
-//            }
-//        }
         return this.hashMap.get(point);
-//        return null;
     }
-//    public static void main(String[] args) {
-//        CSVFileManager loader = new CSVFileManager();
-//        loader.setFilename(args[0]);
-//        loader.setNumberOfInputDimensions(1);
-//        loader.setOutputDimensionIndex(1);
-//        System.out.println(loader.getOutputSpacePoints());
-//    }
 }
