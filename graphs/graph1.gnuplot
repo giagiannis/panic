@@ -20,7 +20,7 @@ tmpfile='/tmp/'.system("openssl rand -hex 5").".eps"
 print("Temp file:\t".tmpfile)
 
 
-set terminal postscript eps enhanced color font 'Arial,24' size 10,6
+set terminal postscript eps enhanced color font 'Arial,24' size 5,3
 set output tmpfile
 
 
