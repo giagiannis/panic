@@ -28,12 +28,18 @@ import java.util.List;
 public class SeparatorFactory {
 
     public Separator create(String separatorType, DecisionTreeLeafNode node) {
-        if(separatorType == null) {
-            return null;
+        Separator separator;
+        switch (separatorType) {
+            case "variance":
+                separator = new VarianceSeparator(node);
+                break;
+            case "modelerror":
+                separator = new ModelErrorSeparator(node);
+                break;
+            default:
+                separator = null;
+                break;
         }
-        if(separatorType.equals("variance")) {
-            return new VarianceSeparator(node);
-        }
-        return null;
+        return separator;
     }
 }
