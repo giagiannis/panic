@@ -23,19 +23,17 @@ print("Temp file:\t".tmpfile)
 set terminal postscript eps enhanced color font 'Arial,24' size 10,6
 set output tmpfile
 
-set xlabel "x"
-set ylabel "y"
-set y2label "y2"
-set y2tics auto
 
-
+set title "MSE/# of leaves vs bucket size"
 firstrow = system('head -1 '.filename)
 set xlabel word(firstrow, 1)
 set ylabel word(firstrow, 2)
 set y2label word(firstrow, 3)
-
 set autoscale y
 set autoscale y2
+set grid
+set ytics auto
+set y2tics auto
 
 plot filename u 1:2 w l axes x1y1 t col, \
 	filename u 1:3 w l axes x2y2 t col
