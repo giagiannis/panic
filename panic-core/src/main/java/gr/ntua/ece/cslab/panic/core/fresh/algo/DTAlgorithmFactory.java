@@ -47,17 +47,16 @@ public class DTAlgorithmFactory {
         MetricSource source = factory.create(properties.getProperty(CONF_METRICSOURCE_TYPE_KEY), msProps);
         source.configure();
         String separatorType = properties.getProperty(CONF_SEPARATOR_TYPE_KEY);
-
+        String budgetType = properties.getProperty(CONF_BUDGET_TYPE_KEY);
+        Properties budgetProperties = this.isolateProperties(properties, CONF_BUDGET_PREFIX+"."+properties.getProperty(CONF_BUDGET_TYPE_KEY));
 
         switch (type) {
             case "dtonline":
-                String budgetType = properties.getProperty(CONF_BUDGET_TYPE_KEY);
-                Properties budgetProperties = this.isolateProperties(properties, CONF_BUDGET_PREFIX+"."+properties.getProperty(CONF_BUDGET_TYPE_KEY));
                 algorithm = new DTOnline(deploymentBudget,samplerType,source, separatorType,
                         budgetType, budgetProperties);
                 break;
-            case "dtrandom":
-                algorithm = new DTRandom(deploymentBudget, samplerType, source,separatorType);
+            case "dtrt":
+                algorithm = new DTRT(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties);
                 break;
             default:
                 break;

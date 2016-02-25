@@ -38,15 +38,10 @@ import java.util.*;
 public class DTOnline extends DTAlgorithm {
 
     // fields of the class
-    protected final Budget budgetStrategy;
 
     public DTOnline(int deploymentBudget, String samplerType, MetricSource source, String separatorType,
                     String budgetType, Properties budgetProperties) {
-        super(deploymentBudget, samplerType, source, separatorType);
-
-        BudgetFactory factory = new BudgetFactory();
-        this.budgetStrategy = factory.create(budgetType, this.tree, budgetProperties, deploymentBudget);
-        this.budgetStrategy.configure();
+        super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties);
 
     }
 
@@ -58,11 +53,6 @@ public class DTOnline extends DTAlgorithm {
         while (!this.terminationCondition()) {
             this.runStep();
         }
-    }
-
-    // terminationCondition is true if the algorithm should terminate
-    private boolean terminationCondition() {
-        return this.tree.getSamples().size()>=this.deploymentBudget;
     }
 
     private void runStep() {
@@ -91,14 +81,4 @@ public class DTOnline extends DTAlgorithm {
         }
     }
 
-    private void sampleLeaf(DecisionTreeLeafNode leaf) {
-        int budget = this.budgetStrategy.estimate(leaf);
-        SamplerFactory factory = new SamplerFactory();
-        AbstractSampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget);
-        while(sampler.hasMore() && !this.terminationCondition()) {
-            InputSpacePoint point = sampler.next();
-            OutputSpacePoint out = source.getPoint(point);
-            this.tree.addPoint(out);
-        }
-    }
 }
