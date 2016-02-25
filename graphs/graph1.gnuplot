@@ -5,12 +5,23 @@
 # 2nd col: the y axis
 # 3rd col: the y2 axis
 
+
 if (!exists("filename")) \
-	system("echo \"add -e 'filename=<filename>' to execution\""); \
-	exit(0)
+        system("echo \"add -e 'filename=<filename>' to execution\""); \
+        exit(0)
+
+if (!exists("outfile")) \
+        print "You can set the outfile by adding: \"-e 'outfile=<outfile>'\"";\
+        outfile=filename.".pdf"
+
+print("Output: ".outfile)
+
+tmpfile='/tmp/'.system("openssl rand -hex 5").".eps"
+print("Temp file:\t".tmpfile)
+
 
 set terminal postscript eps enhanced color font 'Arial,24' size 10,6
-set output filename.".eps"
+set output tmpfile
 
 set xlabel "x"
 set ylabel "y"
@@ -30,5 +41,4 @@ plot filename u 1:2 w l axes x1y1 t col, \
 	filename u 1:3 w l axes x2y2 t col
 
 
-system("epstopdf ".filename.".eps")
-system("rm ".filename.".eps")
+system("epstopdf ".tmpfile." --outfile=".outfile." && rm ".tmpfile)
