@@ -68,20 +68,19 @@ public class DecisionTree {
      * @return the leaves of the tree
      */
     public List<DecisionTreeLeafNode> getLeaves() {
-        if(leavesChanged) {
-            this.leaves.clear();
-            List<DecisionTreeNode> toVisit = new LinkedList<>();
-            toVisit.add(this.root);
-            while (!toVisit.isEmpty()) {
-                DecisionTreeNode n = toVisit.remove(0);
-                if(!n.isLeaf()) {
-                    toVisit.add(n.castToTest().getLeftChild());
-                    toVisit.add(n.castToTest().getRightChild());
-                } else {
-                    this.leaves.add(n.castToLeaf());
-                }
+//            this.leaves.clear();
+
+        List<DecisionTreeLeafNode> leaves = new LinkedList<>();
+        List<DecisionTreeNode> toVisit = new LinkedList<>();
+        toVisit.add(this.root);
+        while (!toVisit.isEmpty()) {
+            DecisionTreeNode n = toVisit.remove(0);
+            if(!n.isLeaf()) {
+                toVisit.add(n.castToTest().getLeftChild());
+                toVisit.add(n.castToTest().getRightChild());
+            } else {
+                leaves.add(n.castToLeaf());
             }
-            leavesChanged = false;
         }
         return leaves;
     }
