@@ -44,6 +44,19 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
     }
 
     /**
+     * Default construction
+     * @param attribute the split dimension name
+     * @param value the split dimension value
+     * @param id the id of node
+     */
+    public DecisionTreeTestNode(String attribute, double value, DeploymentSpace space, String id) {
+        this.attribute = attribute;
+        this.value = value;
+        this.deploymentSpace = space;
+        this.id = id;
+    }
+
+    /**
      * Constructor of the test node
      * @param attribute the split dimension name
      * @param value the split dimension value
@@ -137,8 +150,7 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
     }
 
     public DecisionTreeTestNode clone() {
-        DecisionTreeTestNode test = new DecisionTreeTestNode(this.attribute, this.value, this.deploymentSpace);
-        test.id = this.id;
+        DecisionTreeTestNode test = new DecisionTreeTestNode(this.attribute, this.value, this.deploymentSpace, this.id);
         return  test;
     }
 }
