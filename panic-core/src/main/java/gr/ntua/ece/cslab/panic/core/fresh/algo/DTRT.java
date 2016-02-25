@@ -17,9 +17,20 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.algo;
 
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
+import gr.ntua.ece.cslab.panic.core.fresh.samplers.AbstractSampler;
+import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.Separator;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.SeparatorFactory;
+import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Algorithm that trains a decision train iteratively.
@@ -34,6 +45,67 @@ public class DTRT extends DTAlgorithm{
 
     @Override
     public void run() {
+        while(!terminationCondition()) {
+            this.step();
+        }
+    }
 
+    private void step() {
+        // expands the tree
+        DecisionTree tree = this.expandAll(this.tree);
+
+        // order the leaves according to their errors (most erroneous leaves go first)
+        List<DecisionTreeLeafNode> leaves = tree.getLeaves();
+        Collections.sort(leaves, (node1, node2) -> {
+            double mse1=CrossValidation.meanSquareError(LinearRegression.class, node1.getPoints());
+            double mse2=CrossValidation.meanSquareError(LinearRegression.class, node2.getPoints());
+            return -Double.compare(mse1,mse2);
+        });
+
+        // for each leaf sample
+        DecisionTreeLeafNode mostErroneousLeaf = leaves.remove(0);
+        this.sampleLeaf(mostErroneousLeaf, tree);
+    }
+
+    protected void sampleLeaf(DecisionTreeLeafNode leaf, DecisionTree tree) {
+        int budget = this.budgetStrategy.estimate(leaf, tree);
+        SamplerFactory factory = new SamplerFactory();
+        AbstractSampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget);
+        while (sampler.hasMore() && !this.terminationCondition()) {
+            InputSpacePoint point = sampler.next();
+            OutputSpacePoint out = source.getPoint(point);
+            this.tree.addPoint(out);
+        }
+    }
+
+        // expands the tree by one level
+    private DecisionTree expandTree(DecisionTree original) {
+        DecisionTree tree = original.clone();
+
+        ReplacementCouples couples = new ReplacementCouples();
+        for(DecisionTreeLeafNode leaf : tree.getLeaves()) {
+            SeparatorFactory factory = new SeparatorFactory();
+            Separator separator = factory.create(this.separatorType, leaf);
+            separator.separate();
+            if(separator.getResult()!=null) {
+                couples.addCouple(leaf, separator.getResult());
+            }
+        }
+
+        for(DecisionTreeNode t : couples.getOriginalNodes()) {
+            tree.replaceNode(t, couples.getNode(t));
+        }
+        return tree;
+    }
+
+    // expands the tree until no new expansions can be made
+    private DecisionTree expandAll(DecisionTree original) {
+        DecisionTree tree = original.clone();
+        int numberOfLeaves = 0;
+        while(numberOfLeaves!=tree.getLeaves().size()) {
+            numberOfLeaves = tree.getLeaves().size();
+            tree = this.expandTree(tree);
+        }
+        return tree;
     }
 }

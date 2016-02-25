@@ -62,6 +62,11 @@ public class TreeBudget extends Budget {
         return (int) (this.getLevelBudget(level)/Math.pow(2, level));
     }
 
+    @Override
+    public int estimate(DecisionTreeNode node, DecisionTree tree) {
+        return this.estimate(node);
+    }
+
     private int getLevelBudget(int level) {
         return (int) Math.round(Math.pow(this.coefficient,level)  * this.perLevelConstant);
     }

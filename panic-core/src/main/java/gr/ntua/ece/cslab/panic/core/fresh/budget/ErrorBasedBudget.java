@@ -17,36 +17,44 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.budget;
 
+import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
+import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithm;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
- * Budget strategy that always returns the same
- * Created by Giannis Giannakopoulos on 2/17/16.
+ * Created by Giannis Giannakopoulos on 2/25/16.
  */
-public class ConstantBudget extends Budget {
-    protected int coefficient;
-
-    public ConstantBudget(DecisionTree tree, Properties properties, Integer totalBudget) {
+public class ErrorBasedBudget extends Budget {
+    private Integer maxBudget;
+    public ErrorBasedBudget(DecisionTree tree, Properties properties, Integer totalBudget) {
         super(tree, properties, totalBudget);
-        this.coefficient = new Integer(this.properties.getProperty("coefficient"));
+        this.maxBudget = new Integer(properties.getProperty("max"));
     }
 
     @Override
     public void configure() {
-        // don't have to do anything
+        // probably nothing needed here
     }
 
     @Override
     public int estimate(DecisionTreeNode node) {
-        // FIXME: we may exceed the budget here
-        return this.coefficient;
+        return this.estimate(node, this.tree);
     }
 
     @Override
     public int estimate(DecisionTreeNode node, DecisionTree tree) {
-        return this.estimate(node);
+//        System.out.println("ErrorBasedBudget.estimate");
+//        System.out.println(tree);
+        double sumMSE = 0.0;
+        for(DecisionTreeLeafNode l: tree.getLeaves()) {
+//            System.out.format("\t(%s, %.5f)\n", l.getId(), DTAlgorithm.meanSquareError(l));
+            sumMSE+=DTAlgorithm.meanSquareError(l);
+        }
+        return 10;
     }
 }

@@ -28,10 +28,13 @@ import java.util.Properties;
 public class BudgetFactory {
 
     public Budget create(String type, DecisionTree tree, Properties properties, Integer totalBudget) {
-        if(type.equals("constant")) {
-            return new ConstantBudget(tree, properties, totalBudget);
-        } else if (type.equals("tree")) {
-            return new TreeBudget(tree, properties, totalBudget);
+        switch (type) {
+            case "constant":
+                return new ConstantBudget(tree, properties, totalBudget);
+            case "tree":
+                return new TreeBudget(tree, properties, totalBudget);
+            case "error":
+                return new ErrorBasedBudget(tree, properties, totalBudget);
         }
         return null;
     }

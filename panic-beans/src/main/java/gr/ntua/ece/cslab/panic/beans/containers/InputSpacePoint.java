@@ -16,6 +16,9 @@
 
 package gr.ntua.ece.cslab.panic.beans.containers;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,7 +44,9 @@ public class InputSpacePoint extends MultiPoint {
     
     public String toStringCSVFormat(){
         StringBuilder strBuild = new StringBuilder();
-        for(String key: this.getKeysAsCollection()){
+        List<String> dimensionOrder  = new LinkedList<String>(this.getKeysAsCollection());
+        Collections.sort(dimensionOrder);
+        for(String key: dimensionOrder){
             strBuild.append(this.getValue(key));
             strBuild.append("\t");
         }

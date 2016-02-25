@@ -17,6 +17,7 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.tree;
 
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
@@ -97,6 +98,15 @@ public class DecisionTree {
             current=current.castToTest().test(point);
         }
         return current.castToLeaf();
+    }
+
+    /**
+     * Returns the leaf in which the specified point belongs.
+     * @param point the output space point to search
+     * @return the leaf that this point belongs into
+     */
+    public DecisionTreeLeafNode getLeaf(InputSpacePoint point) {
+        return this.getLeaf(new OutputSpacePoint(point, 0.0, "y"));
     }
 
     /**

@@ -48,7 +48,7 @@ public abstract class DTAlgorithm {
     protected final MetricSource source;
     protected final String separatorType;
     protected DecisionTree bestTree;
-    protected final Budget budgetStrategy;
+    protected Budget budgetStrategy;
 
     public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source, String separatorType, String budgetType, Properties budgetProperties) {
         this.deploymentBudget = deploymentBudget;
@@ -103,6 +103,17 @@ public abstract class DTAlgorithm {
             sum += CrossValidation.meanSquareError(LinearRegression.class, l.getPoints()) * l.getPoints().size();
         }
         return sum/tree.getSamples().size();
+    }
+
+    public static double meanSquareError(DecisionTreeNode node) {
+        double mse = 0.0;
+        List<OutputSpacePoint> points = null;
+        if(node.isLeaf()) {
+            points = node.castToLeaf().getPoints();
+        } else {
+            points = node.castToTest().getSamples();
+        }
+        return CrossValidation.meanSquareError(LinearRegression.class, points);
     }
 
 
