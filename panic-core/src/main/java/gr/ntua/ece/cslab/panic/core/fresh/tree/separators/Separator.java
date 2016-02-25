@@ -70,7 +70,8 @@ public abstract class Separator {
                     best.getSeparationValue(),
                     best.getOriginalDS(),
                     new DecisionTreeLeafNode(best.getLeftList(),best.getLeftDS()),
-                    new DecisionTreeLeafNode(best.getRightList(), best.getRightDS()));
+                    new DecisionTreeLeafNode(best.getRightList(), best.getRightDS()),
+                    this.original.getId());
         }
     }
 
@@ -173,6 +174,11 @@ public abstract class Separator {
         return possibleValues;
     }
 
+    /**
+     * The pair that maximizes the estimate function is chosen.
+     * @param possibleValues
+     * @return
+     */
     protected CandidateSolution findBestCandidatePair(HashMap<String,Set<Double>> possibleValues) {
         double maxEstimation = Double.NEGATIVE_INFINITY;
         CandidateSolution best = null;

@@ -28,7 +28,7 @@ import java.util.UUID;
 public abstract class DecisionTreeNode {
     protected DecisionTreeNode father;
     protected DeploymentSpace deploymentSpace;
-    private final String id;
+    protected String id;
 
     public DecisionTreeNode() {
         this.id = UUID.randomUUID().toString();

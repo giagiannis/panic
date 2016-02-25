@@ -20,6 +20,9 @@ package gr.ntua.ece.cslab.panic.core.fresh.tree.nodes;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Class representing and intermediate - test node.
  * Created by Giannis Giannakopoulos on 2/11/16.
@@ -55,6 +58,11 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
         this.setLeftChild(leftChild);
         this.setRightChild(rightChild);
         this.deploymentSpace = space;
+    }
+
+    public DecisionTreeTestNode(String attribute, double value, DeploymentSpace space, DecisionTreeNode leftChild, DecisionTreeNode rightChild, String id) {
+        this(attribute, value, space, leftChild, rightChild);
+        this.id = id;
     }
 
     public String getAttribute() {
@@ -95,6 +103,25 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
             return rightChild;
     }
 
+    /**
+     * Returns the samples for the specified subtree
+     * @return
+     */
+    public List<OutputSpacePoint> getSamples() {
+        List<OutputSpacePoint> points = new LinkedList<>();
+        List<DecisionTreeNode> toVisit = new LinkedList<>();
+        toVisit.add(this);
+        while(!toVisit.isEmpty()) {
+            DecisionTreeNode current = toVisit.remove(0);
+            if(current.isLeaf()) {
+                points.addAll(current.castToLeaf().getPoints());
+            } else {
+                toVisit.add(current.castToTest().getLeftChild());
+                toVisit.add(current.castToTest().getRightChild());
+            }
+        }
+        return points;
+    }
     @Override
     public String toString() {
         return this.toString("");
@@ -110,6 +137,8 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
     }
 
     public DecisionTreeTestNode clone() {
-        return new DecisionTreeTestNode(this.attribute, this.value, this.deploymentSpace);
+        DecisionTreeTestNode test = new DecisionTreeTestNode(this.attribute, this.value, this.deploymentSpace);
+        test.id = this.id;
+        return  test;
     }
 }

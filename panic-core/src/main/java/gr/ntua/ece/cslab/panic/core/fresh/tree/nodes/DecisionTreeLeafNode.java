@@ -36,6 +36,11 @@ public class DecisionTreeLeafNode extends DecisionTreeNode {
         this.deploymentSpace = space;
     }
 
+    public DecisionTreeLeafNode(List<OutputSpacePoint> points, DeploymentSpace space,String id) {
+        this(points, space);
+        this.id = id;
+    }
+
     public List<OutputSpacePoint> getPoints() {
         return points;
     }
@@ -45,7 +50,7 @@ public class DecisionTreeLeafNode extends DecisionTreeNode {
         for(OutputSpacePoint p : points) {
             newList.add(p);
         }
-        return new DecisionTreeLeafNode(newList, this.deploymentSpace);
+        return new DecisionTreeLeafNode(newList, this.deploymentSpace, id);
     }
     @Override
     protected String toString(String pad) {
