@@ -69,6 +69,21 @@ public abstract class DecisionTreeNode {
         } else {
             return ((DecisionTreeTestNode)this).clone();
         }
+    }
 
+    /**
+     * Returns the path from the leaf until the root
+     * @return
+     */
+    public String treePath() {
+        String id = "";
+        DecisionTreeNode n = this;
+        while(n.getFather()!=null) {
+            if(!n.isLeaf()) {
+                id += String.format("%s%s",n.castToTest().getAttribute(), Double.toHexString(n.castToTest().getValue()));
+            }
+            n = n.getFather();
+        }
+        return id;
     }
 }
