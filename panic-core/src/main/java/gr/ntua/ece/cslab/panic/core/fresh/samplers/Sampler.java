@@ -23,17 +23,21 @@
 package gr.ntua.ece.cslab.panic.core.fresh.samplers;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
+import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.samplers.ASampler;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  *
  * @author Giannis Giannakopoulos
  */
-public class AbstractSampler implements Sampler {
+public class Sampler {
+
+    /**
+     * The point should not belong into those points.
+     */
+    protected Set<InputSpacePoint> forbiddenPoints;
     /**
      * HashMap representing the allowed values for each dimension.
      */
@@ -61,7 +65,7 @@ public class AbstractSampler implements Sampler {
     
     protected HashMap<String, String> configuration;
 
-    public AbstractSampler() {
+    public Sampler() {
         this.ranges = new HashMap<>();
         this.samplingRate = 0.0;
         this.pointsPicked = 0;
@@ -71,7 +75,18 @@ public class AbstractSampler implements Sampler {
 
     }
 
-    @Override
+    public Set<InputSpacePoint> getForbiddenPoints() {
+        return forbiddenPoints;
+    }
+
+
+    public void setForbiddenPoints(List<OutputSpacePoint> forbiddenPoints) {
+        this.forbiddenPoints = new HashSet<>();
+        for(OutputSpacePoint p : forbiddenPoints) {
+            this.forbiddenPoints.add(p.getInputSpacePoint());
+        }
+    }
+
     public void setDimensionsWithRanges(HashMap<String, List<Double>> ranges) {
         this.ranges = ranges;
         for (String s : this.ranges.keySet()) {      // sort each dimension ranges
@@ -79,17 +94,14 @@ public class AbstractSampler implements Sampler {
         }
     }
 
-    @Override
     public void setSamplingRate(double samplingRate) {
         this.samplingRate = samplingRate;
     }
     
-    @Override
     public void setPointsToPick(Integer numberOfPoints) {
         this.pointsToPick = numberOfPoints;
     }
 
-    @Override
     public boolean hasMore() {
         if(this.samplingRate!=0) {
             return this.pointsPicked < (int) Math.floor(this.maxChoices * this.samplingRate);
@@ -98,23 +110,19 @@ public class AbstractSampler implements Sampler {
         }
     }
 
-    @Override
     public InputSpacePoint next() {
         this.pointsPicked++;
         return null;
     }
 
-    @Override
     public HashMap<String, String> getConfiguration() {
         return configuration;
     }
 
-    @Override
     public void setConfiguration(HashMap<String, String> configuration) {
         this.configuration = configuration;
     }
-    
-    @Override
+
     public void setConfiguration(String configuration) {
         this.configuration = new HashMap<>();
         String[] confArray = configuration.split(",");
@@ -124,7 +132,6 @@ public class AbstractSampler implements Sampler {
         }
     }
 
-    @Override
     public void configureSampler() {
         this.maxChoices = 1;
         for (String s : this.ranges.keySet()) {

@@ -18,9 +18,10 @@
 package gr.ntua.ece.cslab.panic.core.fresh.samplers;
 
 
+import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
-import java.util.Properties;
+import java.util.List;
 
 /**
  * Factory for samplers
@@ -28,12 +29,13 @@ import java.util.Properties;
  */
 public class SamplerFactory {
 
-    public AbstractSampler create(String type, DeploymentSpace deploymentSpace, int budget) {
-        AbstractSampler sampler = null;
+    public Sampler create(String type, DeploymentSpace deploymentSpace, int budget, List<OutputSpacePoint> existingSamples) {
+        Sampler sampler = null;
         if(type.equals("lhs")) {
             sampler = new LatinHypercubeSampler();
             sampler.setDimensionsWithRanges(deploymentSpace.getRange());
             sampler.setPointsToPick(budget);
+            sampler.setForbiddenPoints(existingSamples);
             sampler.configureSampler();
         }
         return sampler;

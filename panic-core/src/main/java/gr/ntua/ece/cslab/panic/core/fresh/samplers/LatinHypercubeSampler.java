@@ -22,10 +22,10 @@ import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import java.util.*;
 
 /**
- * Sampler implementing the Latin Hypercube Sampling methodology.
+ * ASampler implementing the Latin Hypercube Sampling methodology.
  * @author Giannis Giannakopoulos
  */
-public class LatinHypercubeSampler  extends AbstractSampler {
+public class LatinHypercubeSampler  extends Sampler {
 
     private Map<String, List<Integer>> hyperCubeIndices;
     private Random random;
@@ -42,11 +42,19 @@ public class LatinHypercubeSampler  extends AbstractSampler {
     public InputSpacePoint next() {
         super.next();
         InputSpacePoint sample = new InputSpacePoint();
-        for(String s:this.hyperCubeIndices.keySet()) {
-            List<Integer> indices = this.hyperCubeIndices.get(s);
-            int index = indices.remove(this.random.nextInt(indices.size()));
-            double value = this.pickPointUniformly(this.translateIndex(s, index));
-            sample.addDimension(s, value);
+        while(true) {
+            for (String s : this.hyperCubeIndices.keySet()) {
+                List<Integer> indices = this.hyperCubeIndices.get(s);
+                if(indices.size()<1) {
+                    return null;
+                }
+                int index = indices.remove(this.random.nextInt(indices.size()));
+                double value = this.pickPointUniformly(this.translateIndex(s, index));
+                sample.addDimension(s, value);
+            }
+            if(!this.forbiddenPoints.contains(sample)){
+                break;
+            }
         }
         return sample;
     }
