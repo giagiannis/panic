@@ -31,12 +31,13 @@ public class SamplerFactory {
 
     public Sampler create(String type, DeploymentSpace deploymentSpace, int budget, List<OutputSpacePoint> existingSamples) {
         Sampler sampler = null;
-        if(type.equals("lhs")) {
-            sampler = new LatinHypercubeSampler();
-            sampler.setDimensionsWithRanges(deploymentSpace.getRange());
-            sampler.setPointsToPick(budget);
-            sampler.setForbiddenPoints(existingSamples);
-            sampler.configureSampler();
+        switch (type) {
+            case "random":
+                sampler = new RandomSampler(deploymentSpace, budget);
+                break;
+            case "lhs":
+                sampler = new LatinHypercubeSampler(deploymentSpace, budget);
+                break;
         }
         return sampler;
     }
