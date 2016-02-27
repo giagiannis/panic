@@ -18,7 +18,7 @@
 package gr.ntua.ece.cslab.panic.core.samplers;
 
 /**
- * This class implements most actions from the Sampler interface, consisting to 
+ * This class implements most actions from the Sampler interface, consisting to
  * a static sampling strategy: the model has no knowledge of the model and the 
  * trained values.
  * @author Giannis Giannakopoulos

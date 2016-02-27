@@ -28,7 +28,7 @@ import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
 
 
 /**
- * Sampler used to partition 
+ * Sampler used to partition
  * @author Giannis Giannakopoulos
  */
 public class RandomPartitioningSampler extends AbstractAdaptiveSampler {
