@@ -129,6 +129,7 @@ public class DTRT extends DTAlgorithm{
             numberOfLeaves = tree.getLeaves().size();
             tree = this.expandTree(tree);
         }
+        this.expandedCachedTree=tree;
         return tree;
     }
 
