@@ -30,6 +30,7 @@ public class LatinHypercubeSampler extends Sampler {
     private final HashSet<InputSpacePoint> sampledPoints;
     private HashMap<String, List<List<Double>>> values;
     private Random random;
+    private int maxCombinations;
     public LatinHypercubeSampler(DeploymentSpace deploymentSpace, int budget) {
         super(deploymentSpace, budget);
         this.values = new HashMap<>();
@@ -38,12 +39,22 @@ public class LatinHypercubeSampler extends Sampler {
             this.values.put(dim, this.partitionDimension(dim));
         }
 
-        this.sampledPoints = new HashSet<InputSpacePoint>();
+        this.sampledPoints = new HashSet<>();
+
+        this.maxCombinations = 1;
+        for(String s : this.deploymentSpace.getRange().keySet()) {
+            this.maxCombinations*=this.deploymentSpace.getRange().get(s).size();
+        }
     }
 
     @Override
     public InputSpacePoint next() {
         InputSpacePoint point;
+        double sum = this.forbiddenPoints.size()+this.pickedPoints.size();
+        if(sum >= this.maxCombinations) {
+            this.noMorePoints = true;
+            return null;
+        }
         while(true) {
             point = new InputSpacePoint();
             HashMap<String, Integer> tempIndexes = new HashMap<>();

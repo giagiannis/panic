@@ -19,8 +19,6 @@ package gr.ntua.ece.cslab.panic.core.fresh.samplers;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.fresh.samplers.RandomSampler;
-import gr.ntua.ece.cslab.panic.core.fresh.samplers.deprec.LatinHypercubeSampler;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.TestUtils;
 import org.junit.Before;

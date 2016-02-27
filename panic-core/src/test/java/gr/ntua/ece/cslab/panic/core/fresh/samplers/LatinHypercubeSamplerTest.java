@@ -62,13 +62,13 @@ public class LatinHypercubeSamplerTest {
     }
 
     @Test
-    public void testForbidded() throws Exception {
+    public void testForbidden() throws Exception {
         sampler = new LatinHypercubeSampler(this.space, 10);
         List<InputSpacePoint> forbidden = new LinkedList<>();
         while(sampler.hasMore()) {
             forbidden.add(sampler.next());
         }
-        sampler  = new LatinHypercubeSampler(this.space, 125);
+        sampler  = new LatinHypercubeSampler(this.space, 126);
         sampler.setForbiddenPoints(forbidden);
         int pointCount = 0;
         while(sampler.hasMore()) {
