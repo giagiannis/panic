@@ -40,7 +40,7 @@ public class FileMetricSourceTest {
     private List<OutputSpacePoint> points;
     @Before
     public void setUp() throws Exception {
-        URL url  = this.getClass().getClassLoader().getResource(TestUtils.FileReader.DEFAULT_DATASET_PATH);
+        URL url  = this.getClass().getClassLoader().getResource(TestUtils.FileReader.UNAVAILABLE_DATASET_PATH);
         String defaultDatasetPath = null;
         if(url!=null)
              defaultDatasetPath= url.getFile();
@@ -65,5 +65,10 @@ public class FileMetricSourceTest {
     @Test
     public void testDeploymentSpace() throws Exception {
         assertNotNull(this.deployer.getDeploymentSpace());
+    }
+
+    @Test
+    public void testUnavailable() throws Exception {
+        System.out.println(this.deployer.unavailablePoints);
     }
 }

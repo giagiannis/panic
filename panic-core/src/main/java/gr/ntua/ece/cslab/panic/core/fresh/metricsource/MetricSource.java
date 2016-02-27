@@ -21,7 +21,7 @@ import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Abstract class representing a MetricSource object.
@@ -30,9 +30,11 @@ import java.util.Properties;
 public abstract class MetricSource {
     protected Properties configuration;
     protected DeploymentSpace deploymentSpace;
+    protected Set<InputSpacePoint> unavailablePoints;
 
     public MetricSource(Properties configuration) {
         this.configuration = configuration;
+        this.unavailablePoints = new HashSet<>();
     }
 
     public DeploymentSpace getDeploymentSpace() {
@@ -54,4 +56,8 @@ public abstract class MetricSource {
      * @return the OutputSpacePoint
      */
     public abstract OutputSpacePoint getPoint(InputSpacePoint point);
+
+    public Set<InputSpacePoint> unavailablePoints() {
+        return this.unavailablePoints;
+    }
 }

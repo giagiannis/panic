@@ -23,6 +23,7 @@ import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -31,7 +32,7 @@ import java.util.Properties;
  * Created by Giannis Giannakopoulos on 2/17/16.
  */
 public class FileMetricSource extends MetricSource {
-//    public static String CONF_FILE_INPUT="input";
+    //    public static String CONF_FILE_INPUT="input";
     private Map<InputSpacePoint, OutputSpacePoint> mapping;
 
     /**
@@ -40,11 +41,6 @@ public class FileMetricSource extends MetricSource {
      */
     public FileMetricSource(Properties configuration) {
         super(configuration);
-    }
-
-    @Override
-    public void configure() {
-        // initialize the manager
         this.mapping = new HashMap<>();
         CSVFileManager manager = new CSVFileManager(this.configuration.getProperty("input"));
         for(OutputSpacePoint p : manager.getOutputSpacePoints()) {
@@ -52,10 +48,18 @@ public class FileMetricSource extends MetricSource {
         }
         this.deploymentSpace = new DeploymentSpace();
         this.deploymentSpace.setRange(manager.getDimensionRanges());
+        this.unavailablePoints = manager.getUnavailablePoints();
+    }
+
+    @Override
+    public void configure() {
+        // initialize the manager
     }
 
     @Override
     public OutputSpacePoint getPoint(InputSpacePoint point) {
         return this.mapping.get(point);
     }
+
+
 }
