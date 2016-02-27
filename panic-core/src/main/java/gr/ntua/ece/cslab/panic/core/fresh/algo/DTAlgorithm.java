@@ -23,7 +23,7 @@ import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
 import gr.ntua.ece.cslab.panic.core.fresh.budget.Budget;
 import gr.ntua.ece.cslab.panic.core.fresh.budget.BudgetFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
-import gr.ntua.ece.cslab.panic.core.fresh.samplers.AbstractSampler;
+import gr.ntua.ece.cslab.panic.core.fresh.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
@@ -191,7 +191,7 @@ public abstract class DTAlgorithm {
     protected void sampleLeaf(DecisionTreeLeafNode leaf) {
         int budget = this.budgetStrategy.estimate(leaf);
         SamplerFactory factory = new SamplerFactory();
-        AbstractSampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget);
+        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, this.tree.getSamples());
         while(sampler.hasMore() && !this.terminationCondition()) {
             InputSpacePoint point = sampler.next();
             OutputSpacePoint out = source.getPoint(point);

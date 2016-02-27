@@ -19,16 +19,14 @@ package gr.ntua.ece.cslab.panic.core.fresh.algo;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
-import gr.ntua.ece.cslab.panic.core.fresh.samplers.AbstractSampler;
+import gr.ntua.ece.cslab.panic.core.fresh.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.Separator;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.SeparatorFactory;
-import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 
 import java.util.*;
 
@@ -38,43 +36,58 @@ import java.util.*;
  */
 public class DTRT extends DTAlgorithm{
 
+    private Integer steps;
+    private Set<String> treePathsToIgnore;
 
     public DTRT(int deploymentBudget, String samplerType, MetricSource source, String separatorType, String budgetType, Properties budgetProperties) {
         super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties);
+        this.steps=0;
+        this.treePathsToIgnore = new HashSet<>();
     }
 
     @Override
     public void run() {
+        while(this.tree.getSamples().size()<=this.getSpace().getRange().size()+1) {
+            this.sampleLeaf(this.tree.getLeaves().get(0));
+        }
         while(!terminationCondition()) {
             this.step();
         }
     }
 
     private void step() {
-        // expands the tree
+        this.steps+=1;
+        long start = System.currentTimeMillis();
+//        System.out.format("Step %d: Expanding tree... ", this.steps);
         DecisionTree tree = this.expandAll(this.tree);
+//        System.out.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
+//        System.out.format("Step %d: Selecting most erroneous leaf... ", this.steps);
+        start = System.currentTimeMillis();
+        DecisionTreeLeafNode leaf = this.getLeafWithHighestError(tree);
+//        System.out.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
+//        System.out.format("Step %d: Sampling leaf... ", this.steps);
+        start = System.currentTimeMillis();
+        this.sampleLeaf(leaf, tree);
+//        System.out.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
 
-        // order the leaves according to their errors (most erroneous leaves go first)
-        List<DecisionTreeLeafNode> leaves = tree.getLeaves();
-        Collections.sort(leaves, (node1, node2) -> {
-            double mse1=CrossValidation.meanSquareError(LinearRegression.class, node1.getPoints());
-            double mse2=CrossValidation.meanSquareError(LinearRegression.class, node2.getPoints());
-            return -Double.compare(mse1,mse2);
-        });
-
-        // for each leaf sample
-        DecisionTreeLeafNode mostErroneousLeaf = leaves.remove(0);
-        this.sampleLeaf(mostErroneousLeaf, tree);
     }
 
     protected void sampleLeaf(DecisionTreeLeafNode leaf, DecisionTree tree) {
         int budget = this.budgetStrategy.estimate(leaf, tree);
         SamplerFactory factory = new SamplerFactory();
-        AbstractSampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget);
+        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, this.tree.getSamples());
+        boolean pointPicked = false;
         while (sampler.hasMore() && !this.terminationCondition()) {
             InputSpacePoint point = sampler.next();
-            OutputSpacePoint out = source.getPoint(point);
-            this.tree.addPoint(out);
+            if(point!=null) {
+                OutputSpacePoint out = source.getPoint(point);
+                this.tree.addPoint(out);
+                pointPicked=true;
+            }
+        }
+        // what happens if all the leaves are blacklisted?
+        if(!pointPicked) {
+            this.treePathsToIgnore.add(leaf.treePath());
         }
     }
 
@@ -107,5 +120,27 @@ public class DTRT extends DTAlgorithm{
             tree = this.expandTree(tree);
         }
         return tree;
+    }
+
+    private DecisionTreeLeafNode getLeafWithHighestError(DecisionTree tree) {
+        double minError = Double.POSITIVE_INFINITY;
+        DecisionTreeLeafNode leaf = null;
+        for(DecisionTreeLeafNode l : tree.getLeaves()) {
+            double currentError = DTAlgorithm.meanSquareError(l);
+            if((!this.treePathsToIgnore.contains(l.treePath())) && (currentError<minError || leaf==null)) {
+                leaf = l;
+                minError = currentError;
+            }
+        }
+//        System.out.println(tree.toString());
+        if(leaf==null) {
+            System.out.println("DTRT.step");
+            System.out.println("Chosen leaf is null!!! This is ma-ma-ma-ma-ma-ma-madness!!!");
+            System.out.println(tree.toString());
+            System.out.println(this.treePathsToIgnore);
+            System.exit(1);
+        }
+
+        return leaf;
     }
 }

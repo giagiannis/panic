@@ -155,11 +155,10 @@ public class DecisionTree {
                 t = t.getFather();
                 buffer+="    ";
             }
-//            buffer+=n.getId()+"\n";
             if(n.isLeaf()) {
-                buffer+=String.format("%s (%d)\n", n.getId(),n.castToLeaf().getPoints().size());
+                buffer+=String.format("%s (%d) [%s]\n", n.getId(),n.castToLeaf().getPoints().size(), n.treePath());
             } else {
-                buffer += String.format("%s (%s <> %.2f)\n", n.getId(), n.castToTest().getAttribute(), n.castToTest().getValue());
+                buffer += String.format("%s (%s <> %.2f) [%s]\n", n.getId(), n.castToTest().getAttribute(), n.castToTest().getValue(), n.treePath());
             }
         }
         return buffer.substring(0,buffer.length()-1);

@@ -29,7 +29,7 @@ import java.util.List;
 public class CrossValidation {
 
     public static double meanSquareError(Class<? extends Model> classType, List<OutputSpacePoint> trainedPoints) {
-        if(trainedPoints.size()<1)
+        if(trainedPoints.size() < 1 || trainedPoints.size() < trainedPoints.get(0).getInputSpacePoint().numberDimensions() + 2)
             return Double.NaN;
         double error = 0.0;
         for(int i=0;i<trainedPoints.size();i++) {

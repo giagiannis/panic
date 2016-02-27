@@ -18,6 +18,7 @@
 package gr.ntua.ece.cslab.panic.core.fresh.tree.nodes;
 
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 
 import java.util.UUID;
 
@@ -78,9 +79,16 @@ public abstract class DecisionTreeNode {
     public String treePath() {
         String id = "";
         DecisionTreeNode n = this;
-        while(n.getFather()!=null) {
-            if(!n.isLeaf()) {
-                id += String.format("%s%s",n.castToTest().getAttribute(), Double.toHexString(n.castToTest().getValue()));
+        while(n!=null) {
+            if(n.getFather()!=null) {
+                DecisionTreeTestNode father = n.getFather().castToTest();
+                String sign = "<";
+                if(father.getRightChild()==n) {
+                    sign=">";
+                }
+                id+=father.getAttribute()+sign+Double.toHexString(father.getValue());
+            } else {
+                id+="R";
             }
             n = n.getFather();
         }

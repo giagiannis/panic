@@ -17,13 +17,7 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.algo;
 
-import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
-import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.fresh.budget.Budget;
-import gr.ntua.ece.cslab.panic.core.fresh.budget.BudgetFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
-import gr.ntua.ece.cslab.panic.core.fresh.samplers.AbstractSampler;
-import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.Separator;
