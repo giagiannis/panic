@@ -39,6 +39,8 @@ public class DTRT extends DTAlgorithm{
     private Integer steps;
     private Set<String> treePathsToIgnore;
 
+    private DecisionTree expandedCachedTree = null;
+
     public DTRT(int deploymentBudget, String samplerType, MetricSource source, String separatorType, String budgetType, Properties budgetProperties) {
         super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties);
         this.steps=0;
@@ -88,6 +90,7 @@ public class DTRT extends DTAlgorithm{
                 OutputSpacePoint out = source.getPoint(point);
                 this.tree.addPoint(out);
                 pointPicked=true;
+                this.expandedCachedTree = null;
             }
         }
         // what happens if all the leaves are blacklisted?
@@ -118,6 +121,8 @@ public class DTRT extends DTAlgorithm{
 
     // expands the tree until no new expansions can be made
     private DecisionTree expandAll(DecisionTree original) {
+        if(expandedCachedTree !=null)
+            return expandedCachedTree;
         DecisionTree tree = original.clone();
         int numberOfLeaves = 0;
         while(numberOfLeaves!=tree.getLeaves().size()) {
