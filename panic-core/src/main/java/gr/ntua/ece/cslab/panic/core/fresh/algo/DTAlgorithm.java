@@ -88,27 +88,26 @@ public abstract class DTAlgorithm {
     }
 
 
-
     public double meanSquareError() {
         double sum = 0.0;
-        for(DecisionTreeLeafNode l : this.tree.getLeaves()) {
+        for (DecisionTreeLeafNode l : this.tree.getLeaves()) {
             sum += CrossValidation.meanSquareError(LinearRegression.class, l.getPoints()) * l.getPoints().size();
         }
-        return sum/this.tree.getSamples().size();
+        return sum / this.tree.getSamples().size();
     }
 
     public static double meanSquareError(DecisionTree tree) {
         double sum = 0.0;
-        for(DecisionTreeLeafNode l : tree.getLeaves()) {
+        for (DecisionTreeLeafNode l : tree.getLeaves()) {
             sum += CrossValidation.meanSquareError(LinearRegression.class, l.getPoints()) * l.getPoints().size();
         }
-        return sum/tree.getSamples().size();
+        return sum / tree.getSamples().size();
     }
 
     public static double meanSquareError(DecisionTreeNode node) {
         double mse = 0.0;
         List<OutputSpacePoint> points = null;
-        if(node.isLeaf()) {
+        if (node.isLeaf()) {
             points = node.castToLeaf().getPoints();
         } else {
             points = node.castToTest().getSamples();
@@ -123,45 +122,37 @@ public abstract class DTAlgorithm {
      * This method creates new trees with different partitioning setups and gets the one that appears to be the best.
      */
     public DecisionTree getBestTree() {
-        if (bestTree == null) {
-            DecisionTree currentTree = this.tree.clone();
-            DecisionTree bestTree = this.tree;
-            double bestScore = DTAlgorithm.meanSquareError(currentTree);
+        DecisionTree currentTree = new DecisionTree(this.space);
+        currentTree.addPoint(this.tree.getSamples());
+        DecisionTree bestTree = currentTree.clone();
+        double bestScore = DTAlgorithm.meanSquareError(currentTree);
 
-            boolean someoneReplaced = true;
-            while (someoneReplaced) {
-//                System.out.println("DTAlgorithm.getBestTree");
-//                System.out.println(currentTree);
-                ReplacementCouples couples = new ReplacementCouples();
-                someoneReplaced = false;
-                for (DecisionTreeLeafNode l : currentTree.getLeaves()) {
-//                    System.out.format("Checking leaf with id %s ...\t",l.getId());
-                    SeparatorFactory factory1 = new SeparatorFactory();
-                    Separator sep = factory1.create(this.separatorType, l);
-                    sep.separate();
+        boolean someoneReplaced = true;
+        while (someoneReplaced) {
+            ReplacementCouples couples = new ReplacementCouples();
+            someoneReplaced = false;
+            for (DecisionTreeLeafNode l : currentTree.getLeaves()) {
+                SeparatorFactory factory1 = new SeparatorFactory();
+                Separator sep = factory1.create(this.separatorType, l);
+                sep.separate();
 
-                    if (sep.getResult() != null) {
-                        couples.addCouple(l, sep.getResult());
-                        someoneReplaced = true;
-//                        System.out.println("Replaced");
-                    } else {
-//                        System.out.println("Not replaced");
-                    }
+                if (sep.getResult() != null) {
+                    couples.addCouple(l, sep.getResult());
+                    someoneReplaced = true;
                 }
-                for (DecisionTreeNode n : couples.getOriginalNodes()) {
-                    currentTree.replaceNode(n, couples.getNode(n));
-                }
-
-                double currentScore = DTAlgorithm.meanSquareError(currentTree);
-                if(currentScore<=bestScore) {
-                    bestTree = currentTree;
-                    bestScore = currentScore;
-                }
-                currentTree = currentTree.clone();
-//                System.out.println("=========================================================");
             }
-            this.bestTree = bestTree;
+            for (DecisionTreeNode n : couples.getOriginalNodes()) {
+                currentTree.replaceNode(n, couples.getNode(n));
+            }
+
+            double currentScore = DTAlgorithm.meanSquareError(currentTree);
+            if (currentScore <= bestScore) {
+                bestTree = currentTree;
+                bestScore = currentScore;
+            }
+            currentTree = currentTree.clone();
         }
+        this.bestTree = bestTree;
         return bestTree;
     }
 
@@ -192,11 +183,11 @@ public abstract class DTAlgorithm {
         int budget = this.budgetStrategy.estimate(leaf);
         SamplerFactory factory = new SamplerFactory();
         List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
-        for(OutputSpacePoint p : this.tree.getSamples()) {
+        for (OutputSpacePoint p : this.tree.getSamples()) {
             forbiddenPoints.add(p.getInputSpacePoint());
         }
         Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints);
-        while(sampler.hasMore() && !this.terminationCondition()) {
+        while (sampler.hasMore() && !this.terminationCondition()) {
             InputSpacePoint point = sampler.next();
             OutputSpacePoint out = source.getPoint(point);
             this.tree.addPoint(out);
@@ -206,7 +197,7 @@ public abstract class DTAlgorithm {
 
     // terminationCondition is true if the algorithm should terminate
     protected boolean terminationCondition() {
-        return this.tree.getSamples().size()>=this.deploymentBudget;
+        return this.tree.getSamples().size() >= this.deploymentBudget;
     }
 
 }
