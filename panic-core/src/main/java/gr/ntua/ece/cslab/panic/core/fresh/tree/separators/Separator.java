@@ -18,9 +18,11 @@
 package gr.ntua.ece.cslab.panic.core.fresh.tree.separators;
 
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeTestNode;
+import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 
 import java.util.*;
 
@@ -65,13 +67,19 @@ public abstract class Separator {
         // FIXME: sanity check of the solution is crucial here
 //         setting result
         if (best != null) {
-            this.result = new DecisionTreeTestNode(
-                    best.getSeparationDimension(),
-                    best.getSeparationValue(),
-                    best.getOriginalDS(),
-                    new DecisionTreeLeafNode(best.getLeftList(),best.getLeftDS()),
-                    new DecisionTreeLeafNode(best.getRightList(), best.getRightDS()),
-                    this.original.getId());
+            double mse1 = CrossValidation.meanSquareError(LinearRegression.class, best.getLeftList());
+            double mse2 = CrossValidation.meanSquareError(LinearRegression.class, best.getRightList());
+            double mseSum = CrossValidation.meanSquareError(LinearRegression.class, best.getOriginal());
+            double avgMSE = (mse1*best.getLeftList().size()+mse2*best.getRightList().size())/(best.getLeftList().size()+best.getRightList().size());
+            if(mseSum > avgMSE) {
+                this.result = new DecisionTreeTestNode(
+                        best.getSeparationDimension(),
+                        best.getSeparationValue(),
+                        best.getOriginalDS(),
+                        new DecisionTreeLeafNode(best.getLeftList(),best.getLeftDS()),
+                        new DecisionTreeLeafNode(best.getRightList(), best.getRightDS()),
+                        this.original.getId());
+            }
         }
     }
 
