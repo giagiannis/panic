@@ -34,6 +34,7 @@ public class TestUtils {
     public static class FileReader {
         public static int POINTS_COUNT=100;
         public static String DEFAULT_DATASET_PATH = "sample-input.dat";
+        public static String UNAVAILABLE_DATASET_PATH = "sample-input-unav.dat";
         private CSVFileManager manager;
         private List<OutputSpacePoint> outputSpacePoints;
         private DeploymentSpace space;

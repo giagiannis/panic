@@ -191,7 +191,11 @@ public abstract class DTAlgorithm {
     protected void sampleLeaf(DecisionTreeLeafNode leaf) {
         int budget = this.budgetStrategy.estimate(leaf);
         SamplerFactory factory = new SamplerFactory();
-        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, this.tree.getSamples());
+        List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
+        for(OutputSpacePoint p : this.tree.getSamples()) {
+            forbiddenPoints.add(p.getInputSpacePoint());
+        }
+        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints);
         while(sampler.hasMore() && !this.terminationCondition()) {
             InputSpacePoint point = sampler.next();
             OutputSpacePoint out = source.getPoint(point);

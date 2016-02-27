@@ -18,6 +18,7 @@
 package gr.ntua.ece.cslab.panic.core.fresh.samplers;
 
 
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
@@ -29,7 +30,7 @@ import java.util.List;
  */
 public class SamplerFactory {
 
-    public Sampler create(String type, DeploymentSpace deploymentSpace, int budget, List<OutputSpacePoint> existingSamples) {
+    public Sampler create(String type, DeploymentSpace deploymentSpace, int budget, List<InputSpacePoint> forbiddenPoints) {
         Sampler sampler = null;
         switch (type) {
             case "random":
@@ -39,6 +40,8 @@ public class SamplerFactory {
                 sampler = new LatinHypercubeSampler(deploymentSpace, budget);
                 break;
         }
+        if(forbiddenPoints!=null)
+            sampler.setForbiddenPoints(forbiddenPoints);
         return sampler;
     }
 }

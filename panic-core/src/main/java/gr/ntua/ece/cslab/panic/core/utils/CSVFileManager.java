@@ -19,6 +19,7 @@ package gr.ntua.ece.cslab.panic.core.utils;
 import au.com.bytecode.opencsv.CSVReader;
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -32,7 +33,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author Giannis Giannakopoulos
  */
 public class CSVFileManager {
@@ -42,16 +42,18 @@ public class CSVFileManager {
     private int outputDimensionIndex;
     private char delimiter = '\t';
     private String[] dimensionNames;
-    private int quoteLines=0;
-    
+    private int quoteLines = 0;
+    private Set<InputSpacePoint> unavailablePoints;
+
     private HashMap<InputSpacePoint, OutputSpacePoint> hashMap;
 
     public CSVFileManager() {
-        
+        this.unavailablePoints = new HashSet<>();
     }
 
     public CSVFileManager(String filename) {
         this.setFilename(filename);
+        this.unavailablePoints = new HashSet<>();
     }
 
     public String getFilename() {
@@ -62,20 +64,20 @@ public class CSVFileManager {
         this.filename = filename;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
-            String buffer="";
-            while(reader.ready()) {
+            String buffer = "";
+            while (reader.ready()) {
                 buffer = reader.readLine();
-                if(!buffer.trim().startsWith("#") && buffer.trim().length()!=0)
+                if (!buffer.trim().startsWith("#") && buffer.trim().length() != 0)
                     break;
                 else
-                    quoteLines+=1;
+                    quoteLines += 1;
             }
             this.dimensionNames = buffer.split("\t");
             this.numberOfInputDimensions = this.dimensionNames.length - 1;
             this.outputDimensionIndex = this.dimensionNames.length - 1;
             this.hashMap = new HashMap<>();
             reader.close();
-        } catch ( IOException  ex) {
+        } catch (IOException ex) {
             Logger.getLogger(CSVFileManager.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -118,20 +120,22 @@ public class CSVFileManager {
     public List<OutputSpacePoint> getOutputSpacePoints() {
         List<OutputSpacePoint> results = null;
         try {
-            CSVReader reader = new CSVReader(new FileReader(filename), delimiter, '#', this.quoteLines+1);
+            CSVReader reader = new CSVReader(new FileReader(filename), delimiter, '#', this.quoteLines + 1);
             String[] line;
             results = new LinkedList<>();
             while ((line = reader.readNext()) != null) {
                 boolean sanityCheck = true;
-                    OutputSpacePoint point = new OutputSpacePoint();
-                    point.setInputSpacePoint(new InputSpacePoint());
-                    for (int i = 0; i < numberOfInputDimensions; i++) {
-                        point.getInputSpacePoint().addDimension(this.dimensionNames[i], new Double(line[i]));
-                    }
-                if(!line[outputDimensionIndex].equals("")) {
-                    point.setValue(this.dimensionNames[this.dimensionNames.length-1], new Double(line[outputDimensionIndex]));
+                OutputSpacePoint point = new OutputSpacePoint();
+                point.setInputSpacePoint(new InputSpacePoint());
+                for (int i = 0; i < numberOfInputDimensions; i++) {
+                    point.getInputSpacePoint().addDimension(this.dimensionNames[i], new Double(line[i]));
+                }
+                if (!line[outputDimensionIndex].equals("")) {
+                    point.setValue(this.dimensionNames[this.dimensionNames.length - 1], new Double(line[outputDimensionIndex]));
                     results.add(point);
                     this.hashMap.put(point.getInputSpacePoint(), point);
+                } else {
+                    this.unavailablePoints.add(point.getInputSpacePoint());
                 }
             }
             reader.close();
@@ -177,5 +181,9 @@ public class CSVFileManager {
 
     public OutputSpacePoint getActualValue(InputSpacePoint point) {
         return this.hashMap.get(point);
+    }
+
+    public Set<InputSpacePoint> getUnavailablePoints() {
+        return unavailablePoints;
     }
 }

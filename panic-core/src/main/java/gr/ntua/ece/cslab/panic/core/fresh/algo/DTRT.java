@@ -75,7 +75,12 @@ public class DTRT extends DTAlgorithm{
     protected void sampleLeaf(DecisionTreeLeafNode leaf, DecisionTree tree) {
         int budget = this.budgetStrategy.estimate(leaf, tree);
         SamplerFactory factory = new SamplerFactory();
-        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, this.tree.getSamples());
+        List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
+        for(OutputSpacePoint p : this.tree.getSamples()) {
+            forbiddenPoints.add(p.getInputSpacePoint());
+        }
+        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints);
+
         boolean pointPicked = false;
         while (sampler.hasMore() && !this.terminationCondition()) {
             InputSpacePoint point = sampler.next();
