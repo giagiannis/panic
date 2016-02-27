@@ -58,17 +58,17 @@ public class DTRT extends DTAlgorithm{
     private void step() {
         this.steps+=1;
         long start = System.currentTimeMillis();
-//        System.out.format("Step %d: Expanding tree... ", this.steps);
+        System.out.format("Step %d: Expanding tree (sample size: %d)... ", this.steps, this.tree.getSamples());
         DecisionTree tree = this.expandAll(this.tree);
-//        System.out.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
-//        System.out.format("Step %d: Selecting most erroneous leaf... ", this.steps);
+        System.out.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
+        System.out.format("Step %d: Selecting most erroneous leaf... ", this.steps);
         start = System.currentTimeMillis();
         DecisionTreeLeafNode leaf = this.getLeafWithHighestError(tree);
-//        System.out.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
-//        System.out.format("Step %d: Sampling leaf... ", this.steps);
+        System.out.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
+        System.out.format("Step %d: Sampling leaf... ", this.steps);
         start = System.currentTimeMillis();
         this.sampleLeaf(leaf, tree);
-//        System.out.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
+        System.out.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
 
     }
 
