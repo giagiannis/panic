@@ -108,18 +108,20 @@ public class EntryPoint {
 
         int repetitions = new Integer(properties.getProperty("entrypoint.repetitions"));
         double mse = 0.0, leafNodes = 0.0;
+        long time = System.currentTimeMillis();
         for(int i=0;i<repetitions;i++) {
 //            System.err.format("Repetition %d started...\t", i+1);
-            long start = System.currentTimeMillis();
             DTAlgorithm algorithm;
             DTAlgorithmFactory factory1 = new DTAlgorithmFactory();
             algorithm = factory1.create(properties.getProperty("entrypoint.algorithm"), properties);
+            long start=System.currentTimeMillis();
             algorithm.run();
             DecisionTree tree = algorithm.getBestTree();
+            time+=(System.currentTimeMillis()-start);
             mse+=DTAlgorithm.meanSquareError(tree);
             leafNodes+=tree.getLeaves().size();
 //            System.err.format("Done! (elapsed: %d)\n",(System.currentTimeMillis()-start)/1000);
         }
-        System.out.format("%.5f\t%.5f\n", mse/repetitions, leafNodes/repetitions);
+        System.out.format("%.5f\t%.5f\t%.5f\n", mse/repetitions, leafNodes/repetitions, time/(1000.0*repetitions));
     }
 }
