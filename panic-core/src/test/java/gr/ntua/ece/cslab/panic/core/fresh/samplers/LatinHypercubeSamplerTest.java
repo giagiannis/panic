@@ -49,13 +49,11 @@ public class LatinHypercubeSamplerTest {
 
     @Test
     public void testUniqueness() throws Exception {
-        int pointsCount = 0;
         Set<InputSpacePoint> points = new HashSet<>();
         while (sampler.hasMore()) {
             InputSpacePoint point = sampler.next();
             if(point!=null) {
                 points.add(point);
-                pointsCount += 1;
             }
         }
         assertEquals(135, points.size());
@@ -68,7 +66,7 @@ public class LatinHypercubeSamplerTest {
         while(sampler.hasMore()) {
             forbidden.add(sampler.next());
         }
-        sampler  = new LatinHypercubeSampler(this.space, 126);
+        sampler  = new LatinHypercubeSampler(this.space, 125);
         sampler.setForbiddenPoints(forbidden);
         int pointCount = 0;
         while(sampler.hasMore()) {

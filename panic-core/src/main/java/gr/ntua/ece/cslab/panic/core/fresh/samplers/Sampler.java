@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Sampler abstract class.
@@ -45,11 +46,27 @@ public abstract class Sampler {
     }
 
     public void setForbiddenPoints(List<InputSpacePoint> forbiddenPoints) {
-        this.forbiddenPoints = new HashSet<>(forbiddenPoints);
+//        this.forbiddenPoints = new HashSet<>(forbiddenPoints);
+        this.forbiddenPoints = new HashSet<>();
+        this.forbiddenPoints.addAll(forbiddenPoints.stream().filter(p -> pointContained(p)).collect(Collectors.toList()));
     }
 
     public abstract InputSpacePoint next();
     public boolean hasMore() {
         return (this.pickedPoints.size()<this.budget) && (!noMorePoints);
+    }
+
+
+    private boolean pointContained(InputSpacePoint point) {
+        for(String key : point.getKeysAsCollection()) {
+            double val = point.getValue(key);
+            boolean found =false;
+            for(double d : this.deploymentSpace.getRange().get(key)) {
+                found|=(d==val);
+            }
+            if(!found)
+                return false;
+        }
+        return true;
     }
 }
