@@ -29,6 +29,7 @@ import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.Separator;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.SeparatorFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Algorithm that trains a decision train iteratively.
@@ -49,9 +50,6 @@ public class DTRT extends DTAlgorithm{
 
     @Override
     public void run() {
-        while(this.tree.getSamples().size()<=this.getSpace().getRange().size()+1) {
-            this.sampleLeaf(this.tree.getLeaves().get(0));
-        }
         while(!terminationCondition()) {
             this.step();
         }
@@ -145,10 +143,33 @@ public class DTRT extends DTAlgorithm{
         }
 //        System.out.println(tree.toString());
         if(leaf==null) {
-            System.out.println("DTRT.step");
-            System.out.println("Chosen leaf is null!!! This is ma-ma-ma-ma-ma-ma-madness!!!");
-            System.out.println(tree.toString());
-            System.out.println(this.treePathsToIgnore);
+            System.err.println("DTRT.step");
+            System.err.println("Could not find a leaf. Let's see what happens now:");
+            System.err.println(tree.toString());
+            List<InputSpacePoint> sampled = this.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toCollection(LinkedList::new));
+            for(DecisionTreeLeafNode l : tree.getLeaves()) {
+                Sampler sampler = new SamplerFactory().create(this.samplerType, l.getDeploymentSpace(), 135, sampled);
+                int countWithForbiddenPoints = 0;
+                while (sampler.hasMore()) {
+                    sampler.next();
+                    countWithForbiddenPoints +=1;
+                }
+
+                sampler = new SamplerFactory().create(this.samplerType, l.getDeploymentSpace(), 135, null);
+                int countWithoutForbiddenPoints = 0;
+                while (sampler.hasMore()) {
+                    sampler.next();
+                    countWithoutForbiddenPoints +=1;
+                }
+                System.err.format("Leaf id: %s, into paths to ignore: %s, mse %.5f, ranges: %s, points yet (with forb): %d, points yet (without forb): %d\n",
+                        l.getId(),
+                        this.treePathsToIgnore.contains(l.treePath()),
+                        DTAlgorithm.meanSquareError(l),
+                        l.getDeploymentSpace().getRange(),
+                        countWithForbiddenPoints,
+                        countWithoutForbiddenPoints);
+            }
+            System.err.println(this.treePathsToIgnore);
             System.exit(1);
         }
 

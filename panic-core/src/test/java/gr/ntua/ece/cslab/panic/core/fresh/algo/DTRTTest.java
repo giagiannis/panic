@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -79,10 +80,7 @@ public class DTRTTest {
 
     @Test
     public void testSamplesUniqueness() throws Exception {
-        Set<InputSpacePoint> points = new HashSet<>();
-        for(OutputSpacePoint p : algorithm.getSamples()) {
-            points.add(p.getInputSpacePoint());
-        }
+        Set<InputSpacePoint> points = algorithm.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toSet());
         assertEquals(algorithm.getSamples().size(), points.size());
     }
 }
