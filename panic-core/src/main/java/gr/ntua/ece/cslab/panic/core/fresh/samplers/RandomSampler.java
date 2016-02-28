@@ -40,7 +40,6 @@ public class RandomSampler extends Sampler {
         this.leftIndices = new LinkedList<>();
 
         this.dimensionOrdering = new LinkedList<>(this.deploymentSpace.getRange().keySet());
-        Collections.sort(dimensionOrdering);
         int mul = 1;
         for(String s:dimensionOrdering) {
             mul*=this.deploymentSpace.getRange().get(s).size();
@@ -69,12 +68,13 @@ public class RandomSampler extends Sampler {
     }
 
     InputSpacePoint translate(int index) {
+        int identifier = index;
         InputSpacePoint point = new InputSpacePoint();
-        for(String s: this.dimensionOrdering) {
-            List<Double> dimValues = this.deploymentSpace.getRange().get(s);
-            int mod = index%dimValues.size();
-            index/=dimValues.size();
-            point.addDimension(s, dimValues.get(mod));
+        for(String key: this.dimensionOrdering) {
+            List<Double> dimValues = this.deploymentSpace.getRange().get(key);
+            int mod = identifier % dimValues.size();
+            identifier /= dimValues.size();
+            point.addDimension(key, dimValues.get(mod));
         }
         return point;
     }

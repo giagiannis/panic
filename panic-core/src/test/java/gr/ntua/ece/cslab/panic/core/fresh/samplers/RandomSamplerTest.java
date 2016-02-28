@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -55,7 +56,7 @@ public class RandomSamplerTest {
     }
 
     @Test
-    public void testForbidded() throws Exception {
+    public void testForbidden() throws Exception {
         sampler = new RandomSampler(this.space, 10);
         List<InputSpacePoint> forbidden = new LinkedList<>();
         while(sampler.hasMore()) {
@@ -72,5 +73,14 @@ public class RandomSamplerTest {
             assertFalse(forbidden.contains(p));
         }
         assertEquals(sampler.pickedPoints.size(), pointCount);
+    }
+
+    @Test
+    public void testValidity() throws Exception {
+        Set<InputSpacePoint> set = this.points.stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toSet());
+        while (sampler.hasMore()) {
+            InputSpacePoint point = sampler.next();
+            assertTrue(set.contains(point));
+        }
     }
 }
