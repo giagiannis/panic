@@ -57,6 +57,9 @@ public class DTAlgorithmFactory {
                 break;
             case "dtrt":
                 algorithm = new DTRT(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties);
+                if(new Boolean(properties.getProperty("dtrt.onlinetraining"))) {
+                    ((DTRT)algorithm).setOnlineTraining(true);
+                }
                 break;
             default:
                 break;

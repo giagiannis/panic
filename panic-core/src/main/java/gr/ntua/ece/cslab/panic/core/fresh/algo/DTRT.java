@@ -41,11 +41,16 @@ public class DTRT extends DTAlgorithm{
     private Set<String> treePathsToIgnore;
 
     private DecisionTree expandedCachedTree = null;
+    private boolean onlineTraining;
 
     public DTRT(int deploymentBudget, String samplerType, MetricSource source, String separatorType, String budgetType, Properties budgetProperties) {
         super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties);
         this.steps=0;
         this.treePathsToIgnore = new HashSet<>();
+    }
+
+    public void setOnlineTraining(boolean onlineTraining) {
+        this.onlineTraining = onlineTraining;
     }
 
     @Override
@@ -69,6 +74,10 @@ public class DTRT extends DTAlgorithm{
         start = System.currentTimeMillis();
         this.sampleLeaf(leaf, tree);
         System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
+
+        if(this.onlineTraining) {
+            this.tree = this.expandTree(this.tree);
+        }
 
     }
 
