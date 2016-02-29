@@ -54,6 +54,6 @@ public class DecisionTreeLeafNode extends DecisionTreeNode {
     }
     @Override
     protected String toString(String pad) {
-        return String.format("%s[%d]",pad,this.points.size());
+        return String.format("%s%s[%d]",pad,this.id,this.points.size());
     }
 }

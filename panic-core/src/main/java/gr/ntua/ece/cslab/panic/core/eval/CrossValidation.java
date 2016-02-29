@@ -53,4 +53,13 @@ public class CrossValidation {
         }
         return error/trainedPoints.size();
     }
+
+    public static double meanSquareError(Class<? extends Model> classType, List<OutputSpacePoint> trainedPoints, int folds) {
+        int dimensions = trainedPoints.get(0).getInputSpacePoint().numberDimensions();
+        if(trainedPoints.size()*(1.0-1.0/folds) < dimensions)
+            return Double.NaN;
+        double error = 0.0;
+        
+        return error/trainedPoints.size();
+    }
 }

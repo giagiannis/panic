@@ -72,6 +72,13 @@ public abstract class DecisionTreeNode {
         }
     }
 
+    public boolean isLeftChild() {
+        return (this.father!=null) && (this.father.castToTest().getLeftChild().getId().equals(this.getId()));
+    }
+
+    public boolean isRightChild() {
+        return (father!=null) && (this.father.castToTest().getRightChild().getId().equals(this.getId()));
+    }
     /**
      * Returns the path from the leaf until the root
      * @return

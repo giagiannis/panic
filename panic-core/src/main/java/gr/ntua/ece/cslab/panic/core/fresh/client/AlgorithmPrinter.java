@@ -22,8 +22,10 @@ import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithm;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithmFactory;
+import gr.ntua.ece.cslab.panic.core.fresh.evaluation.Metrics;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 import gr.ntua.ece.cslab.panic.core.models.Model;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
@@ -108,8 +110,8 @@ public class AlgorithmPrinter {
     public static void main(String[] args) throws Exception {
         Map<String,String> cliOptions= parseCLIOptions(args);
         Properties properties = loadConfigurationFile(cliOptions);
-        if(args.length<2) {
-            System.err.println("Please give 2 args: 1 for the samples and 1 for the predicted values");
+        if(args.length<3) {
+            System.err.println("Please give 3 args: 1 for the samples, 1 for the predicted values and 1 for the cuts");
             System.exit(1);
         }
 
@@ -125,7 +127,9 @@ public class AlgorithmPrinter {
             algorithm = factory1.create(properties.getProperty("entrypoint.algorithm"), properties);
             algorithm.run();
             DecisionTree tree = algorithm.getBestTree();
-            double current = DTAlgorithm.meanSquareError(tree);
+            double current = Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
+//            mse += Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
+
             System.out.format("\tCross-validation score: %.5f\n", current);
             if(current<=mse) {
                 bestTree = tree;
@@ -137,6 +141,8 @@ public class AlgorithmPrinter {
 
         PrintStream sampleFile = new PrintStream(new File(args[0]));
         PrintStream predictedFile = new PrintStream(new File(args[1]));
+        PrintStream cuts = new PrintStream(new File(args[2]));
+//        PrintStream cuts = System.out;
 
         Map<String, Model> models = new HashMap<>();
         for(DecisionTreeLeafNode leaf : bestTree.getLeaves()) {
@@ -161,5 +167,25 @@ public class AlgorithmPrinter {
             predictedFile.println(predicted.getInputSpacePoint().toStringCSVFormat()+"\t"+predicted.getValue());
         }
         predictedFile.close();
+
+        for(DecisionTreeLeafNode l :bestTree.getLeaves()) {
+//            System.out.println(l.getDeploymentSpace());
+            double minX1=1.0, maxX1=0.0;
+            for(Double d: l.getDeploymentSpace().getRange().get("x1")) {
+                minX1=(minX1>d?d:minX1);
+                maxX1=(maxX1<d?d:maxX1);
+            }
+            double minX2=1.0, maxX2=0.0;
+            for(Double d: l.getDeploymentSpace().getRange().get("x2")) {
+                minX2=(minX2>d?d:minX2);
+                maxX2=(maxX2<d?d:maxX2);
+            }
+            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      minX2,      0.0,            maxX2-minX2);
+            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", maxX1,      minX2,      0.0,            maxX2-minX2);
+            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      minX2,      maxX1-minX1,    0.0);
+            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      maxX2,      maxX1-minX1,    0.0);
+//            System.out.format("From %3f, %3f to %3f, %3f\n", minX1, minX2, maxX1, maxX2);
+        }
+        cuts.close();
     }
 }

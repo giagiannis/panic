@@ -141,8 +141,9 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
     }
 
     protected String toString(String pad) {
-        return String.format("%s(%s, %.2f)\n%s\n%s",
+        return String.format("%s%s(%s, %.2f)\n%s\n%s",
                 pad,
+                this.id,
                 this.attribute,
                 this.value,
                 this.leftChild.toString(pad+"\t"),

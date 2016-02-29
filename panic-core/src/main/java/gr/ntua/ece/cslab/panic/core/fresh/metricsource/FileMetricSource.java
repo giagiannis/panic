@@ -22,10 +22,7 @@ import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Reads the OutputSpacePoints from a file source and loads them in memory.
@@ -59,6 +56,11 @@ public class FileMetricSource extends MetricSource {
     @Override
     public OutputSpacePoint getPoint(InputSpacePoint point) {
         return this.mapping.get(point);
+    }
+
+    @Override
+    public List<OutputSpacePoint> getActualPoints() {
+        return new LinkedList<>(this.mapping.values());
     }
 
 

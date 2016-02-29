@@ -41,7 +41,7 @@ public class LeafSelectorFactory {
                     ((RegionErrorSelector)selector).setErrorCoefficient(new Double(properties.getProperty("error.coefficient")));
                 }
                 if(properties.containsKey("region.coefficient")) {
-                    ((RegionErrorSelector)selector).setErrorCoefficient(new Double(properties.getProperty("region.coefficient")));
+                    ((RegionErrorSelector)selector).setRegionCoefficient(new Double(properties.getProperty("region.coefficient")));
                 }
                 break;
             default:

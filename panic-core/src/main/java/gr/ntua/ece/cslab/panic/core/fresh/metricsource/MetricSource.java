@@ -60,4 +60,6 @@ public abstract class MetricSource {
     public Set<InputSpacePoint> unavailablePoints() {
         return this.unavailablePoints;
     }
+
+    public abstract List<OutputSpacePoint> getActualPoints();
 }

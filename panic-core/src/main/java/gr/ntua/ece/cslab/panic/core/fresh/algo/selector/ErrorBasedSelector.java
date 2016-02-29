@@ -37,13 +37,13 @@ public class ErrorBasedSelector extends LeafSelector {
      */
     public ErrorBasedSelector(DecisionTree tree, Set<String> forbidden) {
         super(tree, forbidden);
-        double minError = Double.POSITIVE_INFINITY;
+        double maxError = 0.0;
         DecisionTreeLeafNode leaf = null;
         for(DecisionTreeLeafNode l : tree.getLeaves()) {
             double currentError = DTAlgorithm.meanSquareError(l);
-            if((!this.forbiddenTreePaths.contains(l.treePath())) && (currentError<minError || leaf==null)) {
+            if((!this.forbiddenTreePaths.contains(l.treePath())) && (currentError>maxError || leaf==null)) {
                 leaf = l;
-                minError = currentError;
+                maxError = currentError;
             }
         }
         this.leaf = leaf;

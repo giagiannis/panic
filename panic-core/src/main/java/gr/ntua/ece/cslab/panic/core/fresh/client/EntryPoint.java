@@ -20,6 +20,7 @@ package gr.ntua.ece.cslab.panic.core.fresh.client;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithm;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithmFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTOnline;
+import gr.ntua.ece.cslab.panic.core.fresh.evaluation.Metrics;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSourceFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
@@ -112,13 +113,15 @@ public class EntryPoint {
         for(int i=0;i<repetitions;i++) {
 //            System.err.format("Repetition %d started...\t", i+1);
             DTAlgorithm algorithm;
+            DTAlgorithm.DEBUG = DEBUG;
             DTAlgorithmFactory factory1 = new DTAlgorithmFactory();
             algorithm = factory1.create(properties.getProperty("entrypoint.algorithm"), properties);
             long start=System.currentTimeMillis();
             algorithm.run();
             DecisionTree tree = algorithm.getBestTree();
             time+=(System.currentTimeMillis()-start);
-            mse+=DTAlgorithm.meanSquareError(tree);
+//            mse+=DTAlgorithm.meanSquareError(tree);
+            mse += Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
             leafNodes+=tree.getLeaves().size();
 //            System.err.format("Done! (elapsed: %d)\n",(System.currentTimeMillis()-start)/1000);
         }

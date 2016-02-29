@@ -44,13 +44,15 @@ public class RegionErrorSelector extends LeafSelector{
         super(tree, forbidden);
         this.maxError = 0.0;
         this.maxRegionSize = 0.0;
+        this.minError = Double.MAX_VALUE;
+        this.minRegionSize = Double.MAX_VALUE;
         for(DecisionTreeLeafNode l : this.tree.getLeaves()) {
             double currentError = DTAlgorithm.meanSquareError(l);
             double currentRegionSize = this.regionSize(l);
-            this.maxError = (this.maxError<currentError?currentError:this.maxError);
-            this.maxRegionSize = (this.maxRegionSize<currentRegionSize?currentRegionSize:this.maxRegionSize);
-            this.minError = (this.minError > currentError?currentError:this.minError);
-            this.minRegionSize= (this.minRegionSize> currentRegionSize?currentRegionSize:this.minRegionSize);
+            this.maxError=(this.maxError<currentError?currentError:this.maxError);
+            this.maxRegionSize=(this.maxRegionSize<currentRegionSize?currentRegionSize:this.maxRegionSize);
+            this.minError =(this.minError>currentError?currentError:this.minError);
+            this.minRegionSize=(this.minRegionSize>currentRegionSize?currentRegionSize:this.minRegionSize);
         }
     }
 
@@ -59,6 +61,7 @@ public class RegionErrorSelector extends LeafSelector{
     }
 
     public void setErrorCoefficient(double errorCoefficient) {
+//        System.out.println("errorCoefficient = [" + errorCoefficient + "]");
         this.errorCoefficient = errorCoefficient;
     }
 
@@ -67,6 +70,7 @@ public class RegionErrorSelector extends LeafSelector{
     }
 
     public void setRegionCoefficient(double regionCoefficient) {
+//        System.out.println("regionCoefficient = [" + regionCoefficient + "]");
         this.regionCoefficient = regionCoefficient;
     }
 
@@ -82,17 +86,19 @@ public class RegionErrorSelector extends LeafSelector{
 //        System.out.println("Performing the shit!");
         double maxScore = 0;
         DecisionTreeLeafNode leaf = null;
+//        System.out.println("RegionErrorSelector.selectLeaf");
         for(DecisionTreeLeafNode l : tree.getLeaves()) {
             double currentError = this.normalizeValue(DTAlgorithm.meanSquareError(l), this.minError, this.maxError);
             double currentRegion = this.normalizeValue(this.regionSize(l), this.minRegionSize, this.maxRegionSize);
-//            System.out.format("leaf: %s:\t normalized error %.5f, normalized region %.5f, is blacklisted: %s\n",l.getId(), currentError, currentRegion, this.forbiddenTreePaths.contains(l.treePath()));
             double currentScore = this.errorCoefficient * currentError + this.regionCoefficient * currentRegion;
+
+//            System.out.format("leaf: %s:\t normalized error %.5f, normalized region %.5f, current score: %.5f is blacklisted: %s\n",l.getId(), currentError, currentRegion, currentScore, this.forbiddenTreePaths.contains(l.treePath()));
             if((!this.forbiddenTreePaths.contains(l.treePath())) && (currentScore>maxScore || leaf==null)) {
                 leaf = l;
                 maxScore = currentScore;
             }
         }
-//        System.out.println("Chosen leaf: "+leaf.getId());
+//        System.out.println("\t\tChosen leaf: "+leaf.getId());
         return leaf;
     }
 
@@ -106,7 +112,7 @@ public class RegionErrorSelector extends LeafSelector{
 
     private double normalizeValue(double value, double minValue, double maxValue) {
         if(maxValue==minValue)
-            return 1;
+            return 0;
         return (value - minValue) / (maxValue - minValue);
     }
 }
