@@ -36,7 +36,9 @@ public class DTAlgorithmFactory {
             CONF_SEPARATOR_TYPE_KEY = "separator.type",
             CONF_BUDGET_PREFIX = "budget",
             CONF_BUDGET_POINTS_KEY = "budget.points",
-            CONF_BUDGET_TYPE_KEY= "budget.type";
+            CONF_BUDGET_TYPE_KEY= "budget.type",
+            CONF_SELECTOR_TYPE_KEY ="selector.type",
+            CONF_SELECTOR_PREFIX  ="selector";
 
     public DTAlgorithm create(String type, Properties properties) {
         DTAlgorithm algorithm = null;
@@ -50,13 +52,16 @@ public class DTAlgorithmFactory {
         String budgetType = properties.getProperty(CONF_BUDGET_TYPE_KEY);
         Properties budgetProperties = this.isolateProperties(properties, CONF_BUDGET_PREFIX+"."+properties.getProperty(CONF_BUDGET_TYPE_KEY));
 
+        String selectorType = properties.getProperty(CONF_SELECTOR_TYPE_KEY);
+        Properties selectorProperties = this.isolateProperties(properties, CONF_SELECTOR_PREFIX+"."+properties.getProperty(CONF_SELECTOR_TYPE_KEY));
+
         switch (type) {
             case "dtonline":
                 algorithm = new DTOnline(deploymentBudget,samplerType,source, separatorType,
-                        budgetType, budgetProperties);
+                        budgetType, budgetProperties, selectorType, selectorProperties);
                 break;
             case "dtrt":
-                algorithm = new DTRT(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties);
+                algorithm = new DTRT(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
                 if(new Boolean(properties.getProperty("dtrt.onlinetraining"))) {
                     ((DTRT)algorithm).setOnlineTraining(true);
                 }

@@ -108,7 +108,7 @@ public class EntryPoint {
 
         int repetitions = new Integer(properties.getProperty("entrypoint.repetitions"));
         double mse = 0.0, leafNodes = 0.0;
-        long time = System.currentTimeMillis();
+        long time = 0;
         for(int i=0;i<repetitions;i++) {
 //            System.err.format("Repetition %d started...\t", i+1);
             DTAlgorithm algorithm;

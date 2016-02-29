@@ -58,22 +58,24 @@ public class DTRTTest {
             properties.load(stream);
         }
 
-        String samplerType = properties.getProperty("sampler.type");
-        int deploymentBudget = new Integer(properties.getProperty("budget.points"));
-//        int deploymentBudget = 10;
+//        String samplerType = properties.getProperty("sampler.type");
+//        int deploymentBudget = new Integer(properties.getProperty("budget.points"));
+////        int deploymentBudget = 10;
         Properties msProps = isolateProperties(properties, "metricsource."+properties.getProperty("metricsource.type"));
         String classLoaderPathFile = this.getClass().getClassLoader().getResource(msProps.getProperty("input")).getFile();
-        msProps.setProperty("input", classLoaderPathFile);
-        MetricSourceFactory factory  = new MetricSourceFactory();
-        MetricSource source = factory.create(properties.getProperty("metricsource.type"), msProps);
-        source.configure();
+        properties.setProperty("metricsource.file.input", classLoaderPathFile);
+//        MetricSourceFactory factory  = new MetricSourceFactory();
+//        MetricSource source = factory.create(properties.getProperty("metricsource.type"), msProps);
+//        source.configure();
+//
+//        String separatorType = properties.getProperty("separator.type");
+//        String budgetType = properties.getProperty("budget.type");
+//        Properties budgetProperties = this.isolateProperties(properties, "budget"+"."+properties.getProperty("budget.type"));
+//        algorithm = new DTRT(deploymentBudget,samplerType,source, separatorType,
+//                budgetType, budgetProperties);
 
-        String separatorType = properties.getProperty("separator.type");
-        String budgetType = properties.getProperty("budget.type");
-        Properties budgetProperties = this.isolateProperties(properties, "budget"+"."+properties.getProperty("budget.type"));
-        algorithm = new DTRT(deploymentBudget,samplerType,source, separatorType,
-                budgetType, budgetProperties);
-
+        DTAlgorithmFactory factory = new DTAlgorithmFactory();
+        algorithm = factory.create("dtrt", properties);
         algorithm.run();
     }
 

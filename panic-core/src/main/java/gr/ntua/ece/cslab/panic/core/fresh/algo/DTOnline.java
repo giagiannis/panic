@@ -34,8 +34,8 @@ public class DTOnline extends DTAlgorithm {
     // fields of the class
 
     public DTOnline(int deploymentBudget, String samplerType, MetricSource source, String separatorType,
-                    String budgetType, Properties budgetProperties) {
-        super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties);
+                    String budgetType, Properties budgetProperties, String selectorType, Properties selectorProperties) {
+        super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
 
     }
 

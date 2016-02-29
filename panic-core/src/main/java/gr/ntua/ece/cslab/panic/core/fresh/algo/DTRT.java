@@ -19,6 +19,8 @@ package gr.ntua.ece.cslab.panic.core.fresh.algo;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.algo.selector.LeafSelector;
+import gr.ntua.ece.cslab.panic.core.fresh.algo.selector.LeafSelectorFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
@@ -35,7 +37,7 @@ import java.util.stream.Collectors;
  * Algorithm that trains a decision train iteratively.
  * Created by Giannis Giannakopoulos on 2/25/16.
  */
-public class DTRT extends DTAlgorithm{
+public class DTRT extends DTAlgorithm {
 
     private Integer steps;
     private Set<String> treePathsToIgnore;
@@ -43,9 +45,10 @@ public class DTRT extends DTAlgorithm{
     private DecisionTree expandedCachedTree = null;
     private boolean onlineTraining;
 
-    public DTRT(int deploymentBudget, String samplerType, MetricSource source, String separatorType, String budgetType, Properties budgetProperties) {
-        super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties);
-        this.steps=0;
+    public DTRT(int deploymentBudget, String samplerType, MetricSource source, String separatorType, String budgetType, Properties budgetProperties,
+                String selectorType, Properties selectorProperties) {
+        super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
+        this.steps = 0;
         this.treePathsToIgnore = new HashSet<>();
     }
 
@@ -55,27 +58,34 @@ public class DTRT extends DTAlgorithm{
 
     @Override
     public void run() {
-        while(!terminationCondition()) {
+        while (!terminationCondition()) {
             this.step();
         }
     }
 
     private void step() {
-        this.steps+=1;
+        this.steps += 1;
         long start = System.currentTimeMillis();
-        System.err.format("Step %d: Expanding tree (sample size: %d)... ", this.steps, this.tree.getSamples().size());
+        if(DEBUG)
+            System.err.format("Step %d: Expanding tree (sample size: %d)... ", this.steps, this.tree.getSamples().size());
         DecisionTree tree = this.expandAll(this.tree);
-        System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
-        System.err.format("Step %d: Selecting most erroneous leaf... ", this.steps);
+        if(DEBUG)
+            System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start);
+        if(DEBUG)
+            System.err.format("Step %d: Select leaf... ", this.steps);
+
         start = System.currentTimeMillis();
-        DecisionTreeLeafNode leaf = this.getLeafWithHighestError(tree);
-        System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
-        System.err.format("Step %d: Sampling leaf... ", this.steps);
+        DecisionTreeLeafNode leaf = this.selectLeaf(tree);
+        if(DEBUG)
+            System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start);
+        if(DEBUG)
+            System.err.format("Step %d: Sampling leaf... ", this.steps);
         start = System.currentTimeMillis();
         this.sampleLeaf(leaf, tree);
-        System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis()-start);
+        if(DEBUG)
+            System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start);
 
-        if(this.onlineTraining) {
+        if (this.onlineTraining) {
             this.tree = this.expandTree(this.tree);
         }
 
@@ -85,42 +95,42 @@ public class DTRT extends DTAlgorithm{
         int budget = this.budgetStrategy.estimate(leaf, tree);
         SamplerFactory factory = new SamplerFactory();
         List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
-        for(OutputSpacePoint p : this.tree.getSamples()) {
-            forbiddenPoints.add(p.getInputSpacePoint());
-        }
+        forbiddenPoints.addAll(this.tree.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toList()));
         Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints);
 
         boolean pointPicked = false;
         while (sampler.hasMore() && !this.terminationCondition()) {
             InputSpacePoint point = sampler.next();
-            if(point!=null) {
+            if (point != null) {
                 OutputSpacePoint out = source.getPoint(point);
                 this.tree.addPoint(out);
-                pointPicked=true;
+                pointPicked = true;
                 this.expandedCachedTree = null;
             }
         }
         // what happens if all the leaves are blacklisted?
-        if(!pointPicked) {
+        if (!pointPicked) {
+//            System.out.println("DTRT.sampleLeaf");
+//            System.out.format("\t%s (%s) is blacklisted\n", leaf.getId(), leaf.treePath());
             this.treePathsToIgnore.add(leaf.treePath());
         }
     }
 
-        // expands the tree by one level
+    // expands the tree by one level
     private DecisionTree expandTree(DecisionTree original) {
         DecisionTree tree = original.clone();
 
         ReplacementCouples couples = new ReplacementCouples();
-        for(DecisionTreeLeafNode leaf : tree.getLeaves()) {
+        for (DecisionTreeLeafNode leaf : tree.getLeaves()) {
             SeparatorFactory factory = new SeparatorFactory();
             Separator separator = factory.create(this.separatorType, leaf);
             separator.separate();
-            if(separator.getResult()!=null) {
+            if (separator.getResult() != null) {
                 couples.addCouple(leaf, separator.getResult());
             }
         }
 
-        for(DecisionTreeNode t : couples.getOriginalNodes()) {
+        for (DecisionTreeNode t : couples.getOriginalNodes()) {
             tree.replaceNode(t, couples.getNode(t));
         }
         return tree;
@@ -128,47 +138,40 @@ public class DTRT extends DTAlgorithm{
 
     // expands the tree until no new expansions can be made
     private DecisionTree expandAll(DecisionTree original) {
-        if(expandedCachedTree !=null)
+        if (expandedCachedTree != null)
             return expandedCachedTree;
         DecisionTree tree = original.clone();
         int numberOfLeaves = 0;
-        while(numberOfLeaves!=tree.getLeaves().size()) {
+        while (numberOfLeaves != tree.getLeaves().size()) {
             numberOfLeaves = tree.getLeaves().size();
             tree = this.expandTree(tree);
         }
-        this.expandedCachedTree=tree;
+        this.expandedCachedTree = tree;
         return tree;
     }
 
-    private DecisionTreeLeafNode getLeafWithHighestError(DecisionTree tree) {
-        double minError = Double.POSITIVE_INFINITY;
-        DecisionTreeLeafNode leaf = null;
-        for(DecisionTreeLeafNode l : tree.getLeaves()) {
-            double currentError = DTAlgorithm.meanSquareError(l);
-            if((!this.treePathsToIgnore.contains(l.treePath())) && (currentError<minError || leaf==null)) {
-                leaf = l;
-                minError = currentError;
-            }
-        }
-//        System.out.println(tree.toString());
-        if(leaf==null) {
+    private DecisionTreeLeafNode selectLeaf(DecisionTree tree) {
+        LeafSelector selector = new LeafSelectorFactory().create(this.selectorType, tree, this.treePathsToIgnore, this.selectorProperties);
+        DecisionTreeLeafNode leaf = selector.getLeaf();
+
+        if (leaf == null) {
             System.err.println("DTRT.step");
             System.err.println("Could not find a leaf. Let's see what happens now:");
             System.err.println(tree.toString());
             List<InputSpacePoint> sampled = this.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toCollection(LinkedList::new));
-            for(DecisionTreeLeafNode l : tree.getLeaves()) {
+            for (DecisionTreeLeafNode l : tree.getLeaves()) {
                 Sampler sampler = new SamplerFactory().create(this.samplerType, l.getDeploymentSpace(), 135, sampled);
                 int countWithForbiddenPoints = 0;
                 while (sampler.hasMore()) {
                     sampler.next();
-                    countWithForbiddenPoints +=1;
+                    countWithForbiddenPoints += 1;
                 }
 
                 sampler = new SamplerFactory().create(this.samplerType, l.getDeploymentSpace(), 135, null);
                 int countWithoutForbiddenPoints = 0;
                 while (sampler.hasMore()) {
                     sampler.next();
-                    countWithoutForbiddenPoints +=1;
+                    countWithoutForbiddenPoints += 1;
                 }
                 System.err.format("Leaf id: %s, into paths to ignore: %s, mse %.5f, ranges: %s, points yet (with forb): %d, points yet (without forb): %d\n",
                         l.getId(),
@@ -184,4 +187,48 @@ public class DTRT extends DTAlgorithm{
 
         return leaf;
     }
+//    private DecisionTreeLeafNode getLeafWithHighestError(DecisionTree tree) {
+//        double minError = Double.POSITIVE_INFINITY;
+//        DecisionTreeLeafNode leaf = null;
+//        for(DecisionTreeLeafNode l : tree.getLeaves()) {
+//            double currentError = DTAlgorithm.meanSquareError(l);
+//            if((!this.treePathsToIgnore.contains(l.treePath())) && (currentError<minError || leaf==null)) {
+//                leaf = l;
+//                minError = currentError;
+//            }
+//        }
+//
+//        if(leaf==null) {
+//            System.err.println("DTRT.step");
+//            System.err.println("Could not find a leaf. Let's see what happens now:");
+//            System.err.println(tree.toString());
+//            List<InputSpacePoint> sampled = this.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toCollection(LinkedList::new));
+//            for(DecisionTreeLeafNode l : tree.getLeaves()) {
+//                Sampler sampler = new SamplerFactory().create(this.samplerType, l.getDeploymentSpace(), 135, sampled);
+//                int countWithForbiddenPoints = 0;
+//                while (sampler.hasMore()) {
+//                    sampler.next();
+//                    countWithForbiddenPoints +=1;
+//                }
+//
+//                sampler = new SamplerFactory().create(this.samplerType, l.getDeploymentSpace(), 135, null);
+//                int countWithoutForbiddenPoints = 0;
+//                while (sampler.hasMore()) {
+//                    sampler.next();
+//                    countWithoutForbiddenPoints +=1;
+//                }
+//                System.err.format("Leaf id: %s, into paths to ignore: %s, mse %.5f, ranges: %s, points yet (with forb): %d, points yet (without forb): %d\n",
+//                        l.getId(),
+//                        this.treePathsToIgnore.contains(l.treePath()),
+//                        DTAlgorithm.meanSquareError(l),
+//                        l.getDeploymentSpace().getRange(),
+//                        countWithForbiddenPoints,
+//                        countWithoutForbiddenPoints);
+//            }
+//            System.err.println(this.treePathsToIgnore);
+//            System.exit(1);
+//        }
+//
+//        return leaf;
+//
 }

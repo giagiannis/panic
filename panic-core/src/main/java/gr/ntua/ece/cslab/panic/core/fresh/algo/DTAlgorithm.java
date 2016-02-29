@@ -49,8 +49,14 @@ public abstract class DTAlgorithm {
     protected final String separatorType;
     protected DecisionTree bestTree;
     protected Budget budgetStrategy;
+    protected final String selectorType;
+    protected final Properties selectorProperties;
+    static public boolean DEBUG=false;
 
-    public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source, String separatorType, String budgetType, Properties budgetProperties) {
+    public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source,
+                       String separatorType,
+                       String budgetType, Properties budgetProperties,
+                       String selectorType, Properties selectorProperties) {
         this.deploymentBudget = deploymentBudget;
         this.samplerType = samplerType;
         this.source = source;
@@ -61,6 +67,9 @@ public abstract class DTAlgorithm {
         BudgetFactory factory = new BudgetFactory();
         this.budgetStrategy = factory.create(budgetType, this.tree, budgetProperties, deploymentBudget);
         this.budgetStrategy.configure();
+
+        this.selectorType = selectorType;
+        this.selectorProperties = selectorProperties;
     }
 
     // getters and setters

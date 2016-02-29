@@ -55,20 +55,25 @@ public class DTOnlineTest {
             properties.load(stream);
         }
 
-        String samplerType = properties.getProperty("sampler.type");
-        int deploymentBudget = new Integer(properties.getProperty("budget.points"));
+//        String samplerType = properties.getProperty("sampler.type");
+//        int deploymentBudget = new Integer(properties.getProperty("budget.points"));
+//        Properties msProps = isolateProperties(properties, "metricsource."+properties.getProperty("metricsource.type"));
+//        String classLoaderPathFile = this.getClass().getClassLoader().getResource(msProps.getProperty("input")).getFile();
+//        msProps.setProperty("input", classLoaderPathFile);
+//        MetricSourceFactory factory  = new MetricSourceFactory();
+//        MetricSource source = factory.create(properties.getProperty("metricsource.type"), msProps);
+//        source.configure();
+//
+//        String separatorType = properties.getProperty("separator.type");
+//        String budgetType = properties.getProperty("budget.type");
+//        Properties budgetProperties = this.isolateProperties(properties, "budget"+"."+properties.getProperty("budget.type"));
+//        algorithm = new DTOnline(deploymentBudget,samplerType,source, separatorType,
+//                budgetType, budgetProperties);
         Properties msProps = isolateProperties(properties, "metricsource."+properties.getProperty("metricsource.type"));
         String classLoaderPathFile = this.getClass().getClassLoader().getResource(msProps.getProperty("input")).getFile();
-        msProps.setProperty("input", classLoaderPathFile);
-        MetricSourceFactory factory  = new MetricSourceFactory();
-        MetricSource source = factory.create(properties.getProperty("metricsource.type"), msProps);
-        source.configure();
-
-        String separatorType = properties.getProperty("separator.type");
-        String budgetType = properties.getProperty("budget.type");
-        Properties budgetProperties = this.isolateProperties(properties, "budget"+"."+properties.getProperty("budget.type"));
-        algorithm = new DTOnline(deploymentBudget,samplerType,source, separatorType,
-                budgetType, budgetProperties);
+        properties.setProperty("metricsource.file.input", classLoaderPathFile);
+        DTAlgorithmFactory factory = new DTAlgorithmFactory();
+        algorithm = factory.create("dtonline", properties);
 
         algorithm.run();
     }

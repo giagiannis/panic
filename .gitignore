@@ -11,3 +11,6 @@ datasets/
 .buildpath
 *.iml
 .idea/
+*.pdf
+*.txt
+*.log
