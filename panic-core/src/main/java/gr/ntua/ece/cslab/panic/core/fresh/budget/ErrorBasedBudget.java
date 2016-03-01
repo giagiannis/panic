@@ -43,18 +43,6 @@ public class ErrorBasedBudget extends Budget {
 
     @Override
     public int estimate(DecisionTreeNode node) {
-        return this.estimate(node, this.tree);
-    }
-
-    @Override
-    public int estimate(DecisionTreeNode node, DecisionTree tree) {
-//        System.out.println("ErrorBasedBudget.estimate");
-//        System.out.println(tree);
-        double sumMSE = 0.0;
-        for(DecisionTreeLeafNode l: tree.getLeaves()) {
-//            System.out.format("\t(%s, %.5f)\n", l.getId(), DTAlgorithm.meanSquareError(l));
-            sumMSE+=DTAlgorithm.meanSquareError(l);
-        }
-        return 10;
+        return Double.MAX_EXPONENT;
     }
 }

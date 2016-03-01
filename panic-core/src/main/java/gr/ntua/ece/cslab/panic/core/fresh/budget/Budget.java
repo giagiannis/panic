@@ -39,5 +39,4 @@ public abstract class Budget {
 
     public abstract void configure();
     public abstract int estimate(DecisionTreeNode node);
-    public abstract int estimate(DecisionTreeNode node, DecisionTree tree);
 }
