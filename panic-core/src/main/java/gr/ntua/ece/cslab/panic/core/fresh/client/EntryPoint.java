@@ -37,7 +37,7 @@ public class EntryPoint {
 
     protected static void debugPrint(String message) {
         if(DEBUG) {
-            System.out.println(message);
+            System.err.println(message);
         }
     }
     /**
@@ -108,8 +108,8 @@ public class EntryPoint {
 //        List<DecisionTreeNode> producedTrees = new LinkedList<>();
 //        List<Long> executionTimes = new LinkedList<>();
 
-        List<Double> mseList = new LinkedList<>(), leafList = new LinkedList<>(),executionTimes = new LinkedList<>();
-
+        List<Double> mseList = new LinkedList<>(), leafList = new LinkedList<>();
+        List<Double >executionTimes = new LinkedList<>();
         for(int i=0;i<repetitions;i++) {
 //            System.err.format("Repetition %d started...\t", i+1);
             debugPrint("Repetition "+(i+1));
@@ -125,6 +125,7 @@ public class EntryPoint {
             leafNodes=tree.getLeaves().size();
             mseList.add(mse);
             leafList.add(leafNodes);
+            System.out.println(tree.getSamples().size());
         }
         System.out.format("%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\n", mean(mseList), variance(mseList), mean(leafList), variance(leafList), mean(executionTimes), variance(executionTimes));
     }

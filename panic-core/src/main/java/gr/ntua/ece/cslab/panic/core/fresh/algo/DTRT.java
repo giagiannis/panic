@@ -44,7 +44,6 @@ public class DTRT extends DTAlgorithm {
     private Integer steps;
     private Set<String> treePathsToIgnore;
 
-    private DecisionTree expandedCachedTree = null;
     private Budget budgetStrategy;
 
     public DTRT(int deploymentBudget, String samplerType, MetricSource source, String separatorType, String budgetType, Properties budgetProperties,
@@ -68,7 +67,7 @@ public class DTRT extends DTAlgorithm {
             System.err.format("Step %d: Expanding tree (sample size: %d)... ", this.steps, this.tree.getSamples().size());
         DecisionTree tree = this.expandAll(this.tree);
         BudgetFactory factory = new BudgetFactory();
-        this.budgetStrategy=factory.create(this.budgetType, tree, this.budgetProperties, this.deploymentBudget);
+        this.budgetStrategy=factory.create(this.budgetType, tree, this.budgetProperties, this.deploymentBudget, this.treePathsToIgnore);
         if(DEBUG)
             System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start);
 
@@ -84,7 +83,7 @@ public class DTRT extends DTAlgorithm {
         if(DEBUG)
             System.err.format("Step %d: Sampling leaf... ", this.steps);
         start = System.currentTimeMillis();
-        this.sampleLeaf(leaf, tree);
+        this.sampleLeaf(leaf);
         if(DEBUG)
             System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start);
 
@@ -94,7 +93,7 @@ public class DTRT extends DTAlgorithm {
 
     }
 
-    protected void sampleLeaf(DecisionTreeLeafNode leaf, DecisionTree tree) {
+    protected void sampleLeaf(DecisionTreeLeafNode leaf) {
         int budget = this.budgetStrategy.estimate(leaf);
         SamplerFactory factory = new SamplerFactory();
         List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
@@ -108,7 +107,6 @@ public class DTRT extends DTAlgorithm {
                 OutputSpacePoint out = source.getPoint(point);
                 this.tree.addPoint(out);
                 pointPicked = true;
-                this.expandedCachedTree = null;
             }
         }
         // what happens if all the leaves are blacklisted?
@@ -123,18 +121,6 @@ public class DTRT extends DTAlgorithm {
 
 
     // expands the tree until no new expansions can be made
-    private DecisionTree expandAll(DecisionTree original) {
-        if (expandedCachedTree != null)
-            return expandedCachedTree;
-        DecisionTree tree = original.clone();
-        int numberOfLeaves = 0;
-        while (numberOfLeaves != tree.getLeaves().size()) {
-            numberOfLeaves = tree.getLeaves().size();
-            tree = this.expandTree(tree);
-        }
-        this.expandedCachedTree = tree;
-        return tree;
-    }
 
     private DecisionTreeLeafNode selectLeaf(DecisionTree tree) {
         LeafSelector selector = new LeafSelectorFactory().create(this.selectorType, tree, this.treePathsToIgnore, this.selectorProperties);

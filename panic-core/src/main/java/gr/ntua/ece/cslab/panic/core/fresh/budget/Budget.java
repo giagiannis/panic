@@ -20,7 +20,9 @@ package gr.ntua.ece.cslab.panic.core.fresh.budget;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Base class for all the deploymentBudget strategies.
@@ -28,15 +30,19 @@ import java.util.Properties;
  */
 public abstract class Budget {
     protected final DecisionTree tree;
-    protected final Properties properties;
     protected final Integer totalBudget;
+    protected Set<String> pathsToIgnore;
 
-    public Budget(DecisionTree tree, Properties properties, Integer totalBudget) {
+    public Budget(DecisionTree tree, Integer totalBudget) {
         this.tree = tree;
-        this.properties = properties;
         this.totalBudget = totalBudget;
+        this.pathsToIgnore = new HashSet<>();
     }
 
 //    public abstract void configure();
     public abstract int estimate(DecisionTreeNode node);
+
+    public void setPathsToIgnore(Set<String> pathsToIgnore) {
+        this.pathsToIgnore = pathsToIgnore;
+    }
 }

@@ -80,6 +80,5 @@ public class DTAlgorithmFactory {
             }
         }
         return finalProperties;
-
     }
 }

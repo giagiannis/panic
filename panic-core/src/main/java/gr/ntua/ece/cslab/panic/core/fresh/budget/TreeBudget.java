@@ -35,11 +35,10 @@ public class TreeBudget extends Budget {
     private final int treeLength;
 
     private double perLevelConstant;
-    public TreeBudget(DecisionTree tree, Properties properties, Integer totalBudget) {
-        super(tree, properties, totalBudget);
-        this.coefficient = new Double(this.properties.getProperty("coefficient"));
-        this.treeLength = new Integer(this.properties.getProperty("length"));
-//        this.budget = new Integer(this.properties.getProperty("points"));
+    public TreeBudget(DecisionTree tree, Integer totalBudget, Double coefficient, Integer treeLength) {
+        super(tree, totalBudget);
+        this.coefficient = coefficient;
+        this.treeLength = treeLength;
 
         double sum =0.0;
         for(int i=0;i<this.treeLength;i++) {

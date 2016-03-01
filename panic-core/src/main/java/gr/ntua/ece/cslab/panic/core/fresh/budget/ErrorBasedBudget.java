@@ -18,26 +18,114 @@
 package gr.ntua.ece.cslab.panic.core.fresh.budget;
 
 import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
-import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithm;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
+import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by Giannis Giannakopoulos on 2/25/16.
  */
 public class ErrorBasedBudget extends Budget {
-    private Integer maxBudget;
-    public ErrorBasedBudget(DecisionTree tree, Properties properties, Integer totalBudget) {
-        super(tree, properties, totalBudget);
-        this.maxBudget = new Integer(properties.getProperty("max"));
+
+    private final Double minError, maxError, minRegion, maxRegion;
+    private double errorCoefficient=1.0;
+    private double regionCoefficient=1.0;
+    private Integer coefficient;
+    private Map<String, Integer> budgetMap = null;
+
+    public ErrorBasedBudget(DecisionTree tree, Integer totalBudget, Integer coefficient) {
+        super(tree, totalBudget);
+
+        //
+//        this.minError = this.tree.getLeaves().stream().filter(b->!this.pathsToIgnore.contains(b.treePath())).mapToDouble(this::error).min().getAsDouble();
+        this.minError = 0.0;
+        this.maxError = this.tree.getLeaves().stream().filter(b->!this.pathsToIgnore.contains(b.treePath())).mapToDouble(this::error).max().getAsDouble();
+        this.minRegion= this.tree.getLeaves().stream().filter(b->!this.pathsToIgnore.contains(b.treePath())).mapToDouble(this::region).min().getAsDouble();
+        this.maxRegion= this.tree.getLeaves().stream().filter(b->!this.pathsToIgnore.contains(b.treePath())).mapToDouble(this::region).max().getAsDouble();
+        this.coefficient = coefficient;
+    }
+
+    public double getErrorCoefficient() {
+        return errorCoefficient;
+    }
+
+    public void setErrorCoefficient(double errorCoefficient) {
+        this.errorCoefficient = errorCoefficient;
+    }
+
+    public double getRegionCoefficient() {
+        return regionCoefficient;
+    }
+
+    public void setRegionCoefficient(double regionCoefficient) {
+        this.regionCoefficient = regionCoefficient;
     }
 
     @Override
     public int estimate(DecisionTreeNode node) {
-        return Double.MAX_EXPONENT;
+        if(this.budgetMap == null) {
+            this.budgetMap = this.getScores();
+        }
+        return this.budgetMap.get(node.getId());
+    }
+
+
+    private double error(DecisionTreeLeafNode leaf) {
+        return CrossValidation.meanSquareError(LinearRegression.class, leaf.getPoints());
+    }
+
+    private double region(DecisionTreeLeafNode leaf) {
+        double mul = 1.0;
+        for(String s:leaf.getDeploymentSpace().getRange().keySet()) {
+            mul*=leaf.getDeploymentSpace().getRange().get(s).size();
+        }
+        return mul;
+    }
+
+    private double normalizedScore(DecisionTreeLeafNode leaf) {
+        return this.errorCoefficient*this.normalizedError(leaf) + this.regionCoefficient*this.normalizedRegion(leaf);
+    }
+
+    private double normalizedError(DecisionTreeLeafNode leaf) {
+        if(this.maxError.equals(this.minError)|| this.maxError.isNaN() || this.minError.isNaN()) {
+            return 0.0;
+        }
+        return (this.error(leaf)-this.minError)/(this.maxError - this.minError);
+    }
+
+    private double normalizedRegion(DecisionTreeLeafNode leaf) {
+        if(this.maxRegion.equals(this.minRegion)|| this.maxRegion.isNaN() || this.minRegion.isNaN()) {
+            return 0.0;
+        }
+        return (this.region(leaf) - this.minRegion)/(this.maxRegion-this.minRegion);
+    }
+
+    private Map<String, Integer> getScores() {
+        Map<String, Integer> map = new HashMap<>();
+        Double sum = this.tree.getLeaves().stream().mapToDouble(b->normalizedScore(b)).sum();
+        if(sum==0 ) { // we need to do shit here
+            if(this.tree.getLeaves().size()>1) {
+                System.err.println("ErrorBasedBudget.getScores: sum is NaN but we have more leaves than 1! Exiting..");
+                System.err.println("Specifically we have:");
+                System.err.format("min error: %.5f\tmax error: %.5f\tmin region: %.5f\tmax region:%.5f\n",
+                        this.minError, this.maxError, this.minRegion, this.maxRegion);
+                for(DecisionTreeLeafNode leaf : this.tree.getLeaves()) {
+                    System.err.format("%s:\tscore: %.5f\terror: %.5f\tregion: %.5f\n", leaf.getId(), this.normalizedScore(leaf), this.normalizedError(leaf), this.normalizedRegion(leaf));
+                }
+                System.exit(1);
+            } else {
+                map.put(this.tree.getLeaves().get(0).getId(), this.coefficient);
+            }
+        } else {
+//            double leftOver = (this.coefficient)
+            for(DecisionTreeLeafNode  l : this.tree.getLeaves()) {
+                double budget = (this.normalizedScore(l)/sum) * (this.coefficient);
+                map.put(l.getId(), ((int) Math.ceil(budget)));
+            }
+        }
+        return map;
     }
 }

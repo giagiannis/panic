@@ -27,11 +27,15 @@ import java.util.Properties;
  * Created by Giannis Giannakopoulos on 2/17/16.
  */
 public class ConstantBudget extends Budget {
-    protected int coefficient;
+    private final int coefficient;
 
-    public ConstantBudget(DecisionTree tree, Properties properties, Integer totalBudget) {
-        super(tree, properties, totalBudget);
-        this.coefficient = new Integer(this.properties.getProperty("coefficient"));
+    public ConstantBudget(DecisionTree tree, Integer totalBudget, Integer coefficient) {
+        super(tree, totalBudget);
+        this.coefficient = coefficient;
+    }
+
+    public int getCoefficient() {
+        return coefficient;
     }
 
     @Override

@@ -17,14 +17,9 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.algo;
 
-import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
-import gr.ntua.ece.cslab.panic.core.fresh.budget.Budget;
-import gr.ntua.ece.cslab.panic.core.fresh.budget.BudgetFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
-import gr.ntua.ece.cslab.panic.core.fresh.samplers.Sampler;
-import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
@@ -41,6 +36,8 @@ import java.util.*;
  */
 public abstract class DTAlgorithm {
 
+    public static boolean DEBUG=false;
+
     protected final int deploymentBudget;
     protected final String budgetType;
     protected final Properties budgetProperties;
@@ -50,12 +47,9 @@ public abstract class DTAlgorithm {
     protected final MetricSource source;
     protected final String separatorType;
     protected DecisionTree bestTree;
-//    protected Budget budgetStrategy;
     protected final String selectorType;
     protected final Properties selectorProperties;
-    static public boolean DEBUG=false;
     protected boolean onlineTraining;
-
 
     public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source,
                        String separatorType,
@@ -238,4 +232,20 @@ public abstract class DTAlgorithm {
         }
         return tree;
     }
+
+    protected DecisionTree expandAll(DecisionTree original) {
+        DecisionTree tree = original.clone();
+        int numberOfLeaves = 0;
+        while (numberOfLeaves != tree.getLeaves().size()) {
+            numberOfLeaves = tree.getLeaves().size();
+            tree = this.expandTree(tree);
+        }
+        return tree;
+    }
+
+    protected static void debugPrint(String string) {
+        if(DEBUG)
+            System.err.print(string);
+    }
+
 }

@@ -23,6 +23,7 @@ import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import java.util.Set;
 
 /**
+ * FIXME: LeafSelector should be replaced with a specialized Budget instance
  * Class used to select a leaf from the available ones.
  * Created by Giannis Giannakopoulos on 2/29/16.
  */

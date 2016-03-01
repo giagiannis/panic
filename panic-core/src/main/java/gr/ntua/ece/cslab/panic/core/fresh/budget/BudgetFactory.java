@@ -20,6 +20,7 @@ package gr.ntua.ece.cslab.panic.core.fresh.budget;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Factor for Budget instances
@@ -27,15 +28,29 @@ import java.util.Properties;
  */
 public class BudgetFactory {
 
-    public Budget create(String type, DecisionTree tree, Properties properties, Integer totalBudget) {
+    public Budget create(String type, DecisionTree tree, Properties properties, Integer totalBudget, Set<String> treePathsToIgnore) {
+        Budget budget = null;
         switch (type) {
             case "constant":
-                return new ConstantBudget(tree, properties, totalBudget);
+                Integer constant = new Integer(properties.getProperty("coefficient"));
+                budget = new ConstantBudget(tree, totalBudget, constant);
+                break;
             case "tree":
-                return new TreeBudget(tree, properties, totalBudget);
+                budget = new TreeBudget(tree, totalBudget, null, null);
+                break;
             case "error":
-                return new ErrorBasedBudget(tree, properties, totalBudget);
+                Integer coefficient = new Integer(properties.getProperty("coefficient"));
+                budget = new ErrorBasedBudget(tree, totalBudget, coefficient);
+                if(properties.containsKey("error.coefficient")) {
+                    ((ErrorBasedBudget)budget).setErrorCoefficient(new Double(properties.getProperty("error.coefficient")));
+                }
+                if(properties.containsKey("region.coefficient")) {
+                    ((ErrorBasedBudget)budget).setRegionCoefficient(new Double(properties.getProperty("region.coefficient")));
+                }
+                break;
         }
-        return null;
+        if(treePathsToIgnore!=null)
+            budget.setPathsToIgnore(treePathsToIgnore);
+        return budget;
     }
 }
