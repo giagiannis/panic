@@ -21,6 +21,8 @@ import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.selector.LeafSelector;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.selector.LeafSelectorFactory;
+import gr.ntua.ece.cslab.panic.core.fresh.budget.Budget;
+import gr.ntua.ece.cslab.panic.core.fresh.budget.BudgetFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.fresh.samplers.SamplerFactory;
@@ -43,17 +45,13 @@ public class DTRT extends DTAlgorithm {
     private Set<String> treePathsToIgnore;
 
     private DecisionTree expandedCachedTree = null;
-    private boolean onlineTraining;
+    private Budget budgetStrategy;
 
     public DTRT(int deploymentBudget, String samplerType, MetricSource source, String separatorType, String budgetType, Properties budgetProperties,
                 String selectorType, Properties selectorProperties) {
         super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
         this.steps = 0;
         this.treePathsToIgnore = new HashSet<>();
-    }
-
-    public void setOnlineTraining(boolean onlineTraining) {
-        this.onlineTraining = onlineTraining;
     }
 
     @Override
@@ -69,15 +67,20 @@ public class DTRT extends DTAlgorithm {
         if(DEBUG)
             System.err.format("Step %d: Expanding tree (sample size: %d)... ", this.steps, this.tree.getSamples().size());
         DecisionTree tree = this.expandAll(this.tree);
+        BudgetFactory factory = new BudgetFactory();
+        this.budgetStrategy=factory.create(this.budgetType, tree, this.budgetProperties, this.deploymentBudget);
         if(DEBUG)
             System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start);
+
+
         if(DEBUG)
             System.err.format("Step %d: Select leaf... ", this.steps);
-
         start = System.currentTimeMillis();
         DecisionTreeLeafNode leaf = this.selectLeaf(tree);
         if(DEBUG)
             System.err.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start);
+
+
         if(DEBUG)
             System.err.format("Step %d: Sampling leaf... ", this.steps);
         start = System.currentTimeMillis();
@@ -92,7 +95,7 @@ public class DTRT extends DTAlgorithm {
     }
 
     protected void sampleLeaf(DecisionTreeLeafNode leaf, DecisionTree tree) {
-        int budget = this.budgetStrategy.estimate(leaf, tree);
+        int budget = this.budgetStrategy.estimate(leaf);
         SamplerFactory factory = new SamplerFactory();
         List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
         forbiddenPoints.addAll(this.tree.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toList()));
@@ -117,24 +120,7 @@ public class DTRT extends DTAlgorithm {
     }
 
     // expands the tree by one level
-    private DecisionTree expandTree(DecisionTree original) {
-        DecisionTree tree = original.clone();
 
-        ReplacementCouples couples = new ReplacementCouples();
-        for (DecisionTreeLeafNode leaf : tree.getLeaves()) {
-            SeparatorFactory factory = new SeparatorFactory();
-            Separator separator = factory.create(this.separatorType, leaf);
-            separator.separate();
-            if (separator.getResult() != null) {
-                couples.addCouple(leaf, separator.getResult());
-            }
-        }
-
-        for (DecisionTreeNode t : couples.getOriginalNodes()) {
-            tree.replaceNode(t, couples.getNode(t));
-        }
-        return tree;
-    }
 
     // expands the tree until no new expansions can be made
     private DecisionTree expandAll(DecisionTree original) {

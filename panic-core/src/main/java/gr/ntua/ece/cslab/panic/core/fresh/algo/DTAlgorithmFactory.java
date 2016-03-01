@@ -56,18 +56,17 @@ public class DTAlgorithmFactory {
         Properties selectorProperties = this.isolateProperties(properties, CONF_SELECTOR_PREFIX+"."+properties.getProperty(CONF_SELECTOR_TYPE_KEY));
 
         switch (type) {
-            case "dtonline":
-                algorithm = new DTOnline(deploymentBudget,samplerType,source, separatorType,
-                        budgetType, budgetProperties, selectorType, selectorProperties);
-                break;
             case "dtrt":
                 algorithm = new DTRT(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
-                if(new Boolean(properties.getProperty("dtrt.onlinetraining"))) {
-                    ((DTRT)algorithm).setOnlineTraining(true);
-                }
+                break;
+            case "dtadaptive":
+                algorithm = new DTAdaptive(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
                 break;
             default:
                 break;
+        }
+        if(new Boolean(properties.getProperty("algorithm.onlinetraining"))) {
+            algorithm.setOnlineTraining(true);
         }
         return algorithm;
     }

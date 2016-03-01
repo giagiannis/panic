@@ -19,19 +19,14 @@ package gr.ntua.ece.cslab.panic.core.fresh.client;
 
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithm;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithmFactory;
-import gr.ntua.ece.cslab.panic.core.fresh.algo.DTOnline;
 import gr.ntua.ece.cslab.panic.core.fresh.evaluation.Metrics;
-import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
-import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSourceFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import org.apache.commons.cli.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Class used to execute experiments.
@@ -110,8 +105,14 @@ public class EntryPoint {
         int repetitions = new Integer(properties.getProperty("entrypoint.repetitions"));
         double mse = 0.0, leafNodes = 0.0;
         long time = 0;
+//        List<DecisionTreeNode> producedTrees = new LinkedList<>();
+//        List<Long> executionTimes = new LinkedList<>();
+
+        List<Double> mseList = new LinkedList<>(), leafList = new LinkedList<>(),executionTimes = new LinkedList<>();
+
         for(int i=0;i<repetitions;i++) {
 //            System.err.format("Repetition %d started...\t", i+1);
+            debugPrint("Repetition "+(i+1));
             DTAlgorithm algorithm;
             DTAlgorithm.DEBUG = DEBUG;
             DTAlgorithmFactory factory1 = new DTAlgorithmFactory();
@@ -119,12 +120,31 @@ public class EntryPoint {
             long start=System.currentTimeMillis();
             algorithm.run();
             DecisionTree tree = algorithm.getBestTree();
-            time+=(System.currentTimeMillis()-start);
-//            mse+=DTAlgorithm.meanSquareError(tree);
-            mse += Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
-            leafNodes+=tree.getLeaves().size();
-//            System.err.format("Done! (elapsed: %d)\n",(System.currentTimeMillis()-start)/1000);
+            executionTimes.add((System.currentTimeMillis()-start)/1000.0);
+            mse=Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
+            leafNodes=tree.getLeaves().size();
+            mseList.add(mse);
+            leafList.add(leafNodes);
         }
-        System.out.format("%.5f\t%.5f\t%.5f\n", mse/repetitions, leafNodes/repetitions, time/(1000.0*repetitions));
+        System.out.format("%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\n", mean(mseList), variance(mseList), mean(leafList), variance(leafList), mean(executionTimes), variance(executionTimes));
+    }
+
+    private static double mean(List<Double> list) {
+        if(list.size()==0)
+            return Double.NaN;
+        double mean = 0.0;
+        for(Double o  :list) {
+                mean+= o;
+        }
+        return (list.size()==0?Double.NaN:mean/list.size());
+    }
+
+    private static double variance(List<Double> list) {
+        double mean = mean(list);
+        double variance = 0.0;
+        for(Double o : list) {
+            variance+=(o-mean)*(o-mean);
+        }
+        return (list.size()==0?Double.NaN:variance/list.size());
     }
 }

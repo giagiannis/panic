@@ -42,16 +42,20 @@ import java.util.*;
 public abstract class DTAlgorithm {
 
     protected final int deploymentBudget;
+    protected final String budgetType;
+    protected final Properties budgetProperties;
     protected DecisionTree tree;
     protected final String samplerType;
     protected final DeploymentSpace space;
     protected final MetricSource source;
     protected final String separatorType;
     protected DecisionTree bestTree;
-    protected Budget budgetStrategy;
+//    protected Budget budgetStrategy;
     protected final String selectorType;
     protected final Properties selectorProperties;
     static public boolean DEBUG=false;
+    protected boolean onlineTraining;
+
 
     public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source,
                        String separatorType,
@@ -64,9 +68,11 @@ public abstract class DTAlgorithm {
         this.tree = new DecisionTree(this.space);
         this.separatorType = separatorType;
 
-        BudgetFactory factory = new BudgetFactory();
-        this.budgetStrategy = factory.create(budgetType, this.tree, budgetProperties, deploymentBudget);
-        this.budgetStrategy.configure();
+        this.budgetType = budgetType;
+        this.budgetProperties = budgetProperties;
+//        BudgetFactory factory = new BudgetFactory();
+//        this.budgetStrategy = factory.create(budgetType, this.tree, budgetProperties, deploymentBudget);
+//        this.budgetStrategy.configure();
 
         this.selectorType = selectorType;
         this.selectorProperties = selectorProperties;
@@ -96,6 +102,11 @@ public abstract class DTAlgorithm {
         return tree;
     }
 
+    public void setOnlineTraining(boolean onlineTraining) {
+        this.onlineTraining = onlineTraining;
+    }
+
+    // heuristics
 
     public double meanSquareError() {
         double sum = 0.0;
@@ -188,20 +199,20 @@ public abstract class DTAlgorithm {
         }
     }
 
-    protected void sampleLeaf(DecisionTreeLeafNode leaf) {
-        int budget = this.budgetStrategy.estimate(leaf);
-        SamplerFactory factory = new SamplerFactory();
-        List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
-        for (OutputSpacePoint p : this.tree.getSamples()) {
-            forbiddenPoints.add(p.getInputSpacePoint());
-        }
-        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints);
-        while (sampler.hasMore() && !this.terminationCondition()) {
-            InputSpacePoint point = sampler.next();
-            OutputSpacePoint out = source.getPoint(point);
-            this.tree.addPoint(out);
-        }
-    }
+//    protected void sampleLeaf(DecisionTreeLeafNode leaf) {
+//        int budget = this.budgetStrategy.estimate(leaf);
+//        SamplerFactory factory = new SamplerFactory();
+//        List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
+//        for (OutputSpacePoint p : this.tree.getSamples()) {
+//            forbiddenPoints.add(p.getInputSpacePoint());
+//        }
+//        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints);
+//        while (sampler.hasMore() && !this.terminationCondition()) {
+//            InputSpacePoint point = sampler.next();
+//            OutputSpacePoint out = source.getPoint(point);
+//            this.tree.addPoint(out);
+//        }
+//    }
 
 
     // terminationCondition is true if the algorithm should terminate
@@ -209,4 +220,22 @@ public abstract class DTAlgorithm {
         return this.tree.getSamples().size() >= this.deploymentBudget;
     }
 
+    protected DecisionTree expandTree(DecisionTree original) {
+        DecisionTree tree = original.clone();
+
+        ReplacementCouples couples = new ReplacementCouples();
+        for (DecisionTreeLeafNode leaf : tree.getLeaves()) {
+            SeparatorFactory factory = new SeparatorFactory();
+            Separator separator = factory.create(this.separatorType, leaf);
+            separator.separate();
+            if (separator.getResult() != null) {
+                couples.addCouple(leaf, separator.getResult());
+            }
+        }
+
+        for (DecisionTreeNode t : couples.getOriginalNodes()) {
+            tree.replaceNode(t, couples.getNode(t));
+        }
+        return tree;
+    }
 }
