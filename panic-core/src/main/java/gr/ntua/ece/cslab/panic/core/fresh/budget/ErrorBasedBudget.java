@@ -37,11 +37,6 @@ public class ErrorBasedBudget extends Budget {
     }
 
     @Override
-    public void configure() {
-        // probably nothing needed here
-    }
-
-    @Override
     public int estimate(DecisionTreeNode node) {
         return Double.MAX_EXPONENT;
     }

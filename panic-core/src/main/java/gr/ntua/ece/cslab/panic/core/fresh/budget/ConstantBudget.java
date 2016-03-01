@@ -35,11 +35,6 @@ public class ConstantBudget extends Budget {
     }
 
     @Override
-    public void configure() {
-        // don't have to do anything
-    }
-
-    @Override
     public int estimate(DecisionTreeNode node) {
         return this.coefficient;
     }

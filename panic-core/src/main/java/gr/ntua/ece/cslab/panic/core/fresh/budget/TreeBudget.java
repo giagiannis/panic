@@ -40,10 +40,7 @@ public class TreeBudget extends Budget {
         this.coefficient = new Double(this.properties.getProperty("coefficient"));
         this.treeLength = new Integer(this.properties.getProperty("length"));
 //        this.budget = new Integer(this.properties.getProperty("points"));
-    }
 
-    @Override
-    public void configure() {
         double sum =0.0;
         for(int i=0;i<this.treeLength;i++) {
             sum+=Math.pow(this.coefficient, i);

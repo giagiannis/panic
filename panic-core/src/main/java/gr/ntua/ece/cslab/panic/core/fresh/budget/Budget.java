@@ -37,6 +37,6 @@ public abstract class Budget {
         this.totalBudget = totalBudget;
     }
 
-    public abstract void configure();
+//    public abstract void configure();
     public abstract int estimate(DecisionTreeNode node);
 }
