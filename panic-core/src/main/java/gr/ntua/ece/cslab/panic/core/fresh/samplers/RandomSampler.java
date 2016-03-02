@@ -20,28 +20,23 @@ package gr.ntua.ece.cslab.panic.core.fresh.samplers;
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Random sampler class
  * Created by Giannis Giannakopoulos on 2/26/16.
  */
-public class RandomSampler extends Sampler {
+public class RandomSampler extends IndexSampler {
     private Random random;
     private List<Integer> leftIndices;
-    private List<String> dimensionOrdering;
 
     public RandomSampler(DeploymentSpace deploymentSpace, int budget) {
-        super(deploymentSpace, budget);
+        super(deploymentSpace, budget, (String[]) deploymentSpace.getRange().keySet().toArray());
         this.random = new Random();
         this.leftIndices = new LinkedList<>();
 
-        this.dimensionOrdering = new LinkedList<>(this.deploymentSpace.getRange().keySet());
         int mul = 1;
-        for(String s:dimensionOrdering) {
+        for(String s:this.dimensionsOrder) {
             mul*=this.deploymentSpace.getRange().get(s).size();
         }
         for(int i=0;i<mul;i++) {
@@ -64,18 +59,6 @@ public class RandomSampler extends Sampler {
             }
         }
         this.pickedPoints.add(point);
-        return point;
-    }
-
-    InputSpacePoint translate(int index) {
-        int identifier = index;
-        InputSpacePoint point = new InputSpacePoint();
-        for(String key: this.dimensionOrdering) {
-            List<Double> dimValues = this.deploymentSpace.getRange().get(key);
-            int mod = identifier % dimValues.size();
-            identifier /= dimValues.size();
-            point.addDimension(key, dimValues.get(mod));
-        }
         return point;
     }
 }
