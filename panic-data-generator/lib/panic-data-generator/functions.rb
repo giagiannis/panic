@@ -155,7 +155,7 @@ module Panic
 					sum0=@coefficients[index]*(vector[index])
 					sum1+=vector[index]
 				}
-				return Math::cos(sum0)+Math::exp(sum1)
+				return Math::cos(sum0)*Math::exp(sum1)
 			end
 		end
 

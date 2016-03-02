@@ -34,7 +34,7 @@ set xlabel "x"
 set ylabel "y"
 set grid
 unset key
-plot data w image t col, sample u 1:2 w p lc rgb "black" ps 2 pt 5 t "Samples", \
+plot data w image t col, sample u 1:2 w p lc rgb "black" ps 1 pt 5 t "Samples", \
 cuts w vectors ls 5 nohead
 
 system("rm -f ".outfile)

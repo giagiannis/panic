@@ -98,7 +98,7 @@ public class DTRT extends DTAlgorithm {
         SamplerFactory factory = new SamplerFactory();
         List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
         forbiddenPoints.addAll(this.tree.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toList()));
-        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints);
+        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints, null);
 
         boolean pointPicked = false;
         while (sampler.hasMore() && !this.terminationCondition()) {
@@ -125,37 +125,37 @@ public class DTRT extends DTAlgorithm {
     private DecisionTreeLeafNode selectLeaf(DecisionTree tree) {
         LeafSelector selector = new LeafSelectorFactory().create(this.selectorType, tree, this.treePathsToIgnore, this.selectorProperties);
         DecisionTreeLeafNode leaf = selector.getLeaf();
-
-        if (leaf == null) {
-            System.err.println("DTRT.step");
-            System.err.println("Could not find a leaf. Let's see what happens now:");
-            System.err.println(tree.toString());
-            List<InputSpacePoint> sampled = this.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toCollection(LinkedList::new));
-            for (DecisionTreeLeafNode l : tree.getLeaves()) {
-                Sampler sampler = new SamplerFactory().create(this.samplerType, l.getDeploymentSpace(), 135, sampled);
-                int countWithForbiddenPoints = 0;
-                while (sampler.hasMore()) {
-                    sampler.next();
-                    countWithForbiddenPoints += 1;
-                }
-
-                sampler = new SamplerFactory().create(this.samplerType, l.getDeploymentSpace(), 135, null);
-                int countWithoutForbiddenPoints = 0;
-                while (sampler.hasMore()) {
-                    sampler.next();
-                    countWithoutForbiddenPoints += 1;
-                }
-                System.err.format("Leaf id: %s, into paths to ignore: %s, mse %.5f, ranges: %s, points yet (with forb): %d, points yet (without forb): %d\n",
-                        l.getId(),
-                        this.treePathsToIgnore.contains(l.treePath()),
-                        DTAlgorithm.meanSquareError(l),
-                        l.getDeploymentSpace().getRange(),
-                        countWithForbiddenPoints,
-                        countWithoutForbiddenPoints);
-            }
-            System.err.println(this.treePathsToIgnore);
-            System.exit(1);
-        }
+//
+//        if (leaf == null) {
+//            System.err.println("DTRT.step");
+//            System.err.println("Could not find a leaf. Let's see what happens now:");
+//            System.err.println(tree.toString());
+//            List<InputSpacePoint> sampled = this.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toCollection(LinkedList::new));
+////            for (DecisionTreeLeafNode l : tree.getLeaves()) {
+////                Sampler sampler = new SamplerFactory().create(this.samplerType, l.getDeploymentSpace(), 135, sampled);
+////                int countWithForbiddenPoints = 0;
+////                while (sampler.hasMore()) {
+////                    sampler.next();
+////                    countWithForbiddenPoints += 1;
+////                }
+////
+////                sampler = new SamplerFactory().create(this.samplerType, l.getDeploymentSpace(), 135, null);
+////                int countWithoutForbiddenPoints = 0;
+////                while (sampler.hasMore()) {
+////                    sampler.next();
+////                    countWithoutForbiddenPoints += 1;
+////                }
+//                System.err.format("Leaf id: %s, into paths to ignore: %s, mse %.5f, ranges: %s, points yet (with forb): %d, points yet (without forb): %d\n",
+//                        l.getId(),
+//                        this.treePathsToIgnore.contains(l.treePath()),
+//                        DTAlgorithm.meanSquareError(l),
+//                        l.getDeploymentSpace().getRange(),
+//                        countWithForbiddenPoints,
+//                        countWithoutForbiddenPoints);
+//            }
+//            System.err.println(this.treePathsToIgnore);
+//            System.exit(1);
+//        }
 
         return leaf;
     }

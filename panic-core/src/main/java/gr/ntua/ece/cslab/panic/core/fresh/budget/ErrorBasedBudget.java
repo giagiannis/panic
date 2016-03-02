@@ -24,6 +24,7 @@ import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
 import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Giannis Giannakopoulos on 2/25/16.
@@ -124,6 +125,17 @@ public class ErrorBasedBudget extends Budget {
             for(DecisionTreeLeafNode  l : this.tree.getLeaves()) {
                 double budget = (this.normalizedScore(l)/sum) * (this.coefficient);
                 map.put(l.getId(), ((int) Math.ceil(budget)));
+            }
+            int actual = map.values().stream().mapToInt(Integer::intValue).sum();
+            int difference = actual - this.coefficient;
+            while(difference>0) {
+                for (String leafId : map.keySet().stream().filter(kv -> map.get(kv) > 0).collect(Collectors.toList())) {
+                    Integer oldValue = map.get(leafId);
+                    map.put(leafId, oldValue - 1);
+                    difference--;
+                    if (difference == 0)
+                        break;
+                }
             }
         }
         return map;

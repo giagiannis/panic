@@ -93,7 +93,7 @@ public class DTAdaptive extends DTAlgorithm{
         SamplerFactory factory =  new SamplerFactory();
         List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
         forbiddenPoints.addAll(this.tree.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toList()));
-        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints);
+        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints, null);
         int pointsReturned = 0;
         while(sampler.hasMore()) {
             InputSpacePoint point = sampler.next();
@@ -105,8 +105,8 @@ public class DTAdaptive extends DTAlgorithm{
         }
         if(pointsReturned<budget) {
             this.treePathsToIgnore.add(leaf.treePath());
-            System.out.println("DTAdaptive.sampleLeaf");
-            System.out.println(this.treePathsToIgnore);
+//            System.out.println("DTAdaptive.sampleLeaf");
+//            System.out.println(this.treePathsToIgnore);
         }
     }
 

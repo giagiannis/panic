@@ -59,8 +59,6 @@ public class AlgorithmPrinter {
         options.addOption("h","help", false,"Prints this menu");
         options.addOption("c", "conf", true, "overrides the configuration file that is, by default into the classpath");
         options.getOption("c").setArgName("config");
-        options.addOption(null, "debug", false, "if set, prints diagnostic messages");
-
 
         // parsing from args
         CommandLineParser parser = new GnuParser();
@@ -152,10 +150,10 @@ public class AlgorithmPrinter {
             model.train();
             models.put(leaf.getId(), model);
         }
-
         for(OutputSpacePoint p : bestTree.getSamples()) {
             sampleFile.println(p.getInputSpacePoint().toStringCSVFormat()+"\t0.0");
         }
+        sampleFile.flush();
         sampleFile.close();
 
 

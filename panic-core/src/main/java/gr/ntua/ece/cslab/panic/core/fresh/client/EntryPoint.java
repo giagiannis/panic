@@ -17,6 +17,7 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.client;
 
+import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithm;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithmFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.evaluation.Metrics;
@@ -26,7 +27,9 @@ import org.apache.commons.cli.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Class used to execute experiments.
@@ -103,31 +106,40 @@ public class EntryPoint {
         Properties properties = loadConfigurationFile(cliOptions);
 
         int repetitions = new Integer(properties.getProperty("entrypoint.repetitions"));
-        double mse = 0.0, leafNodes = 0.0;
+        double mse = 0.0, leafNodes = 0.0, rSquared = 0.0;
         long time = 0;
-//        List<DecisionTreeNode> producedTrees = new LinkedList<>();
+        List<DecisionTree> producedTrees = new LinkedList<>();
 //        List<Long> executionTimes = new LinkedList<>();
 
-        List<Double> mseList = new LinkedList<>(), leafList = new LinkedList<>();
+//        List<Double> mseList = new LinkedList<>(), leafList = new LinkedList<>();
         List<Double >executionTimes = new LinkedList<>();
+        List<OutputSpacePoint> points = null;
         for(int i=0;i<repetitions;i++) {
-//            System.err.format("Repetition %d started...\t", i+1);
             debugPrint("Repetition "+(i+1));
             DTAlgorithm algorithm;
             DTAlgorithm.DEBUG = DEBUG;
             DTAlgorithmFactory factory1 = new DTAlgorithmFactory();
             algorithm = factory1.create(properties.getProperty("entrypoint.algorithm"), properties);
+            points = algorithm.getSource().getActualPoints();
             long start=System.currentTimeMillis();
             algorithm.run();
             DecisionTree tree = algorithm.getBestTree();
+            producedTrees.add(tree);
             executionTimes.add((System.currentTimeMillis()-start)/1000.0);
-            mse=Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
-            leafNodes=tree.getLeaves().size();
-            mseList.add(mse);
-            leafList.add(leafNodes);
-            System.out.println(tree.getSamples().size());
+//            mse=Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
+//            leafNodes=tree.getLeaves().size();
+//            mseList.add(mse);
+//            leafList.add(leafNodes);
         }
-        System.out.format("%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\n", mean(mseList), variance(mseList), mean(leafList), variance(leafList), mean(executionTimes), variance(executionTimes));
+        // output
+        final List<OutputSpacePoint> testPoints = new LinkedList<>(points);
+        PrintStream out = System.out;
+        printVariable(out, producedTrees.stream().map(a->Metrics.getMSE(a, testPoints)).collect(Collectors.toList()));
+        printVariable(out, producedTrees.stream().map(a->Metrics.getRSquared(a, testPoints)).collect(Collectors.toList()));
+        printVariable(out, executionTimes);
+        printVariable(out, producedTrees.stream().map(a->(double)a.getLeaves().size()).collect(Collectors.toList()));
+        out.println();
+
     }
 
     private static double mean(List<Double> list) {
@@ -147,5 +159,16 @@ public class EntryPoint {
             variance+=(o-mean)*(o-mean);
         }
         return (list.size()==0?Double.NaN:variance/list.size());
+    }
+
+
+    private static double percentile(List<Double> list, int rank) {
+        int index = (int) Math.ceil((rank/100.0)*list.size());
+        list.sort((a,b)->a.compareTo(b));
+        return list.get(index-1);
+    }
+
+    private static void printVariable(PrintStream out, List<Double> metric) {
+        out.format("%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t", mean(metric), variance(metric), percentile(metric, 25), percentile(metric, 50), percentile(metric, 75), percentile(metric, 100));
     }
 }
