@@ -143,6 +143,22 @@ module Panic
 				return -1/(Math::PI*@sigma**4) * (1-division)*Math.exp(-division)
 			end
 		end
+		class Comp1Function < Function
+			def initialize coefficients
+				super()
+				@coefficients = coefficients
+			end
+			def evaluate_expression vector
+				sum0 = 0
+				sum1 = 0
+				vector.length.times{ |index|
+					sum0=@coefficients[index]*(vector[index])
+					sum1+=vector[index]
+				}
+				return Math::cos(sum0)+Math::exp(sum1)
+			end
+		end
+
 	end
 end
 
