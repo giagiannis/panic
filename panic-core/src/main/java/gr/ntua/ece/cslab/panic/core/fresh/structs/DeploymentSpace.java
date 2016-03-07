@@ -17,6 +17,8 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.structs;
 
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,6 +57,17 @@ public class DeploymentSpace {
         return newD;
     }
 
+    public boolean contains(InputSpacePoint point) {
+        for(String s : point.getKeysAsCollection()) {
+            boolean valueFound = false;
+            for(Double d : this.getRange().get(s)) {
+                valueFound = valueFound || (d.equals(point.getValue(s)));
+            }
+            if(!valueFound)
+                return false;
+        }
+        return true;
+    }
     @Override
     public String toString() {
         return this.range.toString();

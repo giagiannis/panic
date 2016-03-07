@@ -108,8 +108,12 @@ public class AlgorithmPrinter {
     public static void main(String[] args) throws Exception {
         Map<String,String> cliOptions= parseCLIOptions(args);
         Properties properties = loadConfigurationFile(cliOptions);
-        if(args.length<3) {
-            System.err.println("Please give 3 args: 1 for the samples, 1 for the predicted values and 1 for the cuts");
+        if(args.length<4) {
+            System.err.format("Provide the following args:\n(1) %s\n" +
+                            "(2) %s\n" +
+                            "(3) %s\n" +
+                            "(4) %s\n",
+                    "sample file", "predicted values file", "cuts file", "error values per leaf");
             System.exit(1);
         }
 
@@ -140,6 +144,7 @@ public class AlgorithmPrinter {
         PrintStream sampleFile = new PrintStream(new File(args[0]));
         PrintStream predictedFile = new PrintStream(new File(args[1]));
         PrintStream cuts = new PrintStream(new File(args[2]));
+        PrintStream errorsPerLeafStream = new PrintStream(new File(args[3]));
 //        PrintStream cuts = System.out;
 
         Map<String, Model> models = new HashMap<>();
@@ -166,6 +171,8 @@ public class AlgorithmPrinter {
         }
         predictedFile.close();
 
+
+        HashMap<String, Double> errorPerLeaf = Metrics.getMSEPerLeaf(bestTree, manager.getOutputSpacePoints());
         for(DecisionTreeLeafNode l :bestTree.getLeaves()) {
 //            System.out.println(l.getDeploymentSpace());
             double minX1=1.0, maxX1=0.0;
@@ -182,8 +189,12 @@ public class AlgorithmPrinter {
             cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", maxX1,      minX2,      0.0,            maxX2-minX2);
             cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      minX2,      maxX1-minX1,    0.0);
             cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      maxX2,      maxX1-minX1,    0.0);
+
+
+            errorsPerLeafStream.format("%.3f\t%.3f\t%.5f\n", (minX1+maxX1)/2.0, (minX2+maxX2)/2.0, errorPerLeaf.get(l.getId()));
 //            System.out.format("From %3f, %3f to %3f, %3f\n", minX1, minX2, maxX1, maxX2);
         }
         cuts.close();
+        errorsPerLeafStream.close();;
     }
 }

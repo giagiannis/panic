@@ -21,8 +21,7 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Represents a multidimensional point. The dimensions are indexed using a key
@@ -89,7 +88,9 @@ public class MultiPoint implements Serializable{
     @Override
     public int hashCode() {
         ByteBuffer buffer = ByteBuffer.allocate(this.values.size() * Double.SIZE/8);
-        for(String key : this.getKeysAsCollection())
+        List<String> sortedKeys = new LinkedList<>(this.getKeysAsCollection());
+        Collections.sort(sortedKeys);
+        for(String key : sortedKeys)
             buffer.putDouble(this.getValue(key));
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");

@@ -67,11 +67,16 @@ public abstract class Separator {
         // FIXME: sanity check of the solution is crucial here
 //         setting result
         if (best != null) {
-            double mse1 = CrossValidation.meanSquareError(LinearRegression.class, best.getLeftList());
-            double mse2 = CrossValidation.meanSquareError(LinearRegression.class, best.getRightList());
+            int leftListSize = best.getLeftList().size(), rightListSize = rightListSize = best.getRightList().size();
+            double mse1 = leftListSize * CrossValidation.meanSquareError(LinearRegression.class, best.getLeftList());
+            double mse2 = rightListSize * CrossValidation.meanSquareError(LinearRegression.class, best.getRightList());
+            double avgMSE = (mse1+mse2)/(leftListSize+rightListSize);
             double mseSum = CrossValidation.meanSquareError(LinearRegression.class, best.getOriginal());
-            double avgMSE = (mse1*best.getLeftList().size()+mse2*best.getRightList().size())/(best.getLeftList().size()+best.getRightList().size());
-            if(mseSum > avgMSE) {
+            if(leftListSize+rightListSize != best.getOriginal().size()) {
+                System.err.println("Separator.separate: xontri malakia edw mesa!");
+                System.exit(1);
+            }
+            if(mseSum >= avgMSE) {
                 this.result = new DecisionTreeTestNode(
                         best.getSeparationDimension(),
                         best.getSeparationValue(),
@@ -79,6 +84,9 @@ public abstract class Separator {
                         new DecisionTreeLeafNode(best.getLeftList(),best.getLeftDS()),
                         new DecisionTreeLeafNode(best.getRightList(), best.getRightDS()),
                         this.original.getId());
+            } else {
+//                System.err.println("Separator.separate");
+//                System.err.println("Solution WAS found but it produced poor-er results!");
             }
         }
     }

@@ -81,6 +81,6 @@ public class PCAnalyzerTest {
         analyzer.analyze();
         assertNotNull(analyzer.getEigenValues());
         assertNotNull(analyzer.getEigenVectors());
-        System.out.println(analyzer.distances);
+//        System.out.println(analyzer.distances);
     }
 }

@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * Algorithm that trains the
  * Created by Giannis Giannakopoulos on 3/1/16.
  */
-public class DTAdaptive extends DTAlgorithm{
+public class DTAdaptive extends DTAlgorithm {
     private int steps;
     private Budget budgetStrategy;
     private Set<String> treePathsToIgnore;
@@ -51,7 +51,7 @@ public class DTAdaptive extends DTAlgorithm{
 
     @Override
     public void run() {
-        while(!this.terminationCondition()) {
+        while (!this.terminationCondition()) {
             this.step();
         }
     }
@@ -60,21 +60,25 @@ public class DTAdaptive extends DTAlgorithm{
         this.steps += 1;
         long start = System.currentTimeMillis();
 
+        int numberOfLeaves;
         debugPrint(String.format("Step %d: Expanding tree (sample size: %d)...\t", this.steps, this.tree.getSamples().size()));
         DecisionTree tree = this.expandAll(this.tree);
+        numberOfLeaves = tree.getLeaves().size();
+//        System.out.println("DTAdaptive.step");
+//        System.out.println("Number of leaves:\t"+numberOfLeaves);
         debugPrint(String.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start));
 
         start = System.currentTimeMillis();
-        debugPrint(String.format("Step %d: Creating budget object...\t\t",this.steps));
+        debugPrint(String.format("Step %d: Creating budget object...\t\t", this.steps));
         BudgetFactory factory = new BudgetFactory();
-        this.budgetStrategy=factory.create(this.budgetType, tree, this.budgetProperties, this.deploymentBudget, this.treePathsToIgnore);
+        this.budgetStrategy = factory.create(this.budgetType, tree, this.budgetProperties, this.deploymentBudget, this.treePathsToIgnore);
         debugPrint(String.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start));
 
 
         start = System.currentTimeMillis();
-        debugPrint(String.format("Step %d: Iterating through leaves...\t\t",this.steps));
-        for(DecisionTreeLeafNode l : tree.getLeaves()) {
-            if(this.terminationCondition())
+        debugPrint(String.format("Step %d: Iterating through leaves...\t\t", this.steps));
+        for (DecisionTreeLeafNode l : tree.getLeaves()) {
+            if (this.terminationCondition())
                 break;
             int budget = this.budgetStrategy.estimate(l);
             this.sampleLeaf(l, budget);
@@ -83,27 +87,31 @@ public class DTAdaptive extends DTAlgorithm{
 
         if (this.onlineTraining) {
             start = System.currentTimeMillis();
-            debugPrint(String.format("Step %d: Expanding the main tree...\t\t",this.steps));
+            debugPrint(String.format("Step %d: Expanding the main tree...\t\t", this.steps));
             this.tree = this.expandTree(this.tree);
             debugPrint(String.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start));
         }
     }
 
     private void sampleLeaf(DecisionTreeLeafNode leaf, int budget) {
-        SamplerFactory factory =  new SamplerFactory();
+        SamplerFactory factory = new SamplerFactory();
         List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
+//        System.err.println("DTAdaptive.sampleLeaf");
+//        System.err.println("Unavailable points:\t" + this.source.unavailablePoints().size());
         forbiddenPoints.addAll(this.tree.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toList()));
         Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints, null);
+        HashSet<InputSpacePoint> forbiddenPointsSet = new HashSet<>(forbiddenPoints);
         int pointsReturned = 0;
-        while(sampler.hasMore()) {
+        while (sampler.hasMore()) {
             InputSpacePoint point = sampler.next();
-            if(point!=null) {
-                pointsReturned+=1;
-                OutputSpacePoint outputSpacePoint=this.source.getPoint(point);
+            if (point != null) {
+                pointsReturned += 1;
+                OutputSpacePoint outputSpacePoint = this.source.getPoint(point);
+//                System.err.format("Source returned %s for point %s (belongs in forbidden: %s)\n", outputSpacePoint, point, forbiddenPointsSet.contains(point));
                 this.tree.addPoint(outputSpacePoint);
             }
         }
-        if(pointsReturned<budget) {
+        if (pointsReturned < budget) {
             this.treePathsToIgnore.add(leaf.treePath());
 //            System.out.println("DTAdaptive.sampleLeaf");
 //            System.out.println(this.treePathsToIgnore);

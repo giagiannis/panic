@@ -80,7 +80,9 @@ public class RandomSamplerTest {
         Set<InputSpacePoint> set = this.points.stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toSet());
         while (sampler.hasMore()) {
             InputSpacePoint point = sampler.next();
-            assertTrue(set.contains(point));
+            if(point!=null) {
+                assertTrue(set.contains(point));
+            }
         }
     }
 }

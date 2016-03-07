@@ -92,12 +92,11 @@ public class EntryPoint {
             stream = EntryPoint.class.getClassLoader().getResourceAsStream(confFileName);
         }
         prop.load(stream);
-        for(String s:System.getProperties().stringPropertyNames()) {
-            if(prop.getProperty(s)!=null) {
-                prop.setProperty(s, System.getProperty(s));
-            }
-        }
+        System.getProperties().stringPropertyNames().stream().filter(s -> prop.getProperty(s) != null).forEach(s -> {
+            prop.setProperty(s, System.getProperty(s));
+        });
         debugPrint("Conf file loaded and parsed");
+        debugPrint("Properties: "+prop);
         return prop;
     }
 

@@ -43,7 +43,7 @@ public class FileMetricSourceTest {
         URL url  = this.getClass().getClassLoader().getResource(TestUtils.FileReader.UNAVAILABLE_DATASET_PATH);
         String defaultDatasetPath = null;
         if(url!=null)
-             defaultDatasetPath= url.getFile();
+             defaultDatasetPath=url.getFile();
         Properties props = new Properties();
         props.setProperty("input", defaultDatasetPath);
         deployer = new FileMetricSource(props);
@@ -65,10 +65,5 @@ public class FileMetricSourceTest {
     @Test
     public void testDeploymentSpace() throws Exception {
         assertNotNull(this.deployer.getDeploymentSpace());
-    }
-
-    @Test
-    public void testUnavailable() throws Exception {
-        System.out.println(this.deployer.unavailablePoints);
     }
 }

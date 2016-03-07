@@ -20,7 +20,9 @@ package gr.ntua.ece.cslab.panic.core.fresh.samplers;
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * This class provides methods necessary to map the InputSpacePoint objects into one dimension (indexed by an int).
@@ -28,9 +30,21 @@ import java.util.List;
  */
 public abstract class IndexSampler extends Sampler {
     protected String[] dimensionsOrder;
+    protected final Random random;
+    protected List<Integer> leftIndices;
+
     public IndexSampler(DeploymentSpace deploymentSpace, int budget, String[] dimensionsOrder) {
         super(deploymentSpace, budget);
         this.dimensionsOrder = dimensionsOrder;
+        this.random = new Random();
+        this.leftIndices = new LinkedList<>();
+        int mul = 1;
+        for(String s:this.dimensionsOrder) {
+            mul*=this.deploymentSpace.getRange().get(s).size();
+        }
+        for(int i=0;i<mul;i++) {
+            this.leftIndices.add(i);
+        }
     }
 
     protected InputSpacePoint translate(int index) {

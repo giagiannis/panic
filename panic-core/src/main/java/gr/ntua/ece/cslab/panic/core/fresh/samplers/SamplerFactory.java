@@ -40,9 +40,9 @@ public class SamplerFactory {
             case "lhs":
                 sampler = new LatinHypercubeSampler(deploymentSpace, budget);
                 break;
-            case "order":
-                String[] dimensionOrder = properties.getProperty("dimension.order").split(",");
-                sampler = new TotalOrderSampler(deploymentSpace, budget, dimensionOrder);
+            case "systematic":
+                String[] dimensionOrder = properties.getProperty("dimensions").split(",");
+                sampler = new SystematicSampler(deploymentSpace, budget, dimensionOrder);
                 break;
         }
         if(forbiddenPoints!=null)

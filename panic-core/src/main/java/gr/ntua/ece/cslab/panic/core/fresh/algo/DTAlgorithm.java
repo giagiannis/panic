@@ -240,6 +240,15 @@ public abstract class DTAlgorithm {
             numberOfLeaves = tree.getLeaves().size();
             tree = this.expandTree(tree);
         }
+        if(tree.getSamples().size()==0)
+            return tree;
+
+//        System.out.println("DTAlgorithm.expandAll");
+//        System.out.println("Let's try pruning here... "+tree.getSamples().size());
+//        double mse1=tree.getLeaves().stream().mapToDouble(a->a.getPoints().size()*CrossValidation.meanSquareError(LinearRegression.class, a.getPoints())).sum()/tree.getSamples().size();
+//        System.out.println(mse1);
+//        System.out.println(tree);
+//        System.exit(0);
         return tree;
     }
 

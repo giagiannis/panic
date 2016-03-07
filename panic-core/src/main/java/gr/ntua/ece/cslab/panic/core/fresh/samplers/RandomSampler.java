@@ -31,7 +31,8 @@ public class RandomSampler extends IndexSampler {
     private List<Integer> leftIndices;
 
     public RandomSampler(DeploymentSpace deploymentSpace, int budget) {
-        super(deploymentSpace, budget, (String[]) deploymentSpace.getRange().keySet().toArray());
+
+        super(deploymentSpace, budget, deploymentSpace.getRange().keySet().toArray(new String[deploymentSpace.getRange().size()]));
         this.random = new Random();
         this.leftIndices = new LinkedList<>();
 

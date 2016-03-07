@@ -58,7 +58,7 @@ public class VarianceSeparatorTest {
                 Separator.CandidateSolution candidatePair;
                 candidatePair = new Separator.CandidateSolution(points, candidateDimension, candidateValue, space);
                 double estimation = separator.estimate(candidatePair);
-                assertTrue(minVariance<=separator.estimate(candidatePair));
+                assertTrue(minVariance>=separator.estimate(candidatePair));
             }
         }
     }

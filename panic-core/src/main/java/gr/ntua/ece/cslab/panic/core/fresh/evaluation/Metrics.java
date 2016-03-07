@@ -33,6 +33,38 @@ import java.util.stream.Collectors;
  * Created by Giannis Giannakopoulos on 2/29/16.
  */
 public class Metrics {
+
+
+    public static HashMap<String, Double> getMSEPerLeaf(DecisionTree tree, List<OutputSpacePoint> testPoints) {
+        HashMap<String, Model> models = createModels(tree);
+        HashMap<String, Double> sum = new HashMap<>();
+        HashMap<String, Integer> count = new HashMap<>();
+
+        for(String leafId : models.keySet()) {
+            sum.put(leafId, 0.0);
+            count.put(leafId, 0);
+        }
+        for(OutputSpacePoint p : testPoints) {
+            String leafId =tree.getLeaf(p).getId();
+            double predicted = 0;
+            try {
+                predicted = models.get(leafId).getPoint(p.getInputSpacePoint()).getValue();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            double actual = p.getValue();
+            sum.put(leafId, sum.get(leafId) + (predicted-actual)*(predicted-actual));
+            count.put(leafId, count.get(leafId)+1);
+//            sum +=(predicted-actual)*(predicted-actual);
+        }
+        for(String leafId : sum.keySet()) {
+            if(count.get(leafId) > 0) {
+                sum.put(leafId, sum.get(leafId) / count.get(leafId));
+            }
+        }
+        return sum;
+    }
+
     public static double getMSE(DecisionTree tree, List<OutputSpacePoint> testPoints) {
         HashMap<String, Model> models = createModels(tree);
         double sum = 0.0;
