@@ -33,6 +33,9 @@ public class AnalyzerFactory {
             case "pca":
                 analyzer = new PCAnalyzer(points);
                 break;
+            case "regression":
+                analyzer = new RegressionAnalyzer(points);
+                break;
             default:
                 break;
         }

@@ -38,7 +38,9 @@ public class DTAlgorithmFactory {
             CONF_BUDGET_POINTS_KEY = "budget.points",
             CONF_BUDGET_TYPE_KEY= "budget.type",
             CONF_SELECTOR_TYPE_KEY ="selector.type",
-            CONF_SELECTOR_PREFIX  ="selector";
+            CONF_SELECTOR_PREFIX  ="selector",
+            CONF_ANALYZER_TYPE_KEY="analyzer.type",
+            CONF_ANALYZER_PREFIX="analyzer";
 
     public DTAlgorithm create(String type, Properties properties) {
         DTAlgorithm algorithm = null;
@@ -55,12 +57,14 @@ public class DTAlgorithmFactory {
         String selectorType = properties.getProperty(CONF_SELECTOR_TYPE_KEY);
         Properties selectorProperties = this.isolateProperties(properties, CONF_SELECTOR_PREFIX+"."+properties.getProperty(CONF_SELECTOR_TYPE_KEY));
 
+        String analyzerType = properties.getProperty(CONF_ANALYZER_TYPE_KEY);
+        Properties analyzerProperties = this.isolateProperties(properties, CONF_ANALYZER_PREFIX+"."+properties.getProperty(CONF_ANALYZER_TYPE_KEY));
         switch (type) {
-            case "dtrt":
-                algorithm = new DTRT(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
-                break;
+//            case "dtrt":
+//                algorithm = new DTRT(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
+//                break;
             case "dtadaptive":
-                algorithm = new DTAdaptive(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
+                algorithm = new DTAdaptive(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties, selectorType, selectorProperties, analyzerType, analyzerProperties);
                 break;
             default:
                 break;

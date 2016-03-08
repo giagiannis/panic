@@ -19,6 +19,8 @@ package gr.ntua.ece.cslab.panic.core.fresh.algo;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.analyzers.Analyzer;
+import gr.ntua.ece.cslab.panic.core.fresh.analyzers.AnalyzerFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.budget.Budget;
 import gr.ntua.ece.cslab.panic.core.fresh.budget.BudgetFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.metricsource.MetricSource;
@@ -44,8 +46,10 @@ public class DTAdaptive extends DTAlgorithm {
                       MetricSource source,
                       String separatorType,
                       String budgetType, Properties budgetProperties,
-                      String selectorType, Properties selectorProperties) {
-        super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
+                      String selectorType, Properties selectorProperties,
+                      String analyzerType, Properties analyzerProperties) {
+        super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties, selectorType, selectorProperties,
+                analyzerType, analyzerProperties);
         this.treePathsToIgnore = new HashSet<>();
     }
 
@@ -98,8 +102,27 @@ public class DTAdaptive extends DTAlgorithm {
         List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
 //        System.err.println("DTAdaptive.sampleLeaf");
 //        System.err.println("Unavailable points:\t" + this.source.unavailablePoints().size());
+
         forbiddenPoints.addAll(this.tree.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toList()));
-        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints, null);
+
+        // fixme: ggian hack
+        Properties samplerProperties = new Properties();
+        if(!this.analyzerType.equals("none") && leaf.getPoints().size()>0) {
+            AnalyzerFactory factory1 = new AnalyzerFactory();
+            Analyzer analyzer = factory1.create(this.analyzerType, leaf.getPoints());
+            analyzer.analyze();
+            String keyName = leaf.getPoints().get(0).getKey();
+            String dimensionOrder = analyzer.getDistances().get(keyName).entrySet().
+                    parallelStream().
+                    filter(a->a.getKey()!="constant").
+                    sorted((a,b)-> -a.getValue().compareTo(b.getValue())).
+                    map(a->a.getKey()).reduce((s, s2) -> s+","+s2).get();
+            samplerProperties.setProperty("dimensions", dimensionOrder);
+//                            .toArray(new String[numberOfInputDimensions]);
+        }
+        // fixme: end of ggian hack
+
+        Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints, samplerProperties);
         HashSet<InputSpacePoint> forbiddenPointsSet = new HashSet<>(forbiddenPoints);
         int pointsReturned = 0;
         while (sampler.hasMore()) {

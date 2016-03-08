@@ -41,7 +41,10 @@ public class SamplerFactory {
                 sampler = new LatinHypercubeSampler(deploymentSpace, budget);
                 break;
             case "systematic":
-                String[] dimensionOrder = properties.getProperty("dimensions").split(",");
+                String[] dimensionOrder = deploymentSpace.getRange().keySet().toArray(new String[deploymentSpace.getRange().size()]);
+                if (properties.containsKey("dimensions")) {
+                    dimensionOrder = properties.getProperty("dimensions").split(",");
+                }
                 sampler = new SystematicSampler(deploymentSpace, budget, dimensionOrder);
                 break;
         }

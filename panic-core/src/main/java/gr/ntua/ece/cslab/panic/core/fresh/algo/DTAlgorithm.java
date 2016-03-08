@@ -41,6 +41,8 @@ public abstract class DTAlgorithm {
     protected final int deploymentBudget;
     protected final String budgetType;
     protected final Properties budgetProperties;
+    protected final String analyzerType;
+    protected final Properties analyzerProperties;
     protected DecisionTree tree;
     protected final String samplerType;
     protected final DeploymentSpace space;
@@ -54,7 +56,8 @@ public abstract class DTAlgorithm {
     public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source,
                        String separatorType,
                        String budgetType, Properties budgetProperties,
-                       String selectorType, Properties selectorProperties) {
+                       String selectorType, Properties selectorProperties,
+                       String analyzerType, Properties analyzerProperties) {
         this.deploymentBudget = deploymentBudget;
         this.samplerType = samplerType;
         this.source = source;
@@ -70,6 +73,8 @@ public abstract class DTAlgorithm {
 
         this.selectorType = selectorType;
         this.selectorProperties = selectorProperties;
+        this.analyzerType = analyzerType;
+        this.analyzerProperties = analyzerProperties;
     }
 
     // getters and setters

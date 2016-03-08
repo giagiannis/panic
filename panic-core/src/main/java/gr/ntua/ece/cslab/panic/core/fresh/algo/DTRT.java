@@ -47,8 +47,8 @@ public class DTRT extends DTAlgorithm {
     private Budget budgetStrategy;
 
     public DTRT(int deploymentBudget, String samplerType, MetricSource source, String separatorType, String budgetType, Properties budgetProperties,
-                String selectorType, Properties selectorProperties) {
-        super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
+                String selectorType, Properties selectorProperties, String analyzerType, Properties analyzerProperties) {
+        super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties, selectorType, selectorProperties, analyzerType, analyzerProperties);
         this.steps = 0;
         this.treePathsToIgnore = new HashSet<>();
     }
