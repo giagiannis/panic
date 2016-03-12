@@ -93,7 +93,7 @@ public abstract class DecisionTreeNode {
                 if(father.getRightChild()==n) {
                     sign=">";
                 }
-                id+=father.getAttribute()+sign+Double.toHexString(father.getValue());
+                id+=sign+father.getSplitLine().toString();
             } else {
                 id+="R";
             }

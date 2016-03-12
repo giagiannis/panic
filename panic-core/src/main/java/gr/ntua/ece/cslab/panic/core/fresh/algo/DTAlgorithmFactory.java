@@ -60,9 +60,6 @@ public class DTAlgorithmFactory {
         String analyzerType = properties.getProperty(CONF_ANALYZER_TYPE_KEY);
         Properties analyzerProperties = this.isolateProperties(properties, CONF_ANALYZER_PREFIX+"."+properties.getProperty(CONF_ANALYZER_TYPE_KEY));
         switch (type) {
-//            case "dtrt":
-//                algorithm = new DTRT(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties, selectorType, selectorProperties);
-//                break;
             case "dtadaptive":
                 algorithm = new DTAdaptive(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties, selectorType, selectorProperties, analyzerType, analyzerProperties);
                 break;

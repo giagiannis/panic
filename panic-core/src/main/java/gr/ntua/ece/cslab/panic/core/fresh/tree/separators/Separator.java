@@ -64,7 +64,7 @@ public abstract class Separator {
         // try all the possible values
         CandidateSolution best = this.findBestCandidatePair(possibleValues);
 
-        // FIXME: sanity check of the solution is crucial here
+
 //         setting result
         if (best != null) {
             int leftListSize = best.getLeftList().size(), rightListSize = rightListSize = best.getRightList().size();
@@ -76,14 +76,15 @@ public abstract class Separator {
                 System.err.println("Separator.separate: xontri malakia edw mesa!");
                 System.exit(1);
             }
+            // FIXME: have to update the separator base class to implement the new Decision Tree logic
             if(mseSum >= avgMSE) {
-                this.result = new DecisionTreeTestNode(
-                        best.getSeparationDimension(),
-                        best.getSeparationValue(),
-                        best.getOriginalDS(),
-                        new DecisionTreeLeafNode(best.getLeftList(),best.getLeftDS()),
-                        new DecisionTreeLeafNode(best.getRightList(), best.getRightDS()),
-                        this.original.getId());
+//                this.result = new DecisionTreeTestNode(
+//                        best.getSeparationDimension(),
+//                        best.getSeparationValue(),
+//                        best.getOriginalDS(),
+//                        new DecisionTreeLeafNode(best.getLeftList(),best.getLeftDS()),
+//                        new DecisionTreeLeafNode(best.getRightList(), best.getRightDS()),
+//                        this.original.getId());
             } else {
 //                System.err.println("Separator.separate");
 //                System.err.println("Solution WAS found but it produced poor-er results!");

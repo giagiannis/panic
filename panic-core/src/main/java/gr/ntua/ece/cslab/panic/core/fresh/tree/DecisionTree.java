@@ -158,7 +158,7 @@ public class DecisionTree {
             if(n.isLeaf()) {
                 buffer+=String.format("%s (%d) [%s]\n", n.getId(),n.castToLeaf().getPoints().size(), n.treePath());
             } else {
-                buffer += String.format("%s (%s <> %.5f) [%s]\n", n.getId(), n.castToTest().getAttribute(), n.castToTest().getValue(), n.treePath());
+                buffer += String.format("%s (%s) [%s]\n", n.getId(), n.castToTest().getSplitLine(), n.treePath());
             }
         }
         return buffer.substring(0,buffer.length()-1);

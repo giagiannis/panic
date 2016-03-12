@@ -19,6 +19,7 @@ package gr.ntua.ece.cslab.panic.core.fresh.tree.nodes;
 
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.line.SplitLine;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,62 +29,33 @@ import java.util.List;
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
 public class DecisionTreeTestNode extends DecisionTreeNode {
-    private final String attribute;
-    private final double value;
+    private final SplitLine splitLine;
     private DecisionTreeNode leftChild, rightChild;
 
-    /**
-     * Default construction
-     * @param attribute the split dimension name
-     * @param value the split dimension value
-     */
-    public DecisionTreeTestNode(String attribute, double value, DeploymentSpace space) {
-        this.attribute = attribute;
-        this.value = value;
+    public DecisionTreeTestNode(SplitLine line, DeploymentSpace space) {
+        super();
+        this.splitLine = line;
         this.deploymentSpace = space;
     }
 
-    /**
-     * Default construction
-     * @param attribute the split dimension name
-     * @param value the split dimension value
-     * @param id the id of node
-     */
-    public DecisionTreeTestNode(String attribute, double value, DeploymentSpace space, String id) {
-        this.attribute = attribute;
-        this.value = value;
-        this.deploymentSpace = space;
+    public DecisionTreeTestNode(SplitLine line, DeploymentSpace space, String id) {
+        this(line, space);
         this.id = id;
     }
 
-    /**
-     * Constructor of the test node
-     * @param attribute the split dimension name
-     * @param value the split dimension value
-     * @param leftChild the left child of the test node
-     * @param rightChild the right child of the test node
-     */
-
-    public DecisionTreeTestNode(String attribute, double value, DeploymentSpace space, DecisionTreeNode leftChild, DecisionTreeNode rightChild) {
-        super();
-        this.attribute = attribute;
-        this.value = value;
+    public DecisionTreeTestNode(SplitLine line, DeploymentSpace space, DecisionTreeNode leftChild, DecisionTreeNode rightChild) {
+        this(line, space);
         this.setLeftChild(leftChild);
         this.setRightChild(rightChild);
-        this.deploymentSpace = space;
     }
 
-    public DecisionTreeTestNode(String attribute, double value, DeploymentSpace space, DecisionTreeNode leftChild, DecisionTreeNode rightChild, String id) {
-        this(attribute, value, space, leftChild, rightChild);
+    public DecisionTreeTestNode(SplitLine line,  DeploymentSpace space, DecisionTreeNode leftChild, DecisionTreeNode rightChild, String id) {
+        this(line, space, leftChild, rightChild);
         this.id = id;
     }
 
-    public String getAttribute() {
-        return attribute;
-    }
-
-    public double getValue() {
-        return value;
+    public SplitLine getSplitLine() {
+        return splitLine;
     }
 
     public DecisionTreeNode getLeftChild() {
@@ -110,7 +82,8 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
      * @return returns the correct child that p belongs into (may be an intermediate node)
      */
     public DecisionTreeNode test(OutputSpacePoint p) {
-        if(p.getInputSpacePoint().getValue(this.attribute) <= this.value)
+        int c = this.splitLine.comparePoint(p.getInputSpacePoint());
+        if(c==-1 || c==0)
             return leftChild;
         else
             return rightChild;
@@ -141,17 +114,16 @@ public class DecisionTreeTestNode extends DecisionTreeNode {
     }
 
     protected String toString(String pad) {
-        return String.format("%s%s(%s, %.2f)\n%s\n%s",
+        return String.format("%s%s(%s)\n%s\n%s",
                 pad,
                 this.id,
-                this.attribute,
-                this.value,
+                this.splitLine,
                 this.leftChild.toString(pad+"\t"),
                 this.rightChild.toString(pad+"\t"));
     }
 
     public DecisionTreeTestNode clone() {
-        DecisionTreeTestNode test = new DecisionTreeTestNode(this.attribute, this.value, this.deploymentSpace, this.id);
+        DecisionTreeTestNode test = new DecisionTreeTestNode(this.splitLine, this.deploymentSpace, this.id);
         return  test;
     }
 }

@@ -105,7 +105,7 @@ public class DTAdaptive extends DTAlgorithm {
 
         forbiddenPoints.addAll(this.tree.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toList()));
 
-        // fixme: ggian hack
+//         fixme: ggian hack
         Properties samplerProperties = new Properties();
         if(!this.analyzerType.equals("none") && leaf.getPoints().size()>0) {
             AnalyzerFactory factory1 = new AnalyzerFactory();
