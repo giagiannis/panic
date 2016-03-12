@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016 Giannis Giannakopoulos
  *
@@ -17,6 +18,7 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.tree.line;
 
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,13 +41,26 @@ public class SplitLineTest {
         // create a line with lambda equals to 1
         Random rand = new Random();
         double value = rand.nextDouble();
-        SplitLine line = new SplitLine(new SplitLine.Point(0.0,0.0), new SplitLine.Point(value,value));
+        InputSpacePoint p1 = new InputSpacePoint();
+        p1.addDimension("x", 0.0);
+        p1.addDimension("y", 0.0);
+
+        InputSpacePoint p2 = new InputSpacePoint();
+        p2.addDimension("x", 1.0);
+        p2.addDimension("y", 1.0);
+
+
+        SplitLine line = new SplitLine(p1, p2, "x", "y");
 
         for(int i=0;i<100;i++) {
-            SplitLine.Point point = new SplitLine.Point(rand.nextDouble(), rand.nextDouble());
-            if(point.getX() > point.getY())
+//            SplitLine.Point point = new SplitLine.Point(rand.nextDouble(), rand.nextDouble());
+            InputSpacePoint point = new InputSpacePoint();
+            point.addDimension("x", rand.nextDouble());
+            point.addDimension("y", rand.nextDouble());
+
+            if(point.getValue("x") > point.getValue("y"))
                 assertEquals(line.comparePoint(point), -1);
-            else if(point.getX()<point.getY())
+            else if(point.getValue("x") < point.getValue("y"))
                 assertEquals(line.comparePoint(point), 1);
             else
                 assertEquals(line.comparePoint(point), 0);

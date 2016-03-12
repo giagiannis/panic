@@ -25,88 +25,51 @@ import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
  */
 public class SplitLine {
 
+    private final String xDimensionsLabel;
+    private final String yDimensionsLabel;
     private Type type;
     private double lambda, c;
 
     public enum Type{
         HORIZONTAL, VERTICAL, NORMAL
     }
-    
-    /**
-     * Point used to construct a line
-     */
-    public static class Point {
-        private double x, y;
 
-        /**
-         * Simple 2D point value
-         * @param x x coefficient (horizontal axis)
-         * @param y y coefficient (vertical axis)
-         */
-        public Point(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        /**
-         * Constructor used to cast an InputSpacePoint to a 2D point
-         * @param point original InputSpacePoint
-         * @param xDim x dimension name
-         * @param yDim y dimension name
-         */
-        public Point(InputSpacePoint point, String xDim, String yDim) {
-            this.x = point.getValue(xDim);
-            this.y = point.getValue(yDim);
-        }
-
-        public double getX() {
-            return x;
-        }
-
-        public double getY() {
-            return y;
-        }
-        @Override
-        public String toString() {
-            return String.format("(%.5f, %.5f)", x, y);
-        }
-    }
-
-
-    public SplitLine(Point p1, Point p2) {
-        double dy = p1.getY() - p2.getY();
-        double dx = p1.getX() - p2.getX();
+    public SplitLine(InputSpacePoint p1, InputSpacePoint p2, String xDimensionLabel, String yDimensionLabel) {
+        this.xDimensionsLabel = xDimensionLabel;
+        this.yDimensionsLabel = yDimensionLabel;
+        double dy = p1.getValue(yDimensionLabel) - p2.getValue(yDimensionLabel);
+        double dx = p1.getValue(xDimensionLabel) - p2.getValue(xDimensionLabel);
         if(dx==0.0 && dy==0.0) {
             System.err.println("We can't do this");
             System.exit(1);
         } else if(dx==0.0) {
             this.type = Type.VERTICAL;
-            c = p1.getX();
+            c = p1.getValue(xDimensionLabel);
         } else if(dy==0.0) {
             this.type = Type.HORIZONTAL;
-            c = p1.getY();
+            c = p1.getValue(yDimensionLabel);
         } else {
             this.type  = Type.NORMAL;
             lambda = dy/dx;
-            c = p1.getY() - lambda*p1.getX();
+            c = p1.getValue(yDimensionLabel) - lambda*p1.getValue(xDimensionLabel);
         }
     }
 
-    public int comparePoint(Point p) {
+    public int comparePoint(InputSpacePoint p) {
         double lineValueToCompare = 0;
         double pointValueToCompare = 0;
         switch (this.type) {
             case HORIZONTAL:
-                pointValueToCompare = p.getX();
+                pointValueToCompare = p.getValue(yDimensionsLabel);
                 lineValueToCompare = this.c;
                 break;
             case VERTICAL:
-                pointValueToCompare = p.getY();
+                pointValueToCompare = p.getValue(xDimensionsLabel);
                 lineValueToCompare = this.c;
                 break;
             case NORMAL:
-                lineValueToCompare = lambda * p.getX() + c;
-                pointValueToCompare = p.getY();
+                lineValueToCompare = lambda * p.getValue(xDimensionsLabel) + c;
+                pointValueToCompare = p.getValue(yDimensionsLabel);
                 break;
         }
         if(pointValueToCompare > lineValueToCompare) {
