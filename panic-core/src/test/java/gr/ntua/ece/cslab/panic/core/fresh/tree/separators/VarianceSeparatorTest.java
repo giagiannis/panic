@@ -41,7 +41,7 @@ public class VarianceSeparatorTest {
         space = new TestUtils.FileReader().getDeploymentSpace();
         points = new TestUtils.FileReader().getOutputSpacePoints();
         SeparatorFactory factory = new SeparatorFactory();
-        separator = factory.create("variance", new DecisionTreeLeafNode(points, space));
+        separator = factory.create("variance", new DecisionTreeLeafNode(points, space), new Properties());
     }
 
     @Test

@@ -26,16 +26,21 @@ import java.util.*;
  * Created by Giannis Giannakopoulos on 2/15/16.
  */
 public class DeploymentSpace {
-//    private HashMap<String, List<Double>> range;
     private final Set<InputSpacePoint> points;
     private final String[] dimensionLabels;
     private final int dimensionality;
 
     public DeploymentSpace(Set<InputSpacePoint> points) {
         this.points = points;
-        Collection<String> keys = this.points.iterator().next().getKeysAsCollection();
-        this.dimensionLabels = keys.toArray(new String[keys.size()]);
-        this.dimensionality = this.dimensionLabels.length;
+        Iterator<InputSpacePoint> it = this.points.iterator();
+        if(it.hasNext()) {
+            Collection<String> keys = this.points.iterator().next().getKeysAsCollection();
+            this.dimensionLabels = keys.toArray(new String[keys.size()]);
+            this.dimensionality = this.dimensionLabels.length;
+        } else {
+            this.dimensionLabels = null;
+            this.dimensionality = 0;
+        }
     }
 
     public String[] getDimensionLabels() {
@@ -63,5 +68,10 @@ public class DeploymentSpace {
 
     public boolean contains(InputSpacePoint point) {
         return this.points.contains(point);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%d", this.points.size());
     }
 }

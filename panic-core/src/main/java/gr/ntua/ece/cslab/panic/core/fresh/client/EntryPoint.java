@@ -123,6 +123,7 @@ public class EntryPoint {
             long start=System.currentTimeMillis();
             algorithm.run();
             DecisionTree tree = algorithm.getBestTree();
+//            System.out.println(tree);
             producedTrees.add(tree);
             executionTimes.add((System.currentTimeMillis()-start)/1000.0);
 //            mse=Metrics.getMSE(tree, algorithm.getSource().getActualPoints());

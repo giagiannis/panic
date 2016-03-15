@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 public abstract class Separator {
     protected DecisionTreeLeafNode original;
     protected DecisionTreeTestNode result;
+    protected double sampleRatio=1.0;
+    protected boolean axisParallelSplits = false;
 
     /**
      * Default constructor
@@ -56,6 +58,9 @@ public abstract class Separator {
         return result;
     }
 
+    public void setAxisParallelSplits(boolean axisParallelSplits) {
+        this.axisParallelSplits = axisParallelSplits;
+    }
 
     /**
      *
@@ -63,16 +68,29 @@ public abstract class Separator {
     public void separate() {
         // get possible values of separation - this returns a superset of the space of the points
         HashMap<String,Set<Double>> possibleValues = this.possibleValues(this.original.getPoints());
+//        System.out.println("Separator.separate: "+possibleValues);
 
-        // find the best two dimensions if axis parallel splits are used
-        String[] dominantDimensions = this.findTwoBestDimensions(possibleValues);
+        List<InputSpacePoint[]> pointsCouples;
+        if(!this.axisParallelSplits) {
+            // find the best two dimensions if axis parallel splits are not used
+            String[] dominantDimensions = this.findTwoBestDimensions(possibleValues);
 
-        // find the best line for the previous two dimensions
-        HashMap<String, Set<Double>> domDimensionValues = new HashMap<>();
-        domDimensionValues.put(dominantDimensions[0], possibleValues.get(dominantDimensions[0]));
-        domDimensionValues.put(dominantDimensions[1], possibleValues.get(dominantDimensions[1]));
-        CandidateSolution best = this.getBestSolution(domDimensionValues);
-        System.out.println(best);
+            if(dominantDimensions==null)
+                return;
+
+
+            // find the best line for the previous two dimensions
+            HashMap<String, Set<Double>> domDimensionValues = new HashMap<>();
+            domDimensionValues.put(dominantDimensions[0], possibleValues.get(dominantDimensions[0]));
+            domDimensionValues.put(dominantDimensions[1], possibleValues.get(dominantDimensions[1]));
+
+            pointsCouples = this.createPointCouplesExhaustive(domDimensionValues);
+        } else {
+            pointsCouples = this.createPointCouplesAxisParallel(possibleValues);
+
+        }
+
+        CandidateSolution best = this.getBestSolution(pointsCouples);
 
 
 
@@ -134,28 +152,67 @@ public abstract class Separator {
                 double estimation = estimate(candidatePair);
                 if (this.solutionIsAccepted(candidatePair)) {
                     dimensionScores.add(new AbstractMap.SimpleEntry<>(candidateDimension, estimation));
+                } else {
+//                    System.out.println("Separator.findTwoBestDimensions: solution found, but it cannot be accepted");
                 }
             }
         }
         dimensionScores.sort((e1, e2) -> -e1.getValue().compareTo(e2.getValue()));
+
         String label1 = "", label2="";
         while (!dimensionScores.isEmpty()) {
-            Map.Entry current = dimensionScores.remove(0);
+            Map.Entry<String, Double> current = dimensionScores.remove(0);
             if(label1.equals("")) {
-                label1 = (String) current.getKey();
-            } else if(label2.equals("") && !((String)current.getKey()).equals(label1)) {
-                label2 = (String) current.getKey();
-            } else {
+                label1 = current.getKey();
+            } else if(label2.equals("") && !(current.getKey()).equals(label1)) {
+                label2 = current.getKey();
+            }
+            if(!label1.equals("") && !label2.equals("")){
                 break;
             }
         }
         String[] result = new String[2];
         result[0] = label1;
         result[1] = label2;
+        if(label1 == null || label1.equals("") ||
+                label2 == null || label2.equals("")) {
+            return null;
+        }
         return result;
     }
 
-    protected CandidateSolution getBestSolution(HashMap<String, Set<Double>> values) {
+    protected CandidateSolution getBestSolution(List<InputSpacePoint[]> couples) {
+        if(couples == null || couples.size()<1 || couples.get(0)[0] == null) {
+            return null;
+        }
+//        for(String s : dimensionLabels) {
+//            System.out.println(s);
+//        }
+
+        Set<String> serializedLines = new HashSet<>();
+        double bestScore = Double.NEGATIVE_INFINITY;
+        CandidateSolution best = null;
+        for(InputSpacePoint[] couple : couples) {
+            InputSpacePoint p1 = couple[0], p2 = couple[1];
+            String[] dimensionLabels = p1.getKeysAsCollection().toArray(new String[2]);
+            if(!p1.equals(p2)) {
+                SplitLine line = new SplitLine(p1, p2, dimensionLabels[0], dimensionLabels[1]);
+                if(!serializedLines.contains(line.toString())) {
+                    serializedLines.add(line.toString());
+
+                    CandidateSolution solution = new CandidateSolution(this.original.getPoints(), this.original.getDeploymentSpace(), line);
+                    double estimation = this.estimate(solution);
+                    if(bestScore <= estimation && this.solutionIsAccepted(solution)) {
+                        best = solution;
+                        bestScore = estimation;
+                    }
+                }
+            }
+        }
+        return best;
+    }
+
+    private List<InputSpacePoint[]> createPointCouplesExhaustive(HashMap<String, Set<Double>> values) {
         List<InputSpacePoint> points = new LinkedList<>();
         for(String s : values.keySet()) {
             if(!points.isEmpty()) {
@@ -176,30 +233,62 @@ public abstract class Separator {
                 }
             }
         }
-        String[] dimensionLabels = points.get(0).getKeysAsCollection().toArray(new String[2]);
-        Set<String> serializedLines = new HashSet<>();
-        double bestScore = Double.NEGATIVE_INFINITY;
-        CandidateSolution best = null;
+        List<InputSpacePoint[]> couples = new LinkedList<>();
         for(InputSpacePoint p1 : points) {
             for(InputSpacePoint p2 : points) {
-                if(!p1.equals(p2)) {
-                    SplitLine line = new SplitLine(p1, p2, dimensionLabels[0], dimensionLabels[1]);
-                    if(!serializedLines.contains(line.toString())) {
-                        serializedLines.add(line.toString());
-
-                        CandidateSolution solution = new CandidateSolution(this.original.getPoints(), this.original.getDeploymentSpace(), line);
-                        double estimation = this.estimate(solution);
-                        if(bestScore <= estimation && this.solutionIsAccepted(solution)) {
-                            best = solution;
-                            bestScore = estimation;
-                        }
-                    }
-                }
+                InputSpacePoint[] couple = new InputSpacePoint[2];
+                couple[0]=p1;
+                couple[1]=p2;
+                couples.add(couple);
             }
         }
-        System.out.println("Lines checked: "+serializedLines.size());
-        return best;
+
+        // FIXME: points eliminated to avoid double checking. really NOT cool to do it like this
+        Collections.shuffle(couples);
+        couples= couples.subList(0, (int)Math.ceil(this.sampleRatio*points.size()));
+//        System.out.println("Separator.createPointCouplesExhaustive"+couples.size());
+        return couples;
     }
+
+    private List<InputSpacePoint[]> createPointCouplesAxisParallel(HashMap<String, Set<Double>> values) {
+        List<InputSpacePoint[]> couples = new LinkedList<>();
+        for(String dim : values.keySet()) {
+//            System.out.println("Separator.createPointCouplesAxisParallel: "+dim);
+            for(Double d : values.get(dim)) {
+                InputSpacePoint in1 = new InputSpacePoint();
+                in1.addDimension(dim, d);
+                in1.addDimension("foobar", 0.0);
+
+                InputSpacePoint in2 = new InputSpacePoint();
+                in2.addDimension(dim, d);
+                in2.addDimension("foobar", 1.0);
+
+                InputSpacePoint[] couple = new InputSpacePoint[2];
+                couple[0]=in1;
+                couple[1]=in2;
+                couples.add(couple);
+
+//                System.out.format("Separator.createPointCouplesAxisParallel: p1: %s, p2:%s, p1-x:%.5f, p1-y:%.5f, p2-x:%.5f, p2-y: %.5f\n",
+//                        in1,in2,
+//                        in1.getValue("foobar"), in1.getValue(dim),
+//                        in2.getValue("foobar"), in2.getValue(dim));
+            }
+        }
+
+//        System.out.println("Separator.createPointCouplesAxisParallel "+couples.size());
+        return couples;
+    }
+
+
+    /**
+     * Creates a list that consists of InputSpacePoint couples. These couples determine the SplitLines to be tested
+     * @return
+     */
+    protected List<InputSpacePoint[]> createPointsCoupleList() {
+
+        return null;
+    }
+
 
     protected abstract double estimate(CandidateSolution pair);
 

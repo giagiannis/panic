@@ -20,6 +20,7 @@ package gr.ntua.ece.cslab.panic.core.fresh.tree.separators;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Class used to construct different separators.
@@ -27,7 +28,7 @@ import java.util.List;
  */
 public class SeparatorFactory {
 
-    public Separator create(String separatorType, DecisionTreeLeafNode node) {
+    public Separator create(String separatorType, DecisionTreeLeafNode node, Properties properties) {
         Separator separator;
         switch (separatorType) {
             case "variance":
@@ -39,6 +40,9 @@ public class SeparatorFactory {
             default:
                 separator = null;
                 break;
+        }
+        if(properties.containsKey("splits.axisparallel")) {
+            separator.setAxisParallelSplits(new Boolean(properties.getProperty("splits.axisparallel")));
         }
         return separator;
     }

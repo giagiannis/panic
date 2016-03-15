@@ -68,6 +68,5 @@ public class SystematicSamplerTest {
                 count++;
             }
         }
-        System.out.println(count);
     }
 }

@@ -44,11 +44,12 @@ public class DTAdaptive extends DTAlgorithm {
     public DTAdaptive(int deploymentBudget,
                       String samplerType,
                       MetricSource source,
-                      String separatorType,
+                      String separatorType, Properties separatorProperties,
                       String budgetType, Properties budgetProperties,
-                      String selectorType, Properties selectorProperties,
+//                      String selectorType, Properties selectorProperties,
                       String analyzerType, Properties analyzerProperties) {
-        super(deploymentBudget, samplerType, source, separatorType, budgetType, budgetProperties, selectorType, selectorProperties,
+        super(deploymentBudget, samplerType, source, separatorType, separatorProperties, budgetType, budgetProperties,
+//                selectorType, selectorProperties,
                 analyzerType, analyzerProperties);
         this.treePathsToIgnore = new HashSet<>();
     }
@@ -64,13 +65,14 @@ public class DTAdaptive extends DTAlgorithm {
         this.steps += 1;
         long start = System.currentTimeMillis();
 
-        int numberOfLeaves;
-        debugPrint(String.format("Step %d: Expanding tree (sample size: %d)...\t", this.steps, this.tree.getSamples().size()));
-        DecisionTree tree = this.expandAll(this.tree);
-        numberOfLeaves = tree.getLeaves().size();
-//        System.out.println("DTAdaptive.step");
-//        System.out.println("Number of leaves:\t"+numberOfLeaves);
-        debugPrint(String.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start));
+        DecisionTree tree;
+        if(this.tree.getSamples().size()>0) {
+            debugPrint(String.format("Step %d: Expanding tree (sample size: %d)...\t", this.steps, this.tree.getSamples().size()));
+            tree = this.expandAll(this.tree);
+            debugPrint(String.format("Done! [ %d ms ]\n", System.currentTimeMillis() - start));
+        } else {
+            tree = this.tree.clone();
+        }
 
         start = System.currentTimeMillis();
         debugPrint(String.format("Step %d: Creating budget object...\t\t", this.steps));
@@ -100,9 +102,6 @@ public class DTAdaptive extends DTAlgorithm {
     private void sampleLeaf(DecisionTreeLeafNode leaf, int budget) {
         SamplerFactory factory = new SamplerFactory();
         List<InputSpacePoint> forbiddenPoints = new LinkedList<>(this.source.unavailablePoints());
-//        System.err.println("DTAdaptive.sampleLeaf");
-//        System.err.println("Unavailable points:\t" + this.source.unavailablePoints().size());
-
         forbiddenPoints.addAll(this.tree.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toList()));
 
         Properties samplerProperties = new Properties();
@@ -133,8 +132,6 @@ public class DTAdaptive extends DTAlgorithm {
         }
         if (pointsReturned < budget) {
             this.treePathsToIgnore.add(leaf.treePath());
-//            System.out.println("DTAdaptive.sampleLeaf");
-//            System.out.println(this.treePathsToIgnore);
         }
     }
 

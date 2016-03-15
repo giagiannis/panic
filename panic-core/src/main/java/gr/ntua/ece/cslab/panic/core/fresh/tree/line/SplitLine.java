@@ -50,6 +50,10 @@ public class SplitLine {
     public SplitLine(InputSpacePoint p1, InputSpacePoint p2, String xDimensionLabel, String yDimensionLabel) {
         this.xDimensionLabel = xDimensionLabel;
         this.yDimensionLabel = yDimensionLabel;
+//        System.out.format("SplitLine.SplitLine: p1: %s, p2:%s, p1-x:%.5f, p1-y:%.5f, p2-x:%.5f, p2-y: %.5f\n", p1,p2,
+//                p1.getValue(xDimensionLabel), p1.getValue(yDimensionLabel),
+//                p2.getValue(xDimensionLabel), p2.getValue(yDimensionLabel));
+
         double dy = p1.getValue(yDimensionLabel) - p2.getValue(yDimensionLabel);
         double dx = p1.getValue(xDimensionLabel) - p2.getValue(xDimensionLabel);
         if(dx==0.0 && dy==0.0) {
@@ -108,9 +112,9 @@ public class SplitLine {
     @Override
     public String toString() {
         if (this.type.equals(Type.HORIZONTAL)) {
-            return String.format("%s = %.5f\n", yDimensionLabel, c);
+            return String.format("%s = %.5f", yDimensionLabel, c);
         } else if (this.type.equals(Type.VERTICAL)) {
-            return String.format("%s = %.5f\n", xDimensionLabel, c);
+            return String.format("%s = %.5f", xDimensionLabel, c);
         } else if (this.type.equals(Type.NORMAL)) {
             return String.format("%s = %.5f * %s + %.5f", yDimensionLabel, lambda, xDimensionLabel, c);
         }

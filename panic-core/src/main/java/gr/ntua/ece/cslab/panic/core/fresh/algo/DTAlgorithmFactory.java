@@ -51,17 +51,22 @@ public class DTAlgorithmFactory {
         MetricSource source = factory.create(properties.getProperty(CONF_METRICSOURCE_TYPE_KEY), msProps);
         source.configure();
         String separatorType = properties.getProperty(CONF_SEPARATOR_TYPE_KEY);
+        Properties separatorProperties = this.isolateProperties(properties, CONF_SEPARATOR_PREFIX);
+
         String budgetType = properties.getProperty(CONF_BUDGET_TYPE_KEY);
         Properties budgetProperties = this.isolateProperties(properties, CONF_BUDGET_PREFIX+"."+properties.getProperty(CONF_BUDGET_TYPE_KEY));
 
-        String selectorType = properties.getProperty(CONF_SELECTOR_TYPE_KEY);
-        Properties selectorProperties = this.isolateProperties(properties, CONF_SELECTOR_PREFIX+"."+properties.getProperty(CONF_SELECTOR_TYPE_KEY));
+//        String selectorType = properties.getProperty(CONF_SELECTOR_TYPE_KEY);
+//        Properties selectorProperties = this.isolateProperties(properties, CONF_SELECTOR_PREFIX+"."+properties.getProperty(CONF_SELECTOR_TYPE_KEY));
 
         String analyzerType = properties.getProperty(CONF_ANALYZER_TYPE_KEY);
         Properties analyzerProperties = this.isolateProperties(properties, CONF_ANALYZER_PREFIX+"."+properties.getProperty(CONF_ANALYZER_TYPE_KEY));
         switch (type) {
             case "dtadaptive":
-                algorithm = new DTAdaptive(deploymentBudget, samplerType, source,separatorType, budgetType, budgetProperties, selectorType, selectorProperties, analyzerType, analyzerProperties);
+                algorithm = new DTAdaptive(deploymentBudget, samplerType, source,
+                        separatorType, separatorProperties,
+                        budgetType, budgetProperties,
+                        analyzerType, analyzerProperties);
                 break;
             default:
                 break;

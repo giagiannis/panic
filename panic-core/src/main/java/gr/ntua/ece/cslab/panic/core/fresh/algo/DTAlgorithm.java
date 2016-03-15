@@ -48,15 +48,13 @@ public abstract class DTAlgorithm {
     protected final DeploymentSpace space;
     protected final MetricSource source;
     protected final String separatorType;
+    protected final Properties separatorProperties;
     protected DecisionTree bestTree;
-    protected final String selectorType;
-    protected final Properties selectorProperties;
     protected boolean onlineTraining;
 
     public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source,
-                       String separatorType,
+                       String separatorType, Properties separatorProperties,
                        String budgetType, Properties budgetProperties,
-                       String selectorType, Properties selectorProperties,
                        String analyzerType, Properties analyzerProperties) {
         this.deploymentBudget = deploymentBudget;
         this.samplerType = samplerType;
@@ -64,15 +62,10 @@ public abstract class DTAlgorithm {
         this.space = source.getDeploymentSpace();
         this.tree = new DecisionTree(this.space);
         this.separatorType = separatorType;
+        this.separatorProperties = separatorProperties;
 
         this.budgetType = budgetType;
         this.budgetProperties = budgetProperties;
-//        BudgetFactory factory = new BudgetFactory();
-//        this.budgetStrategy = factory.create(budgetType, this.tree, budgetProperties, deploymentBudget);
-//        this.budgetStrategy.configure();
-
-        this.selectorType = selectorType;
-        this.selectorProperties = selectorProperties;
         this.analyzerType = analyzerType;
         this.analyzerProperties = analyzerProperties;
     }
@@ -152,7 +145,7 @@ public abstract class DTAlgorithm {
             someoneReplaced = false;
             for (DecisionTreeLeafNode l : currentTree.getLeaves()) {
                 SeparatorFactory factory1 = new SeparatorFactory();
-                Separator sep = factory1.create(this.separatorType, l);
+                Separator sep = factory1.create(this.separatorType, l, this.separatorProperties);
                 sep.separate();
 
                 if (sep.getResult() != null) {
@@ -225,7 +218,7 @@ public abstract class DTAlgorithm {
         ReplacementCouples couples = new ReplacementCouples();
         for (DecisionTreeLeafNode leaf : tree.getLeaves()) {
             SeparatorFactory factory = new SeparatorFactory();
-            Separator separator = factory.create(this.separatorType, leaf);
+            Separator separator = factory.create(this.separatorType, leaf, this.separatorProperties);
             separator.separate();
             if (separator.getResult() != null) {
                 couples.addCouple(leaf, separator.getResult());
