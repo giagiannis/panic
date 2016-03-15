@@ -27,22 +27,8 @@ import java.util.*;
  * Created by Giannis Giannakopoulos on 2/26/16.
  */
 public class RandomSampler extends IndexSampler {
-    private Random random;
-    private List<Integer> leftIndices;
-
     public RandomSampler(DeploymentSpace deploymentSpace, int budget) {
-
-        super(deploymentSpace, budget, deploymentSpace.getRange().keySet().toArray(new String[deploymentSpace.getRange().size()]));
-        this.random = new Random();
-        this.leftIndices = new LinkedList<>();
-
-        int mul = 1;
-        for(String s:this.dimensionsOrder) {
-            mul*=this.deploymentSpace.getRange().get(s).size();
-        }
-        for(int i=0;i<mul;i++) {
-            this.leftIndices.add(i);
-        }
+        super(deploymentSpace, budget, deploymentSpace.getDimensionLabels());
     }
 
     @Override

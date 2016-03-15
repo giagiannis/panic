@@ -42,7 +42,7 @@ public class SystematicSamplerTest {
         TestUtils.FileReader reader = new TestUtils.FileReader();
         space = reader.getDeploymentSpace();
         int budget = 50;
-        String[] dimensionOrder = space.getRange().keySet().toArray(new String[space.getRange().size()]);
+//        String[] dimensionOrder = space.getDimensionLabels();
         this.forbiddenPoints = new LinkedList<>();
         RandomSampler sampler = new RandomSampler(reader.getDeploymentSpace(), budget);
         while (sampler.hasMore()) {
@@ -54,7 +54,7 @@ public class SystematicSamplerTest {
     @Test
     public void testNext() throws Exception {
         int budget = 100;
-        String[] dimensionOrder = space.getRange().keySet().toArray(new String[space.getRange().size()]);
+        String[] dimensionOrder = space.getDimensionLabels();
         this.sampler = new SystematicSampler(this.space, budget, dimensionOrder);
         this.sampler.setForbiddenPoints(this.forbiddenPoints);
         int count = 0;
@@ -68,5 +68,6 @@ public class SystematicSamplerTest {
                 count++;
             }
         }
+        System.out.println(count);
     }
 }

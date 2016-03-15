@@ -20,9 +20,7 @@ package gr.ntua.ece.cslab.panic.core.fresh.samplers;
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * This class provides methods necessary to map the InputSpacePoint objects into one dimension (indexed by an int).
@@ -33,31 +31,31 @@ public abstract class IndexSampler extends Sampler {
     protected final Random random;
     protected List<Integer> leftIndices;
 
+    private List<InputSpacePoint> orderedPoints;
+
+
     public IndexSampler(DeploymentSpace deploymentSpace, int budget, String[] dimensionsOrder) {
         super(deploymentSpace, budget);
+
         this.dimensionsOrder = dimensionsOrder;
         this.random = new Random();
         this.leftIndices = new LinkedList<>();
-        int mul = 1;
-        for(String s:this.dimensionsOrder) {
-            mul*=this.deploymentSpace.getRange().get(s).size();
-        }
-        for(int i=0;i<mul;i++) {
+
+        this.orderedPoints = new ArrayList<>(this.deploymentSpace.getPoints());
+        this.orderedPoints.sort((p1, p2) -> {
+            for(String s : dimensionsOrder) {
+                if(p1.getValue(s)< p2.getValue(s))
+                    return -1;
+                else if(p1.getValue(s) > p2.getValue(s))
+                    return 1;
+            }
+            return 0;
+        });
+        for(int i=0;i<this.orderedPoints.size();i++)
             this.leftIndices.add(i);
-        }
     }
 
     protected InputSpacePoint translate(int index) {
-        int identifier = index;
-        InputSpacePoint point = new InputSpacePoint();
-//        for(String key: this.dimensionsOrder) {
-        for(int i=this.dimensionsOrder.length-1;i>=0;i--) {
-            String key = this.dimensionsOrder[i];
-            List<Double> dimValues = this.deploymentSpace.getRange().get(key);
-            int mod = identifier % dimValues.size();
-            identifier /= dimValues.size();
-            point.addDimension(key, dimValues.get(mod));
-        }
-        return point;
+        return this.orderedPoints.get(index);
     }
 }

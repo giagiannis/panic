@@ -23,6 +23,7 @@ import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
 
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -56,8 +57,8 @@ public class TestUtils {
 
         public DeploymentSpace getDeploymentSpace() {
             if(this.space == null) {
-                this.space = new DeploymentSpace();
-                this.space.setRange(manager.getDimensionRanges());
+                this.space = new DeploymentSpace(new HashSet<>(manager.getInputSpacePoints()));
+//                this.space.setRange(manager.getDimensionRanges());
             }
             return this.space;
         }
