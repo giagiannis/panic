@@ -43,8 +43,12 @@ public class FileMetricSource extends MetricSource {
         for(OutputSpacePoint p : manager.getOutputSpacePoints()) {
             this.mapping.put(p.getInputSpacePoint(), p);
         }
-        this.deploymentSpace = new DeploymentSpace();
-        this.deploymentSpace.setRange(manager.getDimensionRanges());
+        Set<InputSpacePoint> unavailable = manager.getUnavailablePoints();
+        Set<InputSpacePoint> all = new HashSet<>(manager.getInputSpacePoints());
+        all.removeAll(unavailable);
+
+        this.deploymentSpace = new DeploymentSpace(all);
+//        this.deploymentSpace.setRange(manager.getDimensionRanges());
         this.unavailablePoints = manager.getUnavailablePoints();
     }
 

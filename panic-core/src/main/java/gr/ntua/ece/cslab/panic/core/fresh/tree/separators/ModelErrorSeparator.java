@@ -38,7 +38,7 @@ public class ModelErrorSeparator extends Separator{
 
     @Override
     protected double estimate(CandidateSolution pair) {
-        int pointsThreshold = this.original.getDeploymentSpace().getRange().size();
+        int pointsThreshold = this.original.getDeploymentSpace().getDimensionality();
         if(pair.getLeftList().size() <= pointsThreshold ||pair.getRightList().size()<= pointsThreshold)
             return Double.NEGATIVE_INFINITY;
 

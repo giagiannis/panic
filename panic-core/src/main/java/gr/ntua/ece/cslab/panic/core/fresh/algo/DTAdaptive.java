@@ -105,7 +105,6 @@ public class DTAdaptive extends DTAlgorithm {
 
         forbiddenPoints.addAll(this.tree.getSamples().stream().map(OutputSpacePoint::getInputSpacePoint).collect(Collectors.toList()));
 
-//         fixme: ggian hack
         Properties samplerProperties = new Properties();
         if(!this.analyzerType.equals("none") && leaf.getPoints().size()>0) {
             AnalyzerFactory factory1 = new AnalyzerFactory();
@@ -118,9 +117,7 @@ public class DTAdaptive extends DTAlgorithm {
                     sorted((a,b)-> -a.getValue().compareTo(b.getValue())).
                     map(a->a.getKey()).reduce((s, s2) -> s+","+s2).get();
             samplerProperties.setProperty("dimensions", dimensionOrder);
-//                            .toArray(new String[numberOfInputDimensions]);
         }
-        // fixme: end of ggian hack
 
         Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints, samplerProperties);
         HashSet<InputSpacePoint> forbiddenPointsSet = new HashSet<>(forbiddenPoints);

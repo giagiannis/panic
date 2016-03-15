@@ -25,8 +25,8 @@ import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
  */
 public class SplitLine {
 
-    private final String xDimensionsLabel;
-    private final String yDimensionsLabel;
+    private final String xDimensionLabel;
+    private final String yDimensionLabel;
     private Type type;
     private double lambda, c;
 
@@ -34,9 +34,22 @@ public class SplitLine {
         HORIZONTAL, VERTICAL, NORMAL
     }
 
+//    public SplitLine(Double x1, Double x2, Double y1, Double y2, String xDimensionLabel, String yDimensionLabel) {
+//        InputSpacePoint p1 = new InputSpacePoint();
+//        p1.addDimension(xDimensionLabel, x1);
+//        p1.addDimension(yDimensionLabel, y1);
+//
+//        InputSpacePoint p2 = new InputSpacePoint();
+//        p2.addDimension(xDimensionLabel, x2);
+//        p2.addDimension(yDimensionLabel, y2);
+//
+//
+//        this(p1,p2,xDimensionLabel, yDimensionLabel);
+//    }
+
     public SplitLine(InputSpacePoint p1, InputSpacePoint p2, String xDimensionLabel, String yDimensionLabel) {
-        this.xDimensionsLabel = xDimensionLabel;
-        this.yDimensionsLabel = yDimensionLabel;
+        this.xDimensionLabel = xDimensionLabel;
+        this.yDimensionLabel = yDimensionLabel;
         double dy = p1.getValue(yDimensionLabel) - p2.getValue(yDimensionLabel);
         double dx = p1.getValue(xDimensionLabel) - p2.getValue(xDimensionLabel);
         if(dx==0.0 && dy==0.0) {
@@ -60,16 +73,16 @@ public class SplitLine {
         double pointValueToCompare = 0;
         switch (this.type) {
             case HORIZONTAL:
-                pointValueToCompare = p.getValue(yDimensionsLabel);
+                pointValueToCompare = p.getValue(yDimensionLabel);
                 lineValueToCompare = this.c;
                 break;
             case VERTICAL:
-                pointValueToCompare = p.getValue(xDimensionsLabel);
+                pointValueToCompare = p.getValue(xDimensionLabel);
                 lineValueToCompare = this.c;
                 break;
             case NORMAL:
-                lineValueToCompare = lambda * p.getValue(xDimensionsLabel) + c;
-                pointValueToCompare = p.getValue(yDimensionsLabel);
+                lineValueToCompare = lambda * p.getValue(xDimensionLabel) + c;
+                pointValueToCompare = p.getValue(yDimensionLabel);
                 break;
         }
         if(pointValueToCompare > lineValueToCompare) {
@@ -81,14 +94,25 @@ public class SplitLine {
         }
     }
 
+    /**
+     * Method  alias to:
+     * this.comparePoint(point)==-1 || this.comparePoint(point)==0
+     * @param point
+     * @return
+     */
+    public boolean lessOrEqual(InputSpacePoint point) {
+        int compValue = this.comparePoint(point);
+        return ((compValue==-1) || (compValue==0));
+    }
+
     @Override
     public String toString() {
         if (this.type.equals(Type.HORIZONTAL)) {
-            return String.format("y = %.5f\n", c);
+            return String.format("%s = %.5f\n", yDimensionLabel, c);
         } else if (this.type.equals(Type.VERTICAL)) {
-            return String.format("x = %.5f\n", c);
+            return String.format("%s = %.5f\n", xDimensionLabel, c);
         } else if (this.type.equals(Type.NORMAL)) {
-            return String.format("y = %.5f * x + %.5f", lambda, c);
+            return String.format("%s = %.5f * %s + %.5f", yDimensionLabel, lambda, xDimensionLabel, c);
         }
         return super.toString();
     }

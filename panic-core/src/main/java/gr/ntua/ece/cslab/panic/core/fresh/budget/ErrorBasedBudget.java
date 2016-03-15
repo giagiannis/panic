@@ -80,8 +80,8 @@ public class ErrorBasedBudget extends Budget {
 
     private double region(DecisionTreeLeafNode leaf) {
         double mul = 1.0;
-        for(String s:leaf.getDeploymentSpace().getRange().keySet()) {
-            mul*=leaf.getDeploymentSpace().getRange().get(s).size();
+        for(String s:leaf.getDeploymentSpace().getDimensionLabels()) {
+            mul*=leaf.getDeploymentSpace().getSize();
         }
         return mul;
     }

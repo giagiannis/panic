@@ -17,8 +17,10 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.tree.separators;
 
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.TestUtils;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.line.SplitLine;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,21 +45,26 @@ public class CandidatePairTest {
         Random random = new Random();
         OutputSpacePoint o = points.get(random.nextInt(points.size()));
         List<String> dimensions = new LinkedList<>(o.getInputSpacePoint().getKeysAsCollection());
-        String randomDimension = dimensions.get(random.nextInt(dimensions.size()));
-        Double randomValue = o.getInputSpacePoint().getValue(randomDimension);
-        pair = new Separator.CandidateSolution(points, randomDimension, randomValue, new TestUtils.FileReader().getDeploymentSpace());
+        String randomDimension1 = dimensions.get(random.nextInt(dimensions.size()));
+        String randomDimension2 = dimensions.get(random.nextInt(dimensions.size()));
+        while (randomDimension1.equals(randomDimension2))
+            randomDimension2 = dimensions.get(random.nextInt(dimensions.size()));
+        InputSpacePoint p1 = points.get(random.nextInt(points.size())).getInputSpacePoint();
+        InputSpacePoint p2 = points.get(random.nextInt(points.size())).getInputSpacePoint();
+        while (p1.equals(p2)) {
+            p2 = points.get(random.nextInt(points.size())).getInputSpacePoint();
+        }
+        pair = new Separator.CandidateSolution(points, new TestUtils.FileReader().getDeploymentSpace(), new SplitLine(p1, p2, randomDimension1, randomDimension2));
     }
 
     @Test
     public void testValidity() throws Exception {
         for(OutputSpacePoint p : pair.getLeftList()) {
-            double pointValue = p.getInputSpacePoint().getValue(pair.getSeparationDimension());
-            assertTrue(pointValue <= pair.getSeparationValue());
+            assertTrue(pair.getSplitLine().lessOrEqual(p.getInputSpacePoint()));
         }
 
         for(OutputSpacePoint p : pair.getRightList()) {
-            double pointValue = p.getInputSpacePoint().getValue(pair.getSeparationDimension());
-            assertTrue(pointValue > pair.getSeparationValue());
+            assertTrue(!pair.getSplitLine().lessOrEqual(p.getInputSpacePoint()));
         }
     }
 }

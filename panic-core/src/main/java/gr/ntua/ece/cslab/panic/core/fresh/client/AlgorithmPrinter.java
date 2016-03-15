@@ -172,29 +172,30 @@ public class AlgorithmPrinter {
         predictedFile.close();
 
 
-        HashMap<String, Double> errorPerLeaf = Metrics.getMSEPerLeaf(bestTree, manager.getOutputSpacePoints());
-        for(DecisionTreeLeafNode l :bestTree.getLeaves()) {
-//            System.out.println(l.getDeploymentSpace());
-            double minX1=1.0, maxX1=0.0;
-            for(Double d: l.getDeploymentSpace().getRange().get("x1")) {
-                minX1=(minX1>d?d:minX1);
-                maxX1=(maxX1<d?d:maxX1);
-            }
-            double minX2=1.0, maxX2=0.0;
-            for(Double d: l.getDeploymentSpace().getRange().get("x2")) {
-                minX2=(minX2>d?d:minX2);
-                maxX2=(maxX2<d?d:maxX2);
-            }
-            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      minX2,      0.0,            maxX2-minX2);
-            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", maxX1,      minX2,      0.0,            maxX2-minX2);
-            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      minX2,      maxX1-minX1,    0.0);
-            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      maxX2,      maxX1-minX1,    0.0);
-
-
-            errorsPerLeafStream.format("%.3f\t%.3f\t%.5f\n", (minX1+maxX1)/2.0, (minX2+maxX2)/2.0, errorPerLeaf.get(l.getId()));
-//            System.out.format("From %3f, %3f to %3f, %3f\n", minX1, minX2, maxX1, maxX2);
-        }
-        cuts.close();
-        errorsPerLeafStream.close();;
+        // FIXME: deployment spaces are no more orthogonal - find a way to print cuts and errors
+//        HashMap<String, Double> errorPerLeaf = Metrics.getMSEPerLeaf(bestTree, manager.getOutputSpacePoints());
+//        for(DecisionTreeLeafNode l :bestTree.getLeaves()) {
+////            System.out.println(l.getDeploymentSpace());
+//            double minX1=1.0, maxX1=0.0;
+//            for(Double d: l.getDeploymentSpace().getRange().get("x1")) {
+//                minX1=(minX1>d?d:minX1);
+//                maxX1=(maxX1<d?d:maxX1);
+//            }
+//            double minX2=1.0, maxX2=0.0;
+//            for(Double d: l.getDeploymentSpace().getRange().get("x2")) {
+//                minX2=(minX2>d?d:minX2);
+//                maxX2=(maxX2<d?d:maxX2);
+//            }
+//            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      minX2,      0.0,            maxX2-minX2);
+//            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", maxX1,      minX2,      0.0,            maxX2-minX2);
+//            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      minX2,      maxX1-minX1,    0.0);
+//            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1,      maxX2,      maxX1-minX1,    0.0);
+//
+//
+//            errorsPerLeafStream.format("%.3f\t%.3f\t%.5f\n", (minX1+maxX1)/2.0, (minX2+maxX2)/2.0, errorPerLeaf.get(l.getId()));
+////            System.out.format("From %3f, %3f to %3f, %3f\n", minX1, minX2, maxX1, maxX2);
+//        }
+//        cuts.close();
+//        errorsPerLeafStream.close();;
     }
 }

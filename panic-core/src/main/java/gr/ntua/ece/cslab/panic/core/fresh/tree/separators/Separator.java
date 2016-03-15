@@ -17,14 +17,17 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.tree.separators;
 
+import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
 import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.line.SplitLine;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeTestNode;
 import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Abstract class dictating the API of the Separator classes and holding the implementation
@@ -58,11 +61,23 @@ public abstract class Separator {
      *
      */
     public void separate() {
-        // get possible values of separation
+        // get possible values of separation - this returns a superset of the space of the points
         HashMap<String,Set<Double>> possibleValues = this.possibleValues(this.original.getPoints());
 
+        // find the best two dimensions if axis parallel splits are used
+        String[] dominantDimensions = this.findTwoBestDimensions(possibleValues);
+
+        // find the best line for the previous two dimensions
+        HashMap<String, Set<Double>> domDimensionValues = new HashMap<>();
+        domDimensionValues.put(dominantDimensions[0], possibleValues.get(dominantDimensions[0]));
+        domDimensionValues.put(dominantDimensions[1], possibleValues.get(dominantDimensions[1]));
+        CandidateSolution best = this.getBestSolution(domDimensionValues);
+        System.out.println(best);
+
+
+
         // try all the possible values
-        CandidateSolution best = this.findBestCandidatePair(possibleValues);
+//        CandidateSolution best = this .findBestCandidatePair(possibleValues);
 
 
 //         setting result
@@ -76,14 +91,13 @@ public abstract class Separator {
                 System.err.println("Separator.separate: xontri malakia edw mesa!");
                 System.exit(1);
             }
-            // FIXME: have to update the separator base class to implement the new Decision Tree logic
+
             if(mseSum >= avgMSE) {
-//                this.result = new DecisionTreeTestNode(
-//                        best.getSeparationDimension(),
-//                        best.getSeparationValue(),
-//                        best.getOriginalDS(),
-//                        new DecisionTreeLeafNode(best.getLeftList(),best.getLeftDS()),
-//                        new DecisionTreeLeafNode(best.getRightList(), best.getRightDS()),
+                this.result = new DecisionTreeTestNode(
+                        best.getSplitLine(),
+                        best.getOriginalDS(),
+                        new DecisionTreeLeafNode(best.getLeftList(),best.getLeftDS()),
+                        new DecisionTreeLeafNode(best.getRightList(), best.getRightDS()));
 //                        this.original.getId());
             } else {
 //                System.err.println("Separator.separate");
@@ -92,44 +106,120 @@ public abstract class Separator {
         }
     }
 
+    /**
+     * Method that returns a list containing the names of the two most significant dimensions
+     * of the data points.
+     *
+     * @param possibleValues
+     * @return
+     */
+    protected String[] findTwoBestDimensions(HashMap<String,Set<Double>> possibleValues) {
+        List<Map.Entry<String, Double>> dimensionScores = new LinkedList<>();
+
+        for (String candidateDimension : possibleValues.keySet()) {
+            for (Double candidateValue : possibleValues.get(candidateDimension)) {
+                CandidateSolution candidatePair;
+
+                InputSpacePoint p1 = new InputSpacePoint();
+                p1.addDimension(candidateDimension, candidateValue);
+                p1.addDimension("y", 0.0);
+
+                InputSpacePoint p2 = new InputSpacePoint();
+                p2.addDimension(candidateDimension, candidateValue);
+                p2.addDimension("y", 1.0);
+
+                SplitLine line = new SplitLine(p1,p2,candidateDimension, "y");
+
+                candidatePair = new CandidateSolution(this.original.getPoints(), this.original.getDeploymentSpace(), line);
+                double estimation = estimate(candidatePair);
+                if (this.solutionIsAccepted(candidatePair)) {
+                    dimensionScores.add(new AbstractMap.SimpleEntry<>(candidateDimension, estimation));
+                }
+            }
+        }
+        dimensionScores.sort((e1, e2) -> -e1.getValue().compareTo(e2.getValue()));
+        String label1 = "", label2="";
+        while (!dimensionScores.isEmpty()) {
+            Map.Entry current = dimensionScores.remove(0);
+            if(label1.equals("")) {
+                label1 = (String) current.getKey();
+            } else if(label2.equals("") && !((String)current.getKey()).equals(label1)) {
+                label2 = (String) current.getKey();
+            } else {
+                break;
+            }
+        }
+        String[] result = new String[2];
+        result[0] = label1;
+        result[1] = label2;
+        return result;
+    }
+
+    protected CandidateSolution getBestSolution(HashMap<String, Set<Double>> values) {
+        List<InputSpacePoint> points = new LinkedList<>();
+        for(String s : values.keySet()) {
+            if(!points.isEmpty()) {
+                List<InputSpacePoint> newPoints = new LinkedList<>();
+                for(Double d : values.get(s)) {
+                    for(InputSpacePoint old : points) {
+                        InputSpacePoint clone = old.getClone();
+                        clone.addDimension(s,d);
+                        newPoints.add(clone);
+                    }
+                }
+                points = newPoints;
+            } else {
+                for(Double d : values.get(s)) {
+                    InputSpacePoint p = new InputSpacePoint();
+                    p.addDimension(s, d);
+                    points.add(p);
+                }
+            }
+        }
+        String[] dimensionLabels = points.get(0).getKeysAsCollection().toArray(new String[2]);
+        Set<String> serializedLines = new HashSet<>();
+        double bestScore = Double.NEGATIVE_INFINITY;
+        CandidateSolution best = null;
+        for(InputSpacePoint p1 : points) {
+            for(InputSpacePoint p2 : points) {
+                if(!p1.equals(p2)) {
+                    SplitLine line = new SplitLine(p1, p2, dimensionLabels[0], dimensionLabels[1]);
+                    if(!serializedLines.contains(line.toString())) {
+                        serializedLines.add(line.toString());
+
+                        CandidateSolution solution = new CandidateSolution(this.original.getPoints(), this.original.getDeploymentSpace(), line);
+                        double estimation = this.estimate(solution);
+                        if(bestScore <= estimation && this.solutionIsAccepted(solution)) {
+                            best = solution;
+                            bestScore = estimation;
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("Lines checked: "+serializedLines.size());
+        return best;
+    }
+
     protected abstract double estimate(CandidateSolution pair);
 
     protected static class CandidateSolution {
         private final List<OutputSpacePoint> original, leftList, rightList;
         private final DeploymentSpace originalDS;
         private final DeploymentSpace leftDS, rightDS;
-        private final String separationDimension;
-        private final double separationValue;
+        private final SplitLine splitLine;
         private double value;
-        public CandidateSolution(List<OutputSpacePoint> original, String separationDimension, double separationValue, DeploymentSpace space) {
+
+        public CandidateSolution(List<OutputSpacePoint> original, DeploymentSpace space, SplitLine splitLine) {
             this.original = original;
-            this.leftList = new LinkedList<>();
-            this.rightList = new LinkedList<>();
-            this.separationDimension = separationDimension;
-            this.separationValue = separationValue;
             this.originalDS = space;
+            this.splitLine = splitLine;
 
-            for (OutputSpacePoint o : original) {
-                if (o.getInputSpacePoint().getValue(separationDimension) <= separationValue) {
-                    this.leftList.add(o);
-                } else {
-                    this.rightList.add(o);
-                }
-            }
+            this.leftList = original.parallelStream().filter(a->this.splitLine.lessOrEqual(a.getInputSpacePoint())).collect(Collectors.toList());
+            this.rightList= original.parallelStream().filter(a->!this.splitLine.lessOrEqual(a.getInputSpacePoint())).collect(Collectors.toList());
 
-            // separate deployment spaces as well
-            LinkedList<Double> leftL = new LinkedList<>(), rightL = new LinkedList<>();
-            for(Double d:this.originalDS.getRange().get(this.separationDimension)) {
-                if(d <= separationValue)
-                    leftL.add(d);
-                else
-                    rightL.add(d);
-            }
-            this.leftDS = this.originalDS.clone();
-            this.leftDS.getRange().put(this.separationDimension, leftL);
-            this.rightDS = this.originalDS.clone();
-            this.rightDS.getRange().put(this.separationDimension, rightL);
-
+            this.leftDS = new DeploymentSpace(this.originalDS.getPoints().parallelStream().filter(a->this.getSplitLine().lessOrEqual(a)).collect(Collectors.toSet()));
+            this.rightDS = new DeploymentSpace(this.originalDS.getPoints().parallelStream().filter(a->!this.getSplitLine().lessOrEqual(a)).collect(Collectors.toSet()));
         }
 
         public List<OutputSpacePoint> getLeftList() {
@@ -144,17 +234,10 @@ public abstract class Separator {
             return original;
         }
 
-        public String getSeparationDimension() {
-            return separationDimension;
-        }
-
-        public double getSeparationValue() {
-            return separationValue;
-        }
-
         public DeploymentSpace getOriginalDS() {
             return originalDS;
         }
+
 
         public DeploymentSpace getLeftDS() {
             return leftDS;
@@ -162,6 +245,10 @@ public abstract class Separator {
 
         public DeploymentSpace getRightDS() {
             return rightDS;
+        }
+
+        public SplitLine getSplitLine() {
+            return splitLine;
         }
 
         public double getValue() {
@@ -174,7 +261,7 @@ public abstract class Separator {
 
         @Override
         public String toString() {
-            return String.format("(%s, %.5f)", this.separationDimension, this.separationValue);
+            return String.format("(%s)", this.splitLine);
         }
     }
 
@@ -191,33 +278,9 @@ public abstract class Separator {
         return possibleValues;
     }
 
-    /**
-     * The pair that maximizes the estimate function is chosen.
-     * @param possibleValues
-     * @return
-     */
-    protected CandidateSolution findBestCandidatePair(HashMap<String,Set<Double>> possibleValues) {
-        double maxEstimation = Double.NEGATIVE_INFINITY;
-        CandidateSolution best = null;
-        for (String candidateDimension : possibleValues.keySet()) {
-            for (Double candidateValue : possibleValues.get(candidateDimension)) {
-                CandidateSolution candidatePair;
-                candidatePair = new CandidateSolution(this.original.getPoints(), candidateDimension, candidateValue, this.original.getDeploymentSpace());
-                double estimation = estimate(candidatePair);
-                candidatePair.setValue(estimation);
-                if (estimation > maxEstimation && this.solutionIsAccepted(candidatePair)) {
-                    maxEstimation = estimation;
-                    best = candidatePair;
-                }
-            }
-        }
-        return best;
-    }
-
     protected boolean solutionIsAccepted(CandidateSolution solution) {
-//        System.out.format("\t%s: %.5f, %d, %d\n",this.getClass().toString(), solution.getValue(), solution.getRightList().size(), solution.getLeftList().size());
-        boolean accepted= solution.getLeftList().size()>solution.getOriginalDS().getRange().size();
-        accepted &= solution.getRightList().size()>solution.getOriginalDS().getRange().size();
+        boolean accepted= solution.getLeftList().size()>solution.getOriginalDS().getDimensionality();
+        accepted &= solution.getRightList().size()>solution.getOriginalDS().getDimensionality();
         return accepted;
     }
 }

@@ -19,57 +19,49 @@ package gr.ntua.ece.cslab.panic.core.fresh.structs;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Deployment space object, representing the deprecated "ranges" object
  * Created by Giannis Giannakopoulos on 2/15/16.
  */
 public class DeploymentSpace {
+//    private HashMap<String, List<Double>> range;
+    private final Set<InputSpacePoint> points;
+    private final String[] dimensionLabels;
+    private final int dimensionality;
 
-    private HashMap<String, List<Double>> range;
-
-    public DeploymentSpace() {
-        this.range = new HashMap<>();
+    public DeploymentSpace(Set<InputSpacePoint> points) {
+        this.points = points;
+        Collection<String> keys = this.points.iterator().next().getKeysAsCollection();
+        this.dimensionLabels = keys.toArray(new String[keys.size()]);
+        this.dimensionality = this.dimensionLabels.length;
     }
 
-    public void setRange(HashMap<String, List<Double>> range) {
-        this.range = range;
+    public String[] getDimensionLabels() {
+        return dimensionLabels;
     }
 
-    public HashMap<String, List<Double>> getRange() {
-        return range;
+    public int getDimensionality() {
+        return dimensionality;
+    }
+
+    public int getSize() {
+        return this.points.size();
+    }
+
+    public Set<InputSpacePoint> getPoints() {
+        return points;
     }
 
     public DeploymentSpace clone() {
-        HashMap<String, List<Double>> newRegion = new HashMap<>();
-        for(String s: this.range.keySet()) {
-            newRegion.put(s, new LinkedList<>());
-            for(Double v:this.range.get(s)) {
-                newRegion.get(s).add(v);
-            }
-        }
-
-        DeploymentSpace newD = new DeploymentSpace();
-        newD.setRange(newRegion);
-        return newD;
+        Set<InputSpacePoint> points = new HashSet<>();
+        for(InputSpacePoint i : this.points)
+            points.add(i.getClone());
+        return new DeploymentSpace(points);
     }
 
     public boolean contains(InputSpacePoint point) {
-        for(String s : point.getKeysAsCollection()) {
-            boolean valueFound = false;
-            for(Double d : this.getRange().get(s)) {
-                valueFound = valueFound || (d.equals(point.getValue(s)));
-            }
-            if(!valueFound)
-                return false;
-        }
-        return true;
-    }
-    @Override
-    public String toString() {
-        return this.range.toString();
+        return this.points.contains(point);
     }
 }
