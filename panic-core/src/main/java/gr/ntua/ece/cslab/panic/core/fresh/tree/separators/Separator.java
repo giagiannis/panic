@@ -267,15 +267,9 @@ public abstract class Separator {
                 couple[0]=in1;
                 couple[1]=in2;
                 couples.add(couple);
-
-//                System.out.format("Separator.createPointCouplesAxisParallel: p1: %s, p2:%s, p1-x:%.5f, p1-y:%.5f, p2-x:%.5f, p2-y: %.5f\n",
-//                        in1,in2,
-//                        in1.getValue("foobar"), in1.getValue(dim),
-//                        in2.getValue("foobar"), in2.getValue(dim));
             }
         }
 
-//        System.out.println("Separator.createPointCouplesAxisParallel "+couples.size());
         return couples;
     }
 

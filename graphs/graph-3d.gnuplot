@@ -5,6 +5,8 @@ if (!exists("actual") && !exists("predicted")) \
 	print "Add: -e 'actual=<>;predicted=<>;sample=<>;' to draw";\
         exit(0)
 
+#set terminal canvas rounded size 1024,768 enhanced
+#set output "canvas.html"
 
 #print("Output: ".outfile)
 

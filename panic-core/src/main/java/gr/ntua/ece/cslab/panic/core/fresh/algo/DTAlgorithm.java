@@ -140,10 +140,23 @@ public abstract class DTAlgorithm {
         double bestScore = DTAlgorithm.meanSquareError(currentTree);
 
         boolean someoneReplaced = true;
+        Set<String> leafIdsToIgnore = new HashSet<>();
         while (someoneReplaced) {
             ReplacementCouples couples = new ReplacementCouples();
-            someoneReplaced = false;
-            for (DecisionTreeLeafNode l : currentTree.getLeaves()) {
+//            someoneReplaced = false;
+            List<DecisionTreeLeafNode> leaves = currentTree.getLeaves();
+            leaves.sort((a,b)->{
+                Double err1 = CrossValidation.meanSquareError(LinearRegression.class,a.getPoints());
+                Double err2 = CrossValidation.meanSquareError(LinearRegression.class,b.getPoints());
+                return -err1.compareTo(err2);
+            });
+            while (!leaves.isEmpty() && leafIdsToIgnore.contains(leaves.get(0).getId()))
+                leaves.remove(0);
+            if(leaves.isEmpty())
+                break;
+            DecisionTreeLeafNode l = leaves.get(0);
+//            System.out.println("Expanding node "+l.getId());
+//            for (DecisionTreeLeafNode l : currentTree.getLeaves()) {
                 SeparatorFactory factory1 = new SeparatorFactory();
                 Separator sep = factory1.create(this.separatorType, l, this.separatorProperties);
                 sep.separate();
@@ -151,8 +164,10 @@ public abstract class DTAlgorithm {
                 if (sep.getResult() != null) {
                     couples.addCouple(l, sep.getResult());
                     someoneReplaced = true;
+                } else {
+                    leafIdsToIgnore.add(l.getId());
                 }
-            }
+//            }
             for (DecisionTreeNode n : couples.getOriginalNodes()) {
                 currentTree.replaceNode(n, couples.getNode(n));
             }

@@ -89,9 +89,11 @@ public class SplitLine {
                 pointValueToCompare = p.getValue(yDimensionLabel);
                 break;
         }
-        if(pointValueToCompare > lineValueToCompare) {
+        double epsilon = 0.03;
+        double diff = pointValueToCompare - lineValueToCompare;
+        if(diff > epsilon) {
             return 1;
-        } else if(pointValueToCompare < lineValueToCompare) {
+        } else if(diff < -epsilon) {
             return -1;
         } else {
             return 0;
@@ -109,6 +111,45 @@ public class SplitLine {
         return ((compValue==-1) || (compValue==0));
     }
 
+    public Double getValue(String label, double value) {
+        if(label.equals(xDimensionLabel)) {
+            if(this.type.equals(Type.HORIZONTAL)) {
+                return this.c;
+            } else if(this.type.equals(Type.VERTICAL)) {
+                return null;
+            } else {
+                return this.lambda*value+this.c;
+            }
+        } else if(label.equals(yDimensionLabel)){
+            if(this.type.equals(Type.HORIZONTAL)) {
+                return null;
+            } else if(this.type.equals(Type.VERTICAL)) {
+                return this.c;
+            } else {
+                return (value - this.c)/this.lambda;
+            }
+        }
+
+        return null;
+
+    }
+
+    public Double distance(InputSpacePoint point) {
+        Double distance = 0.0;
+        Double pointValue, lineValue;
+        if(this.type.equals(Type.HORIZONTAL)) {
+            pointValue = point.getValue(this.yDimensionLabel);
+            lineValue = this.c;
+        } else if(this.type.equals(Type.VERTICAL)) {
+            pointValue = point.getValue(this.xDimensionLabel);
+            lineValue = this.c;
+        } else {
+            pointValue = point.getValue(this.yDimensionLabel);
+            lineValue = this.lambda*point.getValue(this.xDimensionLabel) + this.c;
+        }
+
+        return Math.abs(pointValue - lineValue);
+    }
     @Override
     public String toString() {
         if (this.type.equals(Type.HORIZONTAL)) {

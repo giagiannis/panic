@@ -43,8 +43,8 @@ public class ModelErrorSeparator extends Separator{
             return Double.NEGATIVE_INFINITY;
 
         double mse = 0.0;
-        mse += CrossValidation.meanSquareError(LinearRegression.class, pair.getLeftList());
-        mse += CrossValidation.meanSquareError(LinearRegression.class, pair.getRightList());
+        mse += pair.getLeftList().size()*CrossValidation.meanSquareError(LinearRegression.class, pair.getLeftList());
+        mse += pair.getRightList().size()*CrossValidation.meanSquareError(LinearRegression.class, pair.getRightList());
         return -mse;
     }
 }
