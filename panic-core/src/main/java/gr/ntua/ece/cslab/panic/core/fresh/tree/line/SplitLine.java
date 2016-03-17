@@ -73,8 +73,8 @@ public class SplitLine {
     }
 
     public int comparePoint(InputSpacePoint p) {
-        double lineValueToCompare = 0;
-        double pointValueToCompare = 0;
+        Double lineValueToCompare = 0.0;
+        Double pointValueToCompare = 0.0;
         switch (this.type) {
             case HORIZONTAL:
                 pointValueToCompare = p.getValue(yDimensionLabel);
@@ -89,15 +89,18 @@ public class SplitLine {
                 pointValueToCompare = p.getValue(yDimensionLabel);
                 break;
         }
-        double epsilon = 0.03;
-        double diff = pointValueToCompare - lineValueToCompare;
-        if(diff > epsilon) {
-            return 1;
-        } else if(diff < -epsilon) {
-            return -1;
-        } else {
-            return 0;
-        }
+//        double epsilon = 0.03;
+//        double diff = (pointValueToCompare - lineValueToCompare);
+////        /(Math.abs(pointValueToCompare)>Math.abs(lineValueToCompare)?Math.abs(pointValueToCompare):Math.abs(lineValueToCompare));
+//        if(diff > epsilon) {
+//            return 1;
+//        } else if(diff < -epsilon) {
+//            return -1;
+//        } else {
+//            return 0;
+//        }
+
+        return pointValueToCompare.compareTo(lineValueToCompare);
     }
 
     /**
@@ -134,22 +137,23 @@ public class SplitLine {
 
     }
 
-    public Double distance(InputSpacePoint point) {
-        Double distance = 0.0;
-        Double pointValue, lineValue;
-        if(this.type.equals(Type.HORIZONTAL)) {
-            pointValue = point.getValue(this.yDimensionLabel);
-            lineValue = this.c;
-        } else if(this.type.equals(Type.VERTICAL)) {
-            pointValue = point.getValue(this.xDimensionLabel);
-            lineValue = this.c;
-        } else {
-            pointValue = point.getValue(this.yDimensionLabel);
-            lineValue = this.lambda*point.getValue(this.xDimensionLabel) + this.c;
-        }
+//    public Double distance(InputSpacePoint point) {
+//        Double distance = 0.0;
+//        Double pointValue, lineValue;
+//        if(this.type.equals(Type.HORIZONTAL)) {
+//            pointValue = point.getValue(this.yDimensionLabel);
+//            lineValue = this.c;
+//        } else if(this.type.equals(Type.VERTICAL)) {
+//            pointValue = point.getValue(this.xDimensionLabel);
+//            lineValue = this.c;
+//        } else {
+//            pointValue = point.getValue(this.yDimensionLabel);
+//            lineValue = this.lambda*point.getValue(this.xDimensionLabel) + this.c;
+//        }
+//
+//        return Math.abs(pointValue - lineValue);
+//    }
 
-        return Math.abs(pointValue - lineValue);
-    }
     @Override
     public String toString() {
         if (this.type.equals(Type.HORIZONTAL)) {
@@ -160,5 +164,32 @@ public class SplitLine {
             return String.format("%s = %.5f * %s + %.5f", yDimensionLabel, lambda, xDimensionLabel, c);
         }
         return super.toString();
+    }
+
+
+    public static int fuzzyCompare(SplitLine line, InputSpacePoint p, Double epsilon) {
+            Double lineValueToCompare = 0.0;
+            Double pointValueToCompare = 0.0;
+            switch (line.type) {
+                case HORIZONTAL:
+                    pointValueToCompare = p.getValue(line.yDimensionLabel);
+                    lineValueToCompare = line.c;
+                    return pointValueToCompare.compareTo(lineValueToCompare);
+                case VERTICAL:
+                    pointValueToCompare = p.getValue(line.xDimensionLabel);
+                    lineValueToCompare = line.c;
+                    return pointValueToCompare.compareTo(lineValueToCompare);
+                case NORMAL:
+                    lineValueToCompare = line.lambda * p.getValue(line.xDimensionLabel) + line.c;
+                    pointValueToCompare = p.getValue(line.yDimensionLabel);
+                    Double d = Math.abs(line.lambda * p.getValue(line.xDimensionLabel) - p.getValue(line.yDimensionLabel) + line.c)
+                            /Math.sqrt(line.lambda*line.lambda + 1);
+                    if(d.compareTo(epsilon)==1) { //distance is greater than epsilon
+                        return pointValueToCompare.compareTo(lineValueToCompare);
+                    } else {
+                        return 0;
+                    }
+            }
+        return 0;
     }
 }

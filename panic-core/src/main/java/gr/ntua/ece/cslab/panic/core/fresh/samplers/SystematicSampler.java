@@ -50,8 +50,8 @@ public class SystematicSampler extends IndexSampler {
                 indicesToRemove.add(this.leftIndices.get(i));
             }
         }
-        List<Integer> leftIndicesNew = this.leftIndices.stream().filter(index -> !indicesToRemove.contains(index)).collect(Collectors.toList());
-        this.leftIndices = leftIndicesNew;
+
+        this.leftIndices = this.leftIndices.stream().filter(index -> !indicesToRemove.contains(index)).collect(Collectors.toList());
 
         pivot = (this.leftIndices.size()*1.0)/(this.budget);
         pivot = (pivot<1.0?1.0:pivot);

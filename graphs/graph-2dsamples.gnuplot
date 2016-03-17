@@ -30,8 +30,8 @@ set output tmpfile
 #set palette grey
 firstrow = system('head -1 '.data)
 
-set xlabel "x"
-set ylabel "y"
+set xlabel "x1"
+set ylabel "x2"
 set grid
 unset key
 plot data w image t col, sample u 1:2 w p lc rgb "blue" ps 1 pt 5 t "Samples", \

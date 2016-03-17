@@ -169,6 +169,6 @@ public class EntryPoint {
     }
 
     private static void printVariable(PrintStream out, List<Double> metric) {
-        out.format("%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t", mean(metric), variance(metric), percentile(metric, 25), percentile(metric, 50), percentile(metric, 75), percentile(metric, 100));
+        out.format("%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t", mean(metric), variance(metric), percentile(metric, 1), percentile(metric, 25), percentile(metric, 50), percentile(metric, 75), percentile(metric, 100));
     }
 }

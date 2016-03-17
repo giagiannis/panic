@@ -193,7 +193,7 @@ public class AlgorithmPrinter {
 
             for(SplitLine s : borderLines) {
                 for(InputSpacePoint p : leaf.getDeploymentSpace().getPoints()) {
-                    if(s.comparePoint(p)==0) {
+                    if(SplitLine.fuzzyCompare(s, p, 0.02)==0) {
                         cuts.format("%.5f\t%.5f\n", p.getValue("x1"), p.getValue("x2"));
                     }
                 }

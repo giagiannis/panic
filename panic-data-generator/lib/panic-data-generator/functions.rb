@@ -127,6 +127,21 @@ module Panic
 				return  Math.log(sum)
 			end
 		end
+		class AbsFunction < Function
+			def initialize coefficients
+				super()
+				@coefficients = coefficients
+			end
+			def evaluate_expression vector
+				sum0 = 0.0
+				vector.length.times{ |index|
+					sum0+=(@coefficients[index]*(vector[index])-0.5)
+				}
+
+				return sum0.abs
+			end
+		end
+
 
 		class MexicanHatFunction < Function
 			def initialize coefficients
@@ -152,13 +167,52 @@ module Panic
 				sum0 = 0
 				sum1 = 0
 				vector.length.times{ |index|
-					sum0=@coefficients[index]*(vector[index])
+					sum0+=@coefficients[index]*(vector[index])
 					sum1+=vector[index]
 				}
 				return Math::cos(sum0)*Math::exp(sum1)
 			end
 		end
 
+		class Comp2Function < Function
+			def initialize coefficients
+				super()
+				@coefficients = coefficients
+			end
+			def evaluate_expression vector
+				sum0 = 0.0
+				vector.length.times{ |index|
+					sum0+=(@coefficients[index]*(vector[index])-0.5)
+				}
+
+				return Math::exp(sum0.abs)-1.0
+			end
+		end
+		class Comp3Function < Function
+			def initialize coefficients
+				super()
+				@coefficients = coefficients
+				@offsets = []
+				@coefficients.length.times { |index|
+					@offsets[index]=rand
+				}
+
+			end
+			def evaluate_expression vector
+				sum0 = 0.0
+				vector.length.times{ |index|
+					sum0+=(@coefficients[index]*(vector[index])-0.5)
+				}
+				return Math::exp(sum0.abs)-1.0 + self.gaussian_abnormality(vector)
+			end
+			def gaussian_abnormality vector
+				gauss = 0
+				@coefficients.length.times { |index|
+					gauss+=(((vector[index]-@offsets[index])**2)/0.05);
+				}
+				return Math::exp(-gauss)
+			end
+		end
 	end
 end
 

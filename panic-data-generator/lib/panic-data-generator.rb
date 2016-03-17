@@ -53,8 +53,14 @@ elsif options[:type]=="log"
   a = LogFunction.new conv
 elsif options[:type]=="mexican"
   a = MexicanHatFunction.new conv
+elsif options[:type]=="abs"
+  a = AbsFunction.new conv
 elsif options[:type]=="comp1"
   a = Comp1Function.new conv
+elsif options[:type]=="comp2"
+  a = Comp2Function.new conv
+elsif options[:type]=="comp3"
+  a = Comp3Function.new conv
 end
 
 a.noise_amplitude=options[:noise].to_f
