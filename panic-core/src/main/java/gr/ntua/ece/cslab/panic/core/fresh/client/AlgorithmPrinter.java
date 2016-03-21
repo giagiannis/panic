@@ -34,12 +34,13 @@ import org.apache.commons.cli.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Class used to print the approximate solutions + samples obtained from the executed algorithm.
  * Created by Giannis Giannakopoulos on 2/25/16.
  */
-public class AlgorithmPrinter {
+public class AlgorithmPrinter extends Client{
 
     public static boolean DEBUG = false;
 
@@ -58,7 +59,22 @@ public class AlgorithmPrinter {
         Options options = new Options();
         options.addOption("h", "help", false, "Prints this menu");
         options.addOption("c", "conf", true, "overrides the configuration file that is, by default into the classpath");
+        options.addOption(null, "samples", true, "provide samples file");
+        options.addOption(null, "predicted", true, "provide predicted file");
+        options.addOption(null, "cuts", true, "provide cuts file");
+        options.addOption(null, "errors", true, "provide errorlabels file");
+        options.addOption(null, "debug", false, "set debug mode");
+
         options.getOption("c").setArgName("config");
+        options.getOption("samples").setRequired(true);
+        options.getOption("predicted").setRequired(true);
+        options.getOption("cuts").setRequired(true);
+        options.getOption("errors").setRequired(true);
+        options.getOption("c").setArgName("config");
+        options.getOption("samples").setRequired(true);
+        options.getOption("predicted").setRequired(true);
+        options.getOption("cuts").setRequired(true);
+        options.getOption("errors").setRequired(true);
 
         // parsing from args
         CommandLineParser parser = new GnuParser();
@@ -101,6 +117,10 @@ public class AlgorithmPrinter {
                 prop.setProperty(s, System.getProperty(s));
             }
         }
+        for(String key : cliOptions.keySet()){
+            if(cliOptions.get(key)!=null)
+                prop.setProperty(key, cliOptions.get(key));
+        }
         debugPrint("Conf file loaded and parsed");
         return prop;
     }
@@ -117,11 +137,13 @@ public class AlgorithmPrinter {
             System.exit(1);
         }
 
-
-        DecisionTree bestTree = null;
-        double mse = Double.MAX_VALUE;
+        debugPrint(properties.toString());
+//        DecisionTree bestTree = null;
+//        double mse = Double.MAX_VALUE;
 
         int repetitions = new Integer(properties.getProperty("entrypoint.repetitions"));
+        List<DecisionTree> trees = new LinkedList<>();
+        List<OutputSpacePoint> actualPoints = null;
         for (int i = 0; i < repetitions; i++) {
             System.out.format("Running execution %d\n", i + 1);
             DTAlgorithm algorithm;
@@ -129,22 +151,30 @@ public class AlgorithmPrinter {
             algorithm = factory1.create(properties.getProperty("entrypoint.algorithm"), properties);
             algorithm.run();
             DecisionTree tree = algorithm.getBestTree();
-            double current = Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
+//            double current = Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
 //            mse += Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
-
-            System.out.format("\tCross-validation score: %.5f\n", current);
-            if (current <= mse) {
-                bestTree = tree;
-                mse = current;
-                System.out.println("\tAssigned best!");
+            if(actualPoints==null) {
+                actualPoints = algorithm.getSource().getActualPoints();
             }
-
+            trees.add(tree);
+//            System.out.format("\tCross-validation score: %.5f\n", current);
+//            if (current <= mse) {
+//                bestTree = tree;
+//                mse = current;
+//                System.out.println("\tAssigned best!");
+//            }
         }
 
-        PrintStream sampleFile = new PrintStream(new File(args[0]));
-        PrintStream predictedFile = new PrintStream(new File(args[1]));
-        PrintStream cuts = new PrintStream(new File(args[2]));
-        PrintStream errorsPerLeafStream = new PrintStream(new File(args[3]));
+        final LinkedList<OutputSpacePoint> testPoints = new LinkedList<>(actualPoints);
+        Double lowestError = trees.parallelStream().mapToDouble(a->Metrics.getMSE(a, testPoints)).min().getAsDouble();
+        DecisionTree bestTree = trees.parallelStream().filter(t->Metrics.getMSE(t, testPoints)==lowestError).collect(Collectors.toList()).get(0);
+        printVariable(System.out, trees.stream().map(a->Metrics.getMSE(a, testPoints)).collect(Collectors.toList()));
+        printVariable(System.out, trees.stream().map(a->Metrics.getRSquared(a, testPoints)).collect(Collectors.toList()));
+
+        PrintStream sampleFile = new PrintStream(new File(properties.getProperty("samples")));
+        PrintStream predictedFile = new PrintStream(new File(properties.getProperty("predicted")));
+        PrintStream cuts = new PrintStream(new File(properties.getProperty("cuts")));
+        PrintStream errorsPerLeafStream = new PrintStream(new File(properties.getProperty("errors")));
 
         Map<String, Model> models = new HashMap<>();
         for (DecisionTreeLeafNode leaf : bestTree.getLeaves()) {

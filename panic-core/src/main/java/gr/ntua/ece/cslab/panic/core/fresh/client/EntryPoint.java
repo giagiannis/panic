@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * Class used to execute experiments.
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
-public class EntryPoint {
+public class EntryPoint extends Client{
     public static boolean DEBUG=false;
 
     protected static void debugPrint(String message) {
@@ -140,35 +140,5 @@ public class EntryPoint {
         printVariable(out, producedTrees.stream().map(a->(double)a.getLeaves().size()).collect(Collectors.toList()));
         out.println();
 
-    }
-
-    private static double mean(List<Double> list) {
-        if(list.size()==0)
-            return Double.NaN;
-        double mean = 0.0;
-        for(Double o  :list) {
-                mean+= o;
-        }
-        return (list.size()==0?Double.NaN:mean/list.size());
-    }
-
-    private static double variance(List<Double> list) {
-        double mean = mean(list);
-        double variance = 0.0;
-        for(Double o : list) {
-            variance+=(o-mean)*(o-mean);
-        }
-        return (list.size()==0?Double.NaN:variance/list.size());
-    }
-
-
-    private static double percentile(List<Double> list, int rank) {
-        int index = (int) Math.ceil((rank/100.0)*list.size());
-        list.sort((a,b)->a.compareTo(b));
-        return list.get(index-1);
-    }
-
-    private static void printVariable(PrintStream out, List<Double> metric) {
-        out.format("%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t", mean(metric), variance(metric), percentile(metric, 1), percentile(metric, 25), percentile(metric, 50), percentile(metric, 75), percentile(metric, 100));
     }
 }
