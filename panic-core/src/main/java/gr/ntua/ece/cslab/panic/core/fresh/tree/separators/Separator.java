@@ -185,10 +185,6 @@ public abstract class Separator {
         if(couples == null || couples.size()<1 || couples.get(0)[0] == null) {
             return null;
         }
-//        for(String s : dimensionLabels) {
-//            System.out.println(s);
-//        }
-
         Set<String> serializedLines = new HashSet<>();
         double bestScore = Double.NEGATIVE_INFINITY;
         CandidateSolution best = null;
@@ -199,7 +195,6 @@ public abstract class Separator {
                 SplitLine line = new SplitLine(p1, p2, dimensionLabels[0], dimensionLabels[1]);
                 if(!serializedLines.contains(line.toString())) {
                     serializedLines.add(line.toString());
-
                     CandidateSolution solution = new CandidateSolution(this.original.getPoints(), this.original.getDeploymentSpace(), line);
                     double estimation = this.estimate(solution);
                     if(bestScore <= estimation && this.solutionIsAccepted(solution)) {
@@ -271,16 +266,6 @@ public abstract class Separator {
         }
 
         return couples;
-    }
-
-
-    /**
-     * Creates a list that consists of InputSpacePoint couples. These couples determine the SplitLines to be tested
-     * @return
-     */
-    protected List<InputSpacePoint[]> createPointsCoupleList() {
-
-        return null;
     }
 
 

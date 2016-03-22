@@ -57,7 +57,7 @@ public class SplitLine {
         double dy = p1.getValue(yDimensionLabel) - p2.getValue(yDimensionLabel);
         double dx = p1.getValue(xDimensionLabel) - p2.getValue(xDimensionLabel);
         if(dx==0.0 && dy==0.0) {
-            System.err.println("We can't do this");
+            System.err.println("SplitLine.SplitLine: Cannot create a line with one point!");
             System.exit(1);
         } else if(dx==0.0) {
             this.type = Type.VERTICAL;

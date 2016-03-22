@@ -138,8 +138,7 @@ public class AlgorithmPrinter extends Client{
         }
 
         debugPrint(properties.toString());
-//        DecisionTree bestTree = null;
-//        double mse = Double.MAX_VALUE;
+        DTAlgorithm.DEBUG=DEBUG;
 
         int repetitions = new Integer(properties.getProperty("entrypoint.repetitions"));
         List<DecisionTree> trees = new LinkedList<>();
@@ -151,25 +150,21 @@ public class AlgorithmPrinter extends Client{
             algorithm = factory1.create(properties.getProperty("entrypoint.algorithm"), properties);
             algorithm.run();
             DecisionTree tree = algorithm.getBestTree();
-//            double current = Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
-//            mse += Metrics.getMSE(tree, algorithm.getSource().getActualPoints());
             if(actualPoints==null) {
                 actualPoints = algorithm.getSource().getActualPoints();
             }
             trees.add(tree);
-//            System.out.format("\tCross-validation score: %.5f\n", current);
-//            if (current <= mse) {
-//                bestTree = tree;
-//                mse = current;
-//                System.out.println("\tAssigned best!");
-//            }
         }
 
         final LinkedList<OutputSpacePoint> testPoints = new LinkedList<>(actualPoints);
-        Double lowestError = trees.parallelStream().mapToDouble(a->Metrics.getMSE(a, testPoints)).min().getAsDouble();
-        DecisionTree bestTree = trees.parallelStream().filter(t->Metrics.getMSE(t, testPoints)==lowestError).collect(Collectors.toList()).get(0);
+        // sort by accuracy
+        trees.sort((a,b)-> new Double(Metrics.getMSE(a, testPoints)).compareTo(new Double(Metrics.getMSE(b, testPoints))));
+        // get median tree
+        DecisionTree bestTree = trees.get(trees.size()/2);
+
         printVariable(System.out, trees.stream().map(a->Metrics.getMSE(a, testPoints)).collect(Collectors.toList()));
         printVariable(System.out, trees.stream().map(a->Metrics.getRSquared(a, testPoints)).collect(Collectors.toList()));
+        System.out.println();
 
         PrintStream sampleFile = new PrintStream(new File(properties.getProperty("samples")));
         PrintStream predictedFile = new PrintStream(new File(properties.getProperty("predicted")));

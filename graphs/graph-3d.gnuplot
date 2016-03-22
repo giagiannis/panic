@@ -19,7 +19,7 @@ if (!exists("actual") && !exists("predicted")) \
 
 
 #set title "MSE/# of leaves vs bucket size"
-firstrow = system('grep --invert-match "\#" '.actual.' | head -1 ')
+firstrow = system("grep --invert-match '#' ".actual." | head -n 1 ")
 set xlabel word(firstrow, 1)
 set ylabel word(firstrow, 2)
 set zlabel word(firstrow, 3)

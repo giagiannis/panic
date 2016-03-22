@@ -34,9 +34,10 @@ set xlabel "x1"
 set ylabel "x2"
 set grid
 unset key
-plot data w image t col, sample u 1:2 w p lc rgb "blue" ps 1 pt 5 t "Samples", \
-cuts w p pt 5 lc rgb "black", errorlabels w labels font "Arial,10" textcolor rgb "white"
-#cuts w vectors ls 5 nohead, errorlabels w labels font "Arial,10" textcolor rgb "white"
+plot data w image t col, \
+cuts w p pt 5 lc rgb "black", \
+sample u 1:2 w p lc rgb "blue" ps 1 pt 7 t "Samples", \
+errorlabels w labels font "Arial,10" textcolor rgb "white"
 
 system("rm -f ".outfile)
 system("epstopdf ".tmpfile." --outfile=".outfile." && rm ".tmpfile)
