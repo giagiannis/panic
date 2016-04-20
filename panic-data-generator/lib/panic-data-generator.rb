@@ -61,6 +61,8 @@ elsif options[:type]=="comp2"
   a = Comp2Function.new conv
 elsif options[:type]=="comp3"
   a = Comp3Function.new conv
+elsif options[:type]=="comp4"
+  a = Comp4Function.new conv
 end
 
 a.noise_amplitude=options[:noise].to_f

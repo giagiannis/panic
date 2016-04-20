@@ -18,6 +18,7 @@ package gr.ntua.ece.cslab.panic.core.client;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.evaluation.Metrics;
 import gr.ntua.ece.cslab.panic.core.metrics.GlobalMetrics;
 import gr.ntua.ece.cslab.panic.core.models.EnsembleMetaModel;
 import gr.ntua.ece.cslab.panic.core.models.Model;
@@ -113,7 +114,7 @@ public class Main extends Benchmark {
                         System.out.println(n);
                     }
                 } else {
-                    System.err.println("Leaf regions is null or model not EnsembleModel");
+//                    System.err.println("Leaf regions is null or model not EnsembleModel");
                 }
                 m.train();
             }
@@ -133,10 +134,14 @@ public class Main extends Benchmark {
                 if (savePredictions) {
                     dbClient.insertModelPredictions(experimentId, modelShortName, samplerShortName, m.getPoints(file.getInputSpacePoints()));
                 }
-
                 GlobalMetrics metrics = new GlobalMetrics(file.getOutputSpacePoints(), m, picked);
+                double mse = metrics.getMSE();
+                double avg = metrics.getAverageError();
+                double dev = metrics.getDeviation();
+                double r = metrics.getR();
+
                 dbClient.insertExperimentMetrics(experimentId, modelShortName, samplerShortName,
-                        metrics.getMSE(), metrics.getAverageError(), metrics.getDeviation(), metrics.getR());
+                        mse, avg, dev, r);
             }
             System.out.println("Done!");
         }

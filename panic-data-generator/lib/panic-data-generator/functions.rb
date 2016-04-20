@@ -213,6 +213,34 @@ module Panic
 				return Math::exp(-gauss)
 			end
 		end
+
+
+		class Comp4Function < Function
+			def initialize coefficients
+				super()
+				@coefficients = coefficients
+				@offsets = []
+				@coefficients.length.times { |index|
+					@offsets[index]=rand
+				}
+
+			end
+			def evaluate_expression vector
+				sum0 = 0.0
+				vector.length.times{ |index|
+					sum0+=@coefficients[index]*vector[index]
+				}
+				return sum0 + self.gaussian_abnormality(vector)
+			end
+			def gaussian_abnormality vector
+				gauss = 0
+				@coefficients.length.times { |index|
+					gauss+=(((vector[index]-@offsets[index])**2)/0.05);
+				}
+				return Math::exp(-gauss)
+			end
+		end
+
 	end
 end
 

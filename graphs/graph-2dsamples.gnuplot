@@ -15,10 +15,10 @@ if (!exists("outfile")) \
         print "You can set the outfile by adding: \"-e 'outfile=<outfile>'\"";\
         outfile=tmpseed.".pdf"
 
-if(exists("comment")) \
-	set title "Samples distribution (".comment.")"; \
-else \
-	set title "Samples distribution"
+#if(exists("comment")) \
+#	set title "Samples distribution (".comment.")"; \
+#else \
+#	set title "Samples distribution"
 	
 print("Output: ".outfile)
 
@@ -30,13 +30,13 @@ set output tmpfile
 #set palette grey
 firstrow = system('head -1 '.data)
 
-set xlabel "x1"
-set ylabel "x2"
+#set xlabel "x1"
+#set ylabel "x2"
 set grid
 unset key
 plot data w image t col, \
 cuts w p pt 5 lc rgb "black", \
-sample u 1:2 w p lc rgb "blue" ps 1 pt 7 t "Samples", \
+sample u 1:2 w p lc rgb "black" ps 1 pt 7 t "Samples", \
 errorlabels w labels font "Arial,10" textcolor rgb "white"
 
 system("rm -f ".outfile)

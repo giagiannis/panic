@@ -19,7 +19,6 @@ package gr.ntua.ece.cslab.panic.core.fresh.client;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
-import gr.ntua.ece.cslab.panic.core.eval.CrossValidation;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithm;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithmFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.evaluation.Metrics;
@@ -89,7 +88,7 @@ public class AlgorithmPrinter extends Client{
         // setting parameters from CLI options
         if (kv.containsKey("help")) { // quick and dirty
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(EntryPoint.class.toString(), options);
+            formatter.printHelp(AlgorithmExecutor.class.toString(), options);
             System.exit(0);
         }
 
@@ -109,7 +108,7 @@ public class AlgorithmPrinter extends Client{
             stream = new FileInputStream(confFileName);
         } else {
             debugPrint("Loading configuration file " + confFileName + " from classpath");
-            stream = EntryPoint.class.getClassLoader().getResourceAsStream(confFileName);
+            stream = AlgorithmExecutor.class.getClassLoader().getResourceAsStream(confFileName);
         }
         prop.load(stream);
         for (String s : System.getProperties().stringPropertyNames()) {

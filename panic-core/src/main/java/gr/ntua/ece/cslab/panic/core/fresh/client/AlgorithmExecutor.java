@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * Class used to execute experiments.
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
-public class EntryPoint extends Client{
+public class AlgorithmExecutor extends Client{
     public static boolean DEBUG=false;
 
     protected static void debugPrint(String message) {
@@ -69,7 +69,7 @@ public class EntryPoint extends Client{
         // setting parameters from CLI options
         if(kv.containsKey("help")) { // quick and dirty
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(EntryPoint.class.toString(), options);
+            formatter.printHelp(AlgorithmExecutor.class.toString(), options);
             System.exit(0);
         }
 
@@ -89,7 +89,11 @@ public class EntryPoint extends Client{
             stream = new FileInputStream(confFileName);
         } else {
             debugPrint("Loading configuration file "+confFileName+" from classpath");
-            stream = EntryPoint.class.getClassLoader().getResourceAsStream(confFileName);
+            stream = AlgorithmExecutor.class.getClassLoader().getResourceAsStream(confFileName);
+        }
+        if(stream==null) {
+            System.err.println("You have to provide a configuration file!");
+            System.exit(0);
         }
         prop.load(stream);
         System.getProperties().stringPropertyNames().stream().filter(s -> prop.getProperty(s) != null).forEach(s -> {
