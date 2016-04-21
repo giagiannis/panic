@@ -94,6 +94,41 @@ module Panic
 			end
 		end
 
+		class ExpSqFunction < Function
+			def initialize coefficients
+				super()
+				@coefficients = coefficients
+			end
+
+			# returns the evaluation of the expression
+			# c+c1x1+c2x2+...+c3x3
+			def evaluate_expression vector
+				sum = 0
+				@coefficients.length.times { |index|
+					sum+=@coefficients[index]*vector[index]
+				}
+				return Math.exp(-sum**2)
+			end
+
+		end
+
+		class PolyFunction < Function
+			def initialize coefficients
+				super()
+				@coefficients = coefficients
+			end
+
+			# returns the evaluation of the expression
+			# c+c1x1+c2x2+...+c3x3
+			def evaluate_expression vector
+				sum = 0
+				@coefficients.length.times { |index|
+					sum+=@coefficients[index]*(vector[index]**2)
+				}
+				return sum
+			end
+		end
+
 
 		class ReverseLinearFunction < Function
 			def initialize coefficients
@@ -158,7 +193,7 @@ module Panic
 				return -1/(Math::PI*@sigma**4) * (1-division)*Math.exp(-division)
 			end
 		end
-		class Comp1Function < Function
+		class WaveFunction < Function
 			def initialize coefficients
 				super()
 				@coefficients = coefficients
