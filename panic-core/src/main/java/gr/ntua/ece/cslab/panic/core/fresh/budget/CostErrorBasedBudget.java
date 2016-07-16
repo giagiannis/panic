@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016 Giannis Giannakopoulos
  *
@@ -46,9 +47,10 @@ public class CostErrorBasedBudget extends ErrorBasedBudget {
 
     @Override
     protected double normalizedScore(DecisionTreeLeafNode leaf) {
-	double score = super.normalizedScore(leaf);
-	double costScore = this.costCoefficient*this.getNormalizedCost(leaf);
-	return(score<=costScore?score:score-costScore);
+	    double score = super.normalizedScore(leaf);
+	    double costScore = this.costCoefficient*this.getNormalizedCost(leaf);
+//	return(score<=costScore?score:score-costScore);
+        return score-costScore;
     }
 
     private double getNormalizedCost(DecisionTreeLeafNode leaf) {
