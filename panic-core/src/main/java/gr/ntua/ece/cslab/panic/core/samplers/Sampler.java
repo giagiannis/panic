@@ -18,6 +18,8 @@
 package gr.ntua.ece.cslab.panic.core.samplers;
 
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.models.Model;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -72,5 +74,6 @@ public interface Sampler {
     public void setConfiguration(HashMap<String, String> configuration);
     
     public void setConfiguration(String configuration);
+
 
 }

@@ -17,6 +17,10 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.evaluation;
 
+import de.congrace.exp4j.Calculable;
+import de.congrace.exp4j.ExpressionBuilder;
+import de.congrace.exp4j.UnknownFunctionException;
+import de.congrace.exp4j.UnparsableExpressionException;
 import gr.ntua.ece.cslab.panic.beans.containers.InputSpacePoint;
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
@@ -81,6 +85,67 @@ public class Metrics {
         return sum/testPoints.size();
     }
 
+    public static Double getMSE(Class<? extends Model> className, List<OutputSpacePoint> trainPoints, List<OutputSpacePoint> testPoints) {
+        Model m = null;
+        double sum = 0.0;
+        try {
+            m = className.newInstance();
+            m.configureClassifier();
+            m.feed(trainPoints);
+            m.train();
+
+
+            sum = 0.0;
+            for(OutputSpacePoint p : testPoints) {
+                double predicted = m.getPoint(p.getInputSpacePoint()).getValue();
+                sum += (predicted-p.getValue())*(predicted-p.getValue());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sum/testPoints.size();
+    }
+
+    public static double getMAE(DecisionTree tree, List<OutputSpacePoint> testPoints) {
+        HashMap<String, Model> models = createModels(tree);
+        double sum = 0.0;
+        for(OutputSpacePoint p : testPoints) {
+            double predicted = 0;
+            try {
+                predicted = models.get(tree.getLeaf(p).getId()).getPoint(p.getInputSpacePoint()).getValue();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            double actual = p.getValue();
+            sum +=Math.abs(predicted-actual);
+        }
+        return sum/testPoints.size();
+    }
+
+
+    public static Double getMAE(Class<? extends Model> className, List<OutputSpacePoint> trainPoints, List<OutputSpacePoint> testPoints) {
+        Model m = null;
+        double sum = 0.0;
+        try {
+            m = className.newInstance();
+            m.configureClassifier();
+            m.feed(trainPoints);
+            m.train();
+
+
+            sum = 0.0;
+            for(OutputSpacePoint p : testPoints) {
+                double predicted = m.getPoint(p.getInputSpacePoint()).getValue();
+                sum += Math.abs(predicted-p.getValue());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sum/testPoints.size();
+    }
+
+
+
     public static double getRSquared(DecisionTree tree, List<OutputSpacePoint> testPoints) {
         HashMap<String, Model> models = createModels(tree);
         double mean  =testPoints.stream().mapToDouble(OutputSpacePoint::getValue).average().getAsDouble();
@@ -99,6 +164,27 @@ public class Metrics {
         }
         return 1.0 - (ssReg/ssTotal);
     }
+
+    public static double getCost(List<OutputSpacePoint> samples, String costFunction) {
+        return samples.stream().mapToDouble(a-> Metrics.cost(a.getInputSpacePoint(), costFunction)).sum();
+    }
+
+    private static double cost(InputSpacePoint point, String costFunction) {
+        ExpressionBuilder builder = new ExpressionBuilder(costFunction);
+        for(String s: point.getKeysAsCollection()) {
+            builder.withVariable(s, point.getValue(s));
+        }
+        Calculable cal = null;
+        try {
+            cal = builder.build();
+        } catch (UnknownFunctionException e) {
+            e.printStackTrace();
+        } catch (UnparsableExpressionException e) {
+            e.printStackTrace();
+        }
+        return cal.calculate();
+    }
+
 
     private static HashMap<String, Model> createModels(DecisionTree tree) {
         HashMap<String, Model> models = new HashMap<>();

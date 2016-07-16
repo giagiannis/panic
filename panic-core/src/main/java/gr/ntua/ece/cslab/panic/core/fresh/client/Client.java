@@ -17,6 +17,8 @@
 
 package gr.ntua.ece.cslab.panic.core.fresh.client;
 
+import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
+
 import java.io.PrintStream;
 import java.util.List;
 

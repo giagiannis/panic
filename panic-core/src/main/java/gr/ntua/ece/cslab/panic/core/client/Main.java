@@ -27,6 +27,7 @@ import gr.ntua.ece.cslab.panic.core.samplers.Sampler;
 import gr.ntua.ece.cslab.panic.core.samplers.special.BiasedPCASampler;
 import gr.ntua.ece.cslab.panic.core.samplers.special.RandomPartitioningSampler;
 import gr.ntua.ece.cslab.panic.core.samplers.special.TreePartitioningSampler;
+import gr.ntua.ece.cslab.panic.core.samplers.special.UncertaintySampler;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTree;
 import gr.ntua.ece.cslab.panic.core.samplers.utils.RegionTreeNode;
 import gr.ntua.ece.cslab.panic.core.utils.CSVFileManager;
@@ -78,6 +79,9 @@ public class Main extends Benchmark {
             s.setDimensionsWithRanges(file.getDimensionRanges());
             s.configureSampler();
 
+            if(s instanceof UncertaintySampler) {
+                ((UncertaintySampler)s).setModel(models[0]);
+            }
             // models training
             List<InputSpacePoint> picked = new LinkedList<>();
             while (s.hasMore()) {
@@ -85,7 +89,7 @@ public class Main extends Benchmark {
                 picked.add(nextSample);
                 OutputSpacePoint out = file.getActualValue(nextSample);
                 for (Model m : models) {
-                    m.feed(out, false);
+                    m.feed(out, true);
                 }
                 if (s instanceof AbstractAdaptiveSampler) {
                     ((AbstractAdaptiveSampler) s).addOutputSpacePoint(out);

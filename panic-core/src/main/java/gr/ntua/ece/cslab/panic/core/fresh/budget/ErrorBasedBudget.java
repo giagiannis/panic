@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
 public class ErrorBasedBudget extends Budget {
 
     private final Double minError, maxError, minRegion, maxRegion;
-    private double errorCoefficient=1.0;
-    private double regionCoefficient=1.0;
+    public double errorCoefficient=1.0;
+    public double regionCoefficient=1.0;
     private Integer coefficient;
     private Map<String, Integer> budgetMap = null;
 
@@ -86,7 +86,7 @@ public class ErrorBasedBudget extends Budget {
         return mul;
     }
 
-    private double normalizedScore(DecisionTreeLeafNode leaf) {
+    protected double normalizedScore(DecisionTreeLeafNode leaf) {
         return this.errorCoefficient*this.normalizedError(leaf) + this.regionCoefficient*this.normalizedRegion(leaf);
     }
 
@@ -94,14 +94,16 @@ public class ErrorBasedBudget extends Budget {
         if(this.maxError.equals(this.minError)|| this.maxError.isNaN() || this.minError.isNaN()) {
             return 0.0;
         }
-        return (this.error(leaf)-this.minError)/(this.maxError - this.minError);
+        //return (this.error(leaf)-this.minError)/(this.maxError - this.minError);
+        return (this.error(leaf))/(this.maxError);
     }
 
     private double normalizedRegion(DecisionTreeLeafNode leaf) {
         if(this.maxRegion.equals(this.minRegion)|| this.maxRegion.isNaN() || this.minRegion.isNaN()) {
             return 0.0;
         }
-        return (this.region(leaf) - this.minRegion)/(this.maxRegion-this.minRegion);
+        return (this.region(leaf))/(this.maxRegion);
+        //return (this.region(leaf) - this.minRegion)/(this.maxRegion-this.minRegion);
     }
 
     private Map<String, Integer> getScores() {

@@ -1,6 +1,5 @@
 #!/bin/bash
 #
-# 
 # author: ggian
 # date: Wed May 13 11:57:19 EEST 2015
 # 

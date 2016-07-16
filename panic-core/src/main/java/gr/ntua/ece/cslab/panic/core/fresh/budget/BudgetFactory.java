@@ -48,6 +48,19 @@ public class BudgetFactory {
                     ((ErrorBasedBudget)budget).setRegionCoefficient(new Double(properties.getProperty("region.coefficient")));
                 }
                 break;
+            case "costerror":
+                coefficient = new Integer(properties.getProperty("coefficient"));
+                budget = new CostErrorBasedBudget(tree, totalBudget, coefficient, properties.getProperty("cost.function"));
+                if(properties.containsKey("error.coefficient")) {
+                    ((CostErrorBasedBudget)budget).setErrorCoefficient(new Double(properties.getProperty("error.coefficient")));
+                }
+                if(properties.containsKey("region.coefficient")) {
+                    ((CostErrorBasedBudget)budget).setRegionCoefficient(new Double(properties.getProperty("region.coefficient")));
+                }
+                if(properties.containsKey("cost.coefficient")) {
+                    ((CostErrorBasedBudget)budget).setCostCoefficient(new Double(properties.getProperty("cost.coefficient")));
+                }
+                break;
         }
         if(treePathsToIgnore!=null)
             budget.setPathsToIgnore(treePathsToIgnore);

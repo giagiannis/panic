@@ -22,6 +22,7 @@ import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithm;
 import gr.ntua.ece.cslab.panic.core.fresh.algo.DTAlgorithmFactory;
 import gr.ntua.ece.cslab.panic.core.fresh.evaluation.Metrics;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
+import gr.ntua.ece.cslab.panic.core.models.*;
 import org.apache.commons.cli.*;
 
 import java.io.FileInputStream;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
 public class AlgorithmExecutor extends Client{
-    public static boolean DEBUG=false;
+    public static boolean DEBUG=false, WEKA_MODELS = false;
 
     protected static void debugPrint(String message) {
         if(DEBUG) {
@@ -54,6 +55,7 @@ public class AlgorithmExecutor extends Client{
         options.addOption("c", "conf", true, "overrides the configuration file that is, by default into the classpath");
         options.getOption("c").setArgName("config");
         options.addOption(null, "debug", false, "if set, prints diagnostic messages");
+        options.addOption(null, "weka-models", false, "if set, bypasses standard tree modeling and trains multiple other models");
 
 
         // parsing from args
@@ -75,6 +77,10 @@ public class AlgorithmExecutor extends Client{
 
         if(kv.containsKey("debug")) {
             DEBUG = true;
+        }
+
+        if(kv.containsKey("weka-models")) {
+            WEKA_MODELS=true;
         }
         return kv;
     }
@@ -104,7 +110,7 @@ public class AlgorithmExecutor extends Client{
         return prop;
     }
 
-    public static void main(String[] args) throws ParseException, IOException {
+    public static void main(String[] args) throws Exception {
         Map<String,String> cliOptions= parseCLIOptions(args);
         Properties properties = loadConfigurationFile(cliOptions);
 
@@ -138,11 +144,48 @@ public class AlgorithmExecutor extends Client{
         // output
         final List<OutputSpacePoint> testPoints = new LinkedList<>(points);
         PrintStream out = System.out;
-        printVariable(out, producedTrees.stream().map(a->Metrics.getMSE(a, testPoints)).collect(Collectors.toList()));
-        printVariable(out, producedTrees.stream().map(a->Metrics.getRSquared(a, testPoints)).collect(Collectors.toList()));
-        printVariable(out, executionTimes);
-        printVariable(out, producedTrees.stream().map(a->(double)a.getLeaves().size()).collect(Collectors.toList()));
-        out.println();
 
+        String costFunction = "";
+        if(properties.containsKey("entrypoint.cost.function"))
+            costFunction = properties.getProperty("entrypoint.cost.function");
+        else
+            costFunction = "";
+        final String costFunctionFinal = new String(costFunction);
+        if(!WEKA_MODELS) {
+            printVariable(out, producedTrees.stream().map(a -> Metrics.getMSE(a, testPoints)).collect(Collectors.toList()));
+            printVariable(out, producedTrees.stream().map(a -> Metrics.getRSquared(a, testPoints)).collect(Collectors.toList()));
+            printVariable(out, executionTimes);
+            printVariable(out, producedTrees.stream().map(a -> Metrics.getMAE(a, testPoints)).collect(Collectors.toList()));
+            printVariable(out, producedTrees.stream().map(a -> (double) a.getLeaves().size()).collect(Collectors.toList()));
+            if(costFunctionFinal!=null && !costFunctionFinal.equals(""))
+                printVariable(out, producedTrees.stream().map(a -> Metrics.getCost(a.getSamples(), costFunctionFinal)).collect(Collectors.toList()));
+            out.println();
+        } else {
+            // RandomCommittee
+            printVariable(out, producedTrees.stream().map(a->Metrics.getMSE(RandomCommittee.class, a.getSamples(), testPoints)).collect(Collectors.toList()));
+            printVariable(out, producedTrees.stream().map(a->Metrics.getMAE(RandomCommittee.class, a.getSamples(), testPoints)).collect(Collectors.toList()));
+
+            //MLPerceptron
+            printVariable(out, producedTrees.stream().map(a->Metrics.getMSE(MLPerceptron.class, a.getSamples(), testPoints)).collect(Collectors.toList()));
+            printVariable(out, producedTrees.stream().map(a->Metrics.getMAE(MLPerceptron.class, a.getSamples(), testPoints)).collect(Collectors.toList()));
+
+            // LeastSquares
+            printVariable(out, producedTrees.stream().map(a->Metrics.getMSE(LeastSquares.class, a.getSamples(), testPoints)).collect(Collectors.toList()));
+            printVariable(out, producedTrees.stream().map(a->Metrics.getMAE(LeastSquares.class, a.getSamples(), testPoints)).collect(Collectors.toList()));
+
+            // RandomSubSpaces
+            printVariable(out, producedTrees.stream().map(a->Metrics.getMSE(RandomSubSpaces.class, a.getSamples(), testPoints)).collect(Collectors.toList()));
+            printVariable(out, producedTrees.stream().map(a->Metrics.getMAE(RandomSubSpaces.class, a.getSamples(), testPoints)).collect(Collectors.toList()));
+
+            // BagClassify
+            printVariable(out, producedTrees.stream().map(a->Metrics.getMSE(BagClassify.class, a.getSamples(), testPoints)).collect(Collectors.toList()));
+            printVariable(out, producedTrees.stream().map(a->Metrics.getMAE(BagClassify.class, a.getSamples(), testPoints)).collect(Collectors.toList()));
+
+            // cost
+            if(costFunctionFinal!=null && !costFunctionFinal.equals(""))
+                printVariable(out, producedTrees.stream().map(a -> Metrics.getCost(a.getSamples(), costFunctionFinal)).collect(Collectors.toList()));
+            out.println();
+
+        }
     }
 }
