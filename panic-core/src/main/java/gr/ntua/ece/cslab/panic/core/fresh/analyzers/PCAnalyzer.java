@@ -173,7 +173,32 @@ public class PCAnalyzer extends Analyzer {
         manager.setFilename(args[0]);
         PCAnalyzer analyzer = new PCAnalyzer(manager.getOutputSpacePoints());
         analyzer.analyze();
-        analyzer.printCoordinates(System.out);
+        System.out.println("Eigenvalues");
+        for(int i=0;i<analyzer.getEigenValues().length;i++) {
+            double value = analyzer.getEigenValues()[i];
+            double variance = analyzer.pcWeights()[i];
+            System.out.format("%.2f (%.2f)\n", value, variance);
+        }
+        System.out.println();
+
+        System.out.println("Eigvenvectors");
+        for(double[] vector: analyzer.getEigenVectors()) {
+            for(double v :  vector) {
+                System.out.format("%.2f\t", v);
+            }
+            System.out.println();
+        }
+        System.out.println();
+
+        System.out.println("Loadings plot");
+        System.out.println("dimensions\tPC1\tPC2");
+        double[] firstPC = analyzer.getEigenVectors()[0],
+                secondPC = analyzer.getEigenVectors()[1];
+        for(int i=0;i<analyzer.dimensionOrdering.size();i++) {
+            System.out.format("%s\t%.2f\t%.2f\n", analyzer.dimensionOrdering.get(i),firstPC[i], secondPC[i]);
+        }
+
+
     }
 
     private double distance(int firstDimension, int secondDimension, double[] weights, int numPC) {

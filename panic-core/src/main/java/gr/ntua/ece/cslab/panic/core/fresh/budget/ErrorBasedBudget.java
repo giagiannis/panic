@@ -115,20 +115,19 @@ public class ErrorBasedBudget extends Budget {
         }
         Double sum = this.tree.getLeaves().stream().mapToDouble(b->normalizedScore(b)).sum() + this.tree.getLeaves().size()*pivotToAdd;
         if(sum==0 ) { // we need to do shit here
-//            if(this.tree.getLeaves().size()>1) {
-//                System.err.println("ErrorBasedBudget.getScores: sum is NaN but we have more leaves than 1! Exiting..");
-//                System.err.println("Specifically we have:");
-//                System.err.format("min error: %.5f\tmax error: %.5f\tmin region: %.5f\tmax region:%.5f\n",
-//                        this.minError, this.maxError, this.minRegion, this.maxRegion);
-//                for(DecisionTreeLeafNode leaf : this.tree.getLeaves()) {
-//                    System.err.format("%s:\tscore: %.5f\terror: %.5f\tregion: %.5f\n", leaf.getId(), this.normalizedScore(leaf), this.normalizedError(leaf), this.normalizedRegion(leaf));
-//                }
-//                System.exit(1);
-//            } else {
-//                map.put(this.tree.getLeaves().get(0).getId(), this.coefficient);
-//            }
+            if(this.tree.getLeaves().size()>1) {
+                System.err.println("ErrorBasedBudget.getScores: sum is NaN but we have more leaves than 1! Exiting..");
+                System.err.println("Specifically we have:");
+                System.err.format("min error: %.5f\tmax error: %.5f\tmin region: %.5f\tmax region:%.5f\n",
+                        this.minError, this.maxError, this.minRegion, this.maxRegion);
+                for(DecisionTreeLeafNode leaf : this.tree.getLeaves()) {
+                    System.err.format("%s:\tscore: %.5f\terror: %.5f\tregion: %.5f\n", leaf.getId(), this.normalizedScore(leaf), this.normalizedError(leaf), this.normalizedRegion(leaf));
+                }
+                System.exit(1);
+            } else {
+                map.put(this.tree.getLeaves().get(0).getId(), this.coefficient);
+            }
         } else {
-//            double leftOver = (this.coefficient)
             for(DecisionTreeLeafNode  l : this.tree.getLeaves()) {
                 double budget = ((this.normalizedScore(l)+pivotToAdd)/sum) * (this.coefficient);
                 map.put(l.getId(), ((int) Math.ceil(budget)));

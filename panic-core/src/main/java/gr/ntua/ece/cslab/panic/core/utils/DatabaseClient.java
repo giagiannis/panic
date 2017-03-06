@@ -297,23 +297,33 @@ public class DatabaseClient {
 	
 	public static void main(String[] args) {
 		DatabaseClient client = new DatabaseClient();
-		String databaseHost=args[0], 
-				databaseName=args[1], 
-				databaseUsername=args[2],
-				databasePassword=args[3];
-		
-		client.setDatabaseHost(databaseHost);
+//		String databaseHost=args[0],
+//				databaseName=args[1],
+//				databaseUsername=args[2],
+//				databasePassword=args[3];
+//
+//		client.setDatabaseHost(databaseHost);
+//		client.setDatabaseName(databaseName);
+//		client.setUsername(databaseUsername);
+//		client.setPassword(databasePassword);
+//		client.openConnection();
+//
+//		String samplesId=args[4];
+		String databaseName = args[0];
 		client.setDatabaseName(databaseName);
-		client.setUsername(databaseUsername);
-		client.setPassword(databasePassword);
 		client.openConnection();
-		String samplesId=args[4];
-		List<InputSpacePoint> l=client.getSampledPoints(new Integer(samplesId));
-		client.closeConnection();
-		
-		for(InputSpacePoint p:l) {
-			System.out.println(p.toStringCSVFormat());
+		Integer experimentId = new Integer(args[1]);
+		List<OutputSpacePoint> points = client.getOutputSpacePoints(experimentId);
+		for(OutputSpacePoint p : points) {
+			System.out.format("%s\t%.5f\n",p.getInputSpacePoint().toStringCSVFormat(), p.getValue());
 		}
+//
+//		List<InputSpacePoint> l=client.getSampledPoints(new Integer(samplesId));
+//		client.closeConnection();
+//
+//		for(InputSpacePoint p:l) {
+//			System.out.println(p.toStringCSVFormat());
+//		}
 	}
 
 }
