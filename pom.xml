@@ -17,11 +17,11 @@
     </description>
     <modules>
         <module>panic-core</module>
-        <module>panic-server</module>
-        <module>panic-client</module>
+        <!--<module>panic-server</module>-->
+        <!--<module>panic-client</module>-->
         <module>panic-beans</module>
-        <module>panic-rpm</module>
-        <module>panic-tar</module>
+        <!--<module>panic-rpm</module>-->
+        <!--<module>panic-tar</module>-->
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
