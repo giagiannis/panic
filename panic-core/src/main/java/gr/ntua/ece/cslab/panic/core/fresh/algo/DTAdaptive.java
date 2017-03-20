@@ -122,7 +122,7 @@ public class DTAdaptive extends DTAlgorithm {
         }
 
         Sampler sampler = factory.create(this.samplerType, leaf.getDeploymentSpace(), budget, forbiddenPoints, samplerProperties);
-        HashSet<InputSpacePoint> forbiddenPointsSet = new HashSet<>(forbiddenPoints);
+//        HashSet<InputSpacePoint> forbiddenPointsSet = new HashSet<>(forbiddenPoints);
         int pointsReturned = 0;
         while (sampler.hasMore()) {
             InputSpacePoint point = sampler.next();
