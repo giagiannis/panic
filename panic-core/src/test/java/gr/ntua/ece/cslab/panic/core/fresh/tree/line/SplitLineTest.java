@@ -30,17 +30,15 @@ import static org.junit.Assert.*;
  * Created by Giannis Giannakopoulos on 3/9/16.
  */
 public class SplitLineTest {
-
+    private Random rand;
     @Before
     public void setUp() throws Exception {
-
+        rand = new Random();
     }
 
     @Test
     public void testCreation() throws Exception {
         // create a line with lambda equals to 1
-        Random rand = new Random();
-        double value = rand.nextDouble();
         InputSpacePoint p1 = new InputSpacePoint();
         p1.addDimension("x", 0.0);
         p1.addDimension("y", 0.0);
@@ -51,19 +49,18 @@ public class SplitLineTest {
 
 
         SplitLine line = new SplitLine(p1, p2, "x", "y");
-
         for(int i=0;i<100;i++) {
 //            SplitLine.Point point = new SplitLine.Point(rand.nextDouble(), rand.nextDouble());
             InputSpacePoint point = new InputSpacePoint();
             point.addDimension("x", rand.nextDouble());
             point.addDimension("y", rand.nextDouble());
-
-            if(point.getValue("x") > point.getValue("y"))
+            if(point.getValue("x") > point.getValue("y")) {
                 assertEquals(line.comparePoint(point), -1);
-            else if(point.getValue("x") < point.getValue("y"))
+            } else if(point.getValue("x") < point.getValue("y")) {
                 assertEquals(line.comparePoint(point), 1);
-            else
+            } else {
                 assertEquals(line.comparePoint(point), 0);
+            }
         }
     }
 }
