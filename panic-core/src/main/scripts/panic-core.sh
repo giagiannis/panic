@@ -11,6 +11,7 @@ export CLASSPATH="$(echo ${PWD}/target/lib/* | tr ' ' ':')"
 export CLASSPATH="$CLASSPATH:$(echo ${PWD}/target/conf)"
 export JAR="target/classes"
 
-[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.client.Main"
+#[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.client.Main"
+[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.fresh.client.AlgorithmExecutor"
 
 java -cp $CLASSPATH:$JAR $CLASS  $@

@@ -26,8 +26,6 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
-
 /**
  * Test class for VarianceSeparator
  * Created by Giannis Giannakopoulos on 2/12/16.
@@ -55,13 +53,13 @@ public class VarianceSeparatorTest {
         // the pair returned by the separator must be the best in terms of variance
 //        HashMap<String, Set<Double>> possibleValues = separator.possibleValues(this.points);
 //
-//        Separator.CandidateSolution best = new Separator.CandidateSolution(points,separator.getResult().getAttribute(), separator.getResult().getValue(), space);
+//        Abstract2DSeparator.CandidateSolution best = new Abstract2DSeparator.CandidateSolution(points,separator.getResult().getAttribute(), separator.getResult().getValue(), space);
 //        double minVariance = separator.estimate(best);
 //
 //        for(String candidateDimension:possibleValues.keySet()) {
 //            for(Double candidateValue: possibleValues.get(candidateDimension)) {
-//                Separator.CandidateSolution candidatePair;
-//                candidatePair = new Separator.CandidateSolution(points, candidateDimension, candidateValue, space);
+//                Abstract2DSeparator.CandidateSolution candidatePair;
+//                candidatePair = new Abstract2DSeparator.CandidateSolution(points, candidateDimension, candidateValue, space);
 //                double estimation = separator.estimate(candidatePair);
 //                assertTrue(minVariance>=separator.estimate(candidatePair));
 //            }

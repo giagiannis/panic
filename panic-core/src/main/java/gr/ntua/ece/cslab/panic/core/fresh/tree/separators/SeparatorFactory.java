@@ -19,7 +19,6 @@ package gr.ntua.ece.cslab.panic.core.fresh.tree.separators;
 
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -36,6 +35,15 @@ public class SeparatorFactory {
                 break;
             case "modelerror":
                 separator = new ModelErrorSeparator(node);
+                break;
+            case "sa":
+                separator = new SASeparator(node);
+                if(properties.getProperty("sa.script")!=null) {
+                    ((SASeparator) separator).setScriptPath(properties.getProperty("sa.script"));
+                } else {
+                    System.err.println("You have to define the script parameter for sa");
+                    System.exit(1);
+                }
                 break;
             default:
                 separator = null;

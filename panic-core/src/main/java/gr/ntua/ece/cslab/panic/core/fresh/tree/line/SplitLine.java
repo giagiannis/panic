@@ -99,7 +99,14 @@ public class SplitLine {
         for (Map.Entry<String, Double> kv : this.coefficients.entrySet()) {
             double val = 1.0;
             if (!kv.getKey().equals("constant")) {
-                val = p.getValue(kv.getKey());
+                if(p.getValue(kv.getKey())==null) {
+//                    System.out.println("Null value!!!");
+//                    System.out.println(p);
+//                    System.out.println(p.getKeysAsCollection());
+//                    System.out.println(this.coefficients);
+                } else {
+                    val = p.getValue(kv.getKey());
+                }
             }
             pointValue += kv.getValue() * val;
         }

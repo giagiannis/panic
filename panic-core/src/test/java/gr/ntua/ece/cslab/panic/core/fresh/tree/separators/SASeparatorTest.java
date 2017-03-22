@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Giannis Giannakopoulos
+ * Copyright 2017 Giannis Giannakopoulos
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,46 +18,36 @@
 package gr.ntua.ece.cslab.panic.core.fresh.tree.separators;
 
 import gr.ntua.ece.cslab.panic.beans.containers.OutputSpacePoint;
+import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.TestUtils;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.*;
 
 /**
- * Test class for abstract Abstract2DSeparator class
- * Created by Giannis Giannakopoulos on 2/12/16.
+ * Created by Giannis Giannakopoulos on 3/21/17.
  */
-public class SeparatorTest {
+public class SASeparatorTest {
     private List<OutputSpacePoint> points;
-    private Abstract2DSeparator separator;
+    private SASeparator separator;
+    private DeploymentSpace space;
 
     @Before
     public void setUp() throws Exception {
+        space = new TestUtils.FileReader().getDeploymentSpace();
         points = new TestUtils.FileReader().getOutputSpacePoints();
-        DecisionTreeLeafNode node = new DecisionTreeLeafNode(points, new TestUtils.FileReader().getDeploymentSpace());
-        separator = new Abstract2DSeparator(node) {
-            @Override
-            protected double estimate(CandidateSolution pair) {
-                return new Random().nextDouble();
-            }
-        };
-        separator.separate();
+        DecisionTreeLeafNode leaf = new DecisionTreeLeafNode(points, space);
+
+        separator = new SASeparator(leaf);
+        separator.setScriptPath("src/main/scripts/rscripts/gensa.R");
     }
 
     @Test
-    public void testPointsCount() throws Exception {
-        // |L| + |R| should be equal to points.size()
-        if(separator.getResult()!=null) {
-            int pointsCount = 0;
-            pointsCount +=separator.getResult().getLeftChild().castToLeaf().getPoints().size();
-            pointsCount +=separator.getResult().getRightChild().castToLeaf().getPoints().size();
-            assertEquals(pointsCount, points.size());
-        }
-
+    public void separate() throws Exception {
+        separator.separate();
     }
 }

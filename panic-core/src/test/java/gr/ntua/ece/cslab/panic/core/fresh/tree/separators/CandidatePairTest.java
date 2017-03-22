@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
 public class CandidatePairTest {
 
     private List<OutputSpacePoint> points;
-    private Separator.CandidateSolution pair;
+    private Abstract2DSeparator.CandidateSolution pair;
 
     @Before
     public void setUp() throws Exception {
@@ -54,7 +54,7 @@ public class CandidatePairTest {
         while (p1.equals(p2)) {
             p2 = points.get(random.nextInt(points.size())).getInputSpacePoint();
         }
-        pair = new Separator.CandidateSolution(points, new TestUtils.FileReader().getDeploymentSpace(), new SplitLine(p1, p2, randomDimension1, randomDimension2));
+        pair = new Abstract2DSeparator.CandidateSolution(points, new TestUtils.FileReader().getDeploymentSpace(), new SplitLine(p1, p2, randomDimension1, randomDimension2));
     }
 
     @Test

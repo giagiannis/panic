@@ -26,7 +26,7 @@ import java.util.*;
  * Separators that targets to separate the original leaf node wrt minimizing the variance of the output variable.
  * Created by Giannis Giannakopoulos on 2/11/16.
  */
-public class VarianceSeparator extends Separator {
+public class VarianceSeparator extends Abstract2DSeparator {
 
     public VarianceSeparator(DecisionTreeLeafNode original) {
         super(original);

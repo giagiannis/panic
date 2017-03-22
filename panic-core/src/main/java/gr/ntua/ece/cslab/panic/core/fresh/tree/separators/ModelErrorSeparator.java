@@ -22,11 +22,11 @@ import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 
 /**
- * Separator that looks to partition the space in such a way that
+ * Abstract2DSeparator that looks to partition the space in such a way that
  * the error of the two trained models is minimized.
  * Created by Giannis Giannakopoulos on 2/24/16.
  */
-public class ModelErrorSeparator extends Separator{
+public class ModelErrorSeparator extends Abstract2DSeparator {
     /**
      * Default constructor
      *
