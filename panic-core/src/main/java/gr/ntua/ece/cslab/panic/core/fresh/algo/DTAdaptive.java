@@ -47,10 +47,10 @@ public class DTAdaptive extends DTAlgorithm {
                       String separatorType, Properties separatorProperties,
                       String budgetType, Properties budgetProperties,
 //                      String selectorType, Properties selectorProperties,
-                      String analyzerType, Properties analyzerProperties) {
+                      String analyzerType, Properties analyzerProperties, int numberOfThreads) {
         super(deploymentBudget, samplerType, source, separatorType, separatorProperties, budgetType, budgetProperties,
 //                selectorType, selectorProperties,
-                analyzerType, analyzerProperties);
+                analyzerType, analyzerProperties, numberOfThreads);
         this.treePathsToIgnore = new HashSet<>();
     }
 
@@ -74,6 +74,8 @@ public class DTAdaptive extends DTAlgorithm {
             tree = this.tree.clone();
         }
 
+
+//        System.out.printf("DEBUG FROM GGIAN:\n%s\n", this.tree.toString());
         start = System.currentTimeMillis();
         debugPrint(String.format("Step %d: Creating budget object...\t\t", this.steps));
         BudgetFactory factory = new BudgetFactory();

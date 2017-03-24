@@ -13,5 +13,6 @@ export JAR="target/classes"
 
 #[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.client.Main"
 [ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.fresh.client.AlgorithmExecutor"
+#[ "$CLASS" == "" ] && export CLASS="gr.ntua.ece.cslab.panic.core.fresh.client.AlgorithmPrinter"
 
 java -cp $CLASSPATH:$JAR $CLASS  $@

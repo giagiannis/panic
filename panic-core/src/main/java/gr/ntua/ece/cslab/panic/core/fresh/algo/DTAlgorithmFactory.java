@@ -40,7 +40,8 @@ public class DTAlgorithmFactory {
             CONF_SELECTOR_TYPE_KEY ="selector.type",
             CONF_SELECTOR_PREFIX  ="selector",
             CONF_ANALYZER_TYPE_KEY="analyzer.type",
-            CONF_ANALYZER_PREFIX="analyzer";
+            CONF_ANALYZER_PREFIX="analyzer",
+            CONF_THREADS_KEY="threads";
 
     public DTAlgorithm create(String type, Properties properties) {
         DTAlgorithm algorithm = null;
@@ -59,6 +60,10 @@ public class DTAlgorithmFactory {
 //        String selectorType = properties.getProperty(CONF_SELECTOR_TYPE_KEY);
 //        Properties selectorProperties = this.isolateProperties(properties, CONF_SELECTOR_PREFIX+"."+properties.getProperty(CONF_SELECTOR_TYPE_KEY));
 
+        System.out.println(properties);
+        int numberOfTheads = 1;
+        numberOfTheads = new Integer(properties.getProperty("threads"));
+//        System.exit(1);
         String analyzerType = properties.getProperty(CONF_ANALYZER_TYPE_KEY);
         Properties analyzerProperties = this.isolateProperties(properties, CONF_ANALYZER_PREFIX+"."+properties.getProperty(CONF_ANALYZER_TYPE_KEY));
         switch (type) {
@@ -66,7 +71,7 @@ public class DTAlgorithmFactory {
                 algorithm = new DTAdaptive(deploymentBudget, samplerType, source,
                         separatorType, separatorProperties,
                         budgetType, budgetProperties,
-                        analyzerType, analyzerProperties);
+                        analyzerType, analyzerProperties, numberOfTheads);
                 break;
             default:
                 break;

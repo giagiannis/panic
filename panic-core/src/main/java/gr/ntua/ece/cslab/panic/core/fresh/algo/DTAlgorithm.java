@@ -24,12 +24,14 @@ import gr.ntua.ece.cslab.panic.core.fresh.structs.DeploymentSpace;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.DecisionTree;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeLeafNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeNode;
+import gr.ntua.ece.cslab.panic.core.fresh.tree.nodes.DecisionTreeTestNode;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.Abstract2DSeparator;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.Separator;
 import gr.ntua.ece.cslab.panic.core.fresh.tree.separators.SeparatorFactory;
 import gr.ntua.ece.cslab.panic.core.models.LinearRegression;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Interface representating the algorith API
@@ -52,11 +54,12 @@ public abstract class DTAlgorithm {
     protected final Properties separatorProperties;
     protected DecisionTree bestTree;
     protected boolean onlineTraining;
+    protected int numberOfThreads;
 
     public DTAlgorithm(int deploymentBudget, String samplerType, MetricSource source,
                        String separatorType, Properties separatorProperties,
                        String budgetType, Properties budgetProperties,
-                       String analyzerType, Properties analyzerProperties) {
+                       String analyzerType, Properties analyzerProperties, int numberOfThreads) {
         this.deploymentBudget = deploymentBudget;
         this.samplerType = samplerType;
         this.source = source;
@@ -69,6 +72,7 @@ public abstract class DTAlgorithm {
         this.budgetProperties = budgetProperties;
         this.analyzerType = analyzerType;
         this.analyzerProperties = analyzerProperties;
+        this.numberOfThreads = numberOfThreads;
     }
 
     // getters and setters
@@ -232,15 +236,51 @@ public abstract class DTAlgorithm {
         DecisionTree tree = original.clone();
 
         ReplacementCouples couples = new ReplacementCouples();
+        // parallel section
+        ExecutorService fixedPool = Executors.newFixedThreadPool(this.numberOfThreads);
+        String separatorType  = this.separatorType;
+        Properties separatorProperties = this.separatorProperties;
+        List<Future<Map.Entry<DecisionTreeNode, DecisionTreeNode>>> futuresList = new LinkedList<>();
         for (DecisionTreeLeafNode leaf : tree.getLeaves()) {
-            SeparatorFactory factory = new SeparatorFactory();
-            Separator separator = factory.create(this.separatorType, leaf, this.separatorProperties);
-            separator.separate();
-            if (separator.getResult() != null) {
-                couples.addCouple(leaf, separator.getResult());
+            Callable<Map.Entry<DecisionTreeNode, DecisionTreeNode>> aCallable = () -> {
+//                System.out.println("Started!");
+                SeparatorFactory factory = new SeparatorFactory();
+                Separator separator = factory.create(separatorType, leaf, separatorProperties);
+                separator.separate();
+                return new AbstractMap.SimpleEntry<>(leaf, separator.getResult());
+            };
+            futuresList.add(fixedPool.submit(aCallable));
+        }
+        fixedPool.shutdown();
+//        System.out.println("Shutting down");
+        try {
+            fixedPool.awaitTermination(60, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        System.out.println("Terminated!");
+        for (Future<Map.Entry<DecisionTreeNode,DecisionTreeNode>> f: futuresList) {
+            try {
+                if(f.get().getValue()!=null ) {
+                    couples.addCouple(f.get().getKey(), f.get().getValue());
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
         }
+        // end of parallel section
 
+//            serialized code
+//        for (DecisionTreeLeafNode leaf : tree.getLeaves()) {
+//            SeparatorFactory factory = new SeparatorFactory();
+//            Separator separator = factory.create(this.separatorType, leaf, this.separatorProperties);
+//            separator.separate();
+//            if (separator.getResult() != null) {
+//                couples.addCouple(leaf, separator.getResult());
+//            }
+//        }
         for (DecisionTreeNode t : couples.getOriginalNodes()) {
             tree.replaceNode(t, couples.getNode(t));
         }

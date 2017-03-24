@@ -203,7 +203,7 @@ public class AlgorithmPrinter extends Client{
 //            double minX2, maxX2;
 //            maxX2 = leaf.getDeploymentSpace().getPoints().parallelStream().mapToDouble(a -> a.getValue("x2")).max().getAsDouble();
 //            minX2 = leaf.getDeploymentSpace().getPoints().parallelStream().mapToDouble(a -> a.getValue("x2")).min().getAsDouble();
-
+//
 //            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1, minX2, 0.0, maxX2 - minX2);
 //            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", maxX1, minX2, 0.0, maxX2 - minX2);
 //            cuts.format("%.3f\t%.3f\t%.3f\t%.3f\n", minX1, minX2, maxX1 - minX1, 0.0);
@@ -217,7 +217,7 @@ public class AlgorithmPrinter extends Client{
 
             for(SplitLine s : borderLines) {
                 for(InputSpacePoint p : leaf.getDeploymentSpace().getPoints()) {
-                    if(SplitLine.fuzzyCompare(s, p, 0.02)==0) {
+                    if(SplitLine.fuzzyCompare(s, p, .1)==0) {
                         cuts.format("%.5f\t%.5f\n", p.getValue("x1"), p.getValue("x2"));
                     }
                 }

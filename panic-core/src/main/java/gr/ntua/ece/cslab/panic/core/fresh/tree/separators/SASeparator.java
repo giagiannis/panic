@@ -44,6 +44,7 @@ public class SASeparator implements Separator{
      */
     public SASeparator(DecisionTreeLeafNode node) {
         this.input = node;
+        this.result = null;
         if(this.input.getPoints().size()>0) {
             this.keyOrdering = this.input.getPoints().get(0).getInputSpacePoint().getKeysAsCollection().parallelStream().collect(Collectors.toList());
         }
@@ -55,7 +56,8 @@ public class SASeparator implements Separator{
 
     @Override
     public void separate() {
-        if (this.input.getPoints().size()<=0) {
+        // if the number of points is zero or less than twice the dimensionality of the space then do nothing
+        if (this.input.getPoints().size()==0 || this.input.getPoints().size()<=this.input.getPoints().get(0).getInputSpacePoint().getValuesAsCollection().size()*2) {
             return;
         }
         String tempFileName="/tmp/file-"+Integer.toHexString(new Random().nextInt())+".csv";
@@ -80,10 +82,12 @@ public class SASeparator implements Separator{
                     parallelStream().
                     filter(u->!line.lessOrEqual(u)).
                     collect(Collectors.toSet());
-            this.result = new DecisionTreeTestNode(
-                    line,   this.input.getDeploymentSpace(),
-                    new DecisionTreeLeafNode(left,  new DeploymentSpace(leftDS)),
-                    new DecisionTreeLeafNode(right, new DeploymentSpace(rightDS)));
+            if(left.size() > 0 && right.size() > 0) {
+                this.result = new DecisionTreeTestNode(
+                        line, this.input.getDeploymentSpace(),
+                        new DecisionTreeLeafNode(left, new DeploymentSpace(leftDS)),
+                        new DecisionTreeLeafNode(right, new DeploymentSpace(rightDS)));
+            } // else the result remains null
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

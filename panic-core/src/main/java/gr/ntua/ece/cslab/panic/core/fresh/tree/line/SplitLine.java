@@ -91,7 +91,11 @@ public class SplitLine {
     }
 
     public static int fuzzyCompare(SplitLine line, InputSpacePoint p, Double epsilon) {
-            return new Double(Math.abs(line.getLineValue(p))).compareTo(epsilon);
+        Double abs = Math.abs(line.getLineValue(p));
+        if(abs < epsilon) {
+            return 0;
+        }
+        return abs.compareTo(0.0);
     }
 
     private Double getLineValue(InputSpacePoint p) {
